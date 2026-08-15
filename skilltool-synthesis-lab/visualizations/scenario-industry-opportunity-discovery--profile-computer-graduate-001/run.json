@@ -1,0 +1,4290 @@
+{
+  "run_id": "run-20260815-111828-a791494a",
+  "model_mode": "gpt-5.6-sol-offline-simulation",
+  "inputs": {
+    "profile": {
+      "profile_id": "profile-computer-graduate-001",
+      "profile_version": "2.0",
+      "identity": {
+        "persona": "计算机专业硕士研究生",
+        "location": "中国",
+        "languages": [
+          "中文",
+          "英文技术阅读"
+        ],
+        "graduation_window": "12-18个月"
+      },
+      "education": {
+        "degree": "硕士在读",
+        "major": "计算机科学与技术",
+        "coursework": [
+          "机器学习",
+          "数据结构",
+          "软件工程",
+          "自然语言处理"
+        ],
+        "research_mode": "应用研究为主",
+        "evidence_confidence": "medium"
+      },
+      "capability_evidence": [
+        {
+          "capability": "Python",
+          "level": "applied",
+          "evidence": [
+            "课程项目",
+            "研究代码"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "capability": "PyTorch",
+          "level": "applied",
+          "evidence": [
+            "模型训练实验"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "capability": "软件开发",
+          "level": "foundational",
+          "evidence": [
+            "问答原型"
+          ],
+          "confidence": "low"
+        },
+        {
+          "capability": "研究与分析",
+          "level": "applied",
+          "evidence": [
+            "论文检索",
+            "实验设计",
+            "技术报告"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "capability": "商业问题理解",
+          "level": "unknown",
+          "evidence": [],
+          "confidence": "low"
+        }
+      ],
+      "experience": {
+        "internships": [],
+        "projects": [
+          {
+            "name": "图像分类课程项目",
+            "role": "独立完成",
+            "outcome_evidence": "课程验收",
+            "transferability": "unvalidated"
+          },
+          {
+            "name": "校园知识库问答原型",
+            "role": "方案与实现",
+            "outcome_evidence": "可运行原型",
+            "transferability": "unvalidated"
+          }
+        ],
+        "public_outputs": [],
+        "collaboration_exposure": "limited"
+      },
+      "motivations_and_values": {
+        "motivators": [
+          "解决复杂问题",
+          "持续学习",
+          "工作成果可见"
+        ],
+        "values": [
+          "成长反馈",
+          "工作自主性",
+          "有意义的产品或研究影响"
+        ],
+        "anti_preferences": [
+          "长期重复性工作",
+          "完全缺少反馈的环境"
+        ],
+        "confidence": "medium"
+      },
+      "work_preferences": {
+        "locations": [
+          "上海",
+          "杭州",
+          "深圳"
+        ],
+        "organization_types": [
+          "成长型公司",
+          "成熟科技公司",
+          "研究型组织"
+        ],
+        "work_modes": [
+          "需要一定技术深度",
+          "允许跨职能协作"
+        ],
+        "risk_tolerance": "medium",
+        "compensation_priority": "important_but_not_primary"
+      },
+      "learning_and_decision_style": {
+        "learning_style": [
+          "通过项目学习",
+          "先建立框架再深入"
+        ],
+        "decision_style": "先发散收集证据，再用小实验收敛",
+        "common_biases": [
+          "容易把专业背景当成唯一方向",
+          "可能高估课程项目的岗位迁移性"
+        ],
+        "feedback_preference": "具体、基于证据、可以转化为行动"
+      },
+      "life_context_and_constraints": {
+        "time_budget_per_week": "8-12小时用于职业探索",
+        "financial_runway": "未提供",
+        "mobility": "可考虑异地，但优先目标城市",
+        "hard_constraints": [
+          "需要在毕业前获得真实工作场景证据"
+        ],
+        "soft_constraints": [
+          "缺少正式实习",
+          "行业信息来源零散"
+        ]
+      },
+      "unknowns": [
+        "希望服务的业务问题与人群",
+        "研究、工程、产品、咨询等工作形态的真实偏好",
+        "能力在不同产业中的可迁移性",
+        "压力、协作和模糊环境下的表现",
+        "薪酬、稳定性、成长性之间的真实权重"
+      ],
+      "profile_boundaries": {
+        "facts_only": true,
+        "must_not_infer": [
+          "目标行业",
+          "目标岗位",
+          "目标赛道"
+        ],
+        "note": "专业和已有项目只是个人证据，不等于场景方向。"
+      }
+    },
+    "state": {
+      "state_id": "state-open-career-exploration-001",
+      "timestamp": "2026-08-15T00:00:00+08:00",
+      "career_stage": "graduate_exploration",
+      "decision_phase": "divergent",
+      "current_goal": "形成跨行业、跨岗位族的可比较机会地图，并确定下一轮验证范围",
+      "target_domain_status": "open",
+      "explicit_target_domains": [],
+      "available_evidence": [
+        "教育与项目经历",
+        "初步地点和组织偏好",
+        "能力自评及部分项目证据"
+      ],
+      "missing_evidence": [
+        "不同工作形态的体验证据",
+        "跨行业岗位样本",
+        "目标组织的一手信息",
+        "能力迁移性验证",
+        "个人决策权重"
+      ],
+      "active_hypotheses": [
+        {
+          "hypothesis": "技术背景可以迁移到多个产业和职能",
+          "status": "untested"
+        },
+        {
+          "hypothesis": "比起具体技术标签，工作内容和成长环境可能更影响长期匹配",
+          "status": "untested"
+        }
+      ],
+      "completed_tasks": [],
+      "decision_horizon": "8周内形成2-3个需要深入验证的机会方向",
+      "state_boundaries": {
+        "do_not_default_to_major": true,
+        "domain_requires_explicit_scenario_input": true
+      }
+    },
+    "scenario": {
+      "scenario_id": "scenario-industry-opportunity-discovery",
+      "scenario_version": "2.0",
+      "name": "行业探索与机会发现",
+      "objective": "在不预设用户专业对应行业的前提下，构建跨行业、岗位族、组织和具体机会的可比较探索空间，并形成下一轮验证组合。",
+      "trigger": "用户处于方向发散或重新定位阶段，尚未通过明确证据锁定目标领域。",
+      "target_domain": {
+        "mode": "open",
+        "explicit_domains": [],
+        "selection_rule": "仅当场景显式提供领域时才限定领域；否则保持跨领域探索，禁止从画像专业、项目或技能推断目标行业。",
+        "breadth": "先比较产业问题、工作形态和岗位族，再选择需要深入的领域"
+      },
+      "scene_dimensions": [
+        "职业阶段与决策成熟度",
+        "个人价值、动机、约束和证据",
+        "产业问题与价值链位置",
+        "工作形态与岗位族",
+        "组织类型与团队环境",
+        "地域、薪酬、成长性和风险",
+        "真实机会与进入窗口",
+        "能力迁移性与证据缺口",
+        "信息访谈、项目、实习等验证实验"
+      ],
+      "scope": {
+        "include": [
+          "识别职业阶段、决策约束和信息缺口",
+          "形成跨行业、跨职能的探索假设",
+          "比较产业问题、价值链和组织生态",
+          "比较岗位族、工作内容和进入路径",
+          "发现雇主、团队、项目、实习和岗位信号",
+          "映射能力证据及跨领域迁移性",
+          "按个人权重、证据质量和可逆性进行机会组合排序",
+          "设计低成本验证实验和停止规则"
+        ],
+        "exclude": [
+          "根据专业自动限定行业或岗位",
+          "代替用户做最终职业决定",
+          "无数据依据地预测录用概率或行业增长",
+          "把一次探索直接扩张为长期学习计划",
+          "直接修改主应用状态"
+        ]
+      },
+      "required_outputs": [
+        "职业阶段、约束与未知项摘要",
+        "跨领域探索假设集合",
+        "产业问题与价值链机会地图",
+        "岗位族、工作形态与要求矩阵",
+        "组织生态与具体机会清单",
+        "能力迁移性和证据缺口矩阵",
+        "带来源、置信度和敏感性的机会组合",
+        "下一轮验证实验及更新决策的规则"
+      ],
+      "quality_preferences": {
+        "coverage": "high",
+        "cross_domain_comparison": "required_when_target_open",
+        "evidence_grounding": "required",
+        "uncertainty_visible": true,
+        "profile_scenario_leakage": "reject",
+        "max_skill_candidates": 12,
+        "target_skill_candidates": 8
+      }
+    }
+  },
+  "skilltool_template": {
+    "skill_id": "snake_case_unique_id",
+    "skill_name": "kebab-case-runtime-name",
+    "tool_name": "PascalCaseCallableName",
+    "title": "面向用户的名称",
+    "business_goal": "一个有意义、可验证、边界明确的业务结果",
+    "when_to_use": "触发条件，以及不应使用的边界",
+    "task_ids": [
+      "covered_task_id"
+    ],
+    "scenario_binding": {
+      "domain_source": "scenario_only",
+      "domain_mode": "open|explicit",
+      "explicit_domains": [],
+      "profile_role": "evidence_only"
+    },
+    "scope": {
+      "includes": [
+        "负责内容"
+      ],
+      "excludes": [
+        "明确不负责的内容"
+      ]
+    },
+    "input_schema": {
+      "field_name": {
+        "type": "object",
+        "required": true,
+        "description": "字段语义",
+        "source": "profile|state|scenario|user_input|external_data|prior_skill_output",
+        "available": true
+      }
+    },
+    "output_schema": {
+      "result_field": {
+        "type": "object",
+        "description": "可被直接消费的结构化结果"
+      }
+    },
+    "output_consumers": [
+      "user_decision|another-skilltool|external_system"
+    ],
+    "tool_selection": [
+      {
+        "tool_name": "WebSearch",
+        "usage_mode": "conditional",
+        "reason": "只有需要补齐最新公开证据时才搜索",
+        "condition": "输入未提供足够且新鲜的外部证据",
+        "fallback": "返回 insufficient_input，并列出缺失证据"
+      }
+    ],
+    "child_tools": [
+      "WebSearch"
+    ],
+    "fresh_data_policy": "none|optional|required",
+    "complexity": {
+      "level": "bounded",
+      "estimated_steps": 4,
+      "rationale": "为什么不是简单包装，也不应继续拆分"
+    },
+    "independence": {
+      "portable": true,
+      "assumptions": [
+        "仅依赖输入契约、外部模型 API 和已选普通工具"
+      ]
+    },
+    "evaluation_cases": [
+      {
+        "case": "输入完整",
+        "expected_outcome": "success"
+      }
+    ]
+  },
+  "tool_catalog": {
+    "catalog_version": "2026-08-15",
+    "source_of_truth": "CrescoAI-Backend/backend/src/tools.ts#getAllBaseTools",
+    "snapshot_policy": "独立快照，不在运行时导入主程序；项目工具变化后需显式刷新此文件。",
+    "selection_policy": {
+      "default": "none",
+      "rule": "SkillTool 只能选择完成业务目标确实需要的工具；不因工具存在而选用。",
+      "usage_modes": [
+        "required",
+        "optional",
+        "conditional"
+      ],
+      "conditional_requirement": "usage_mode=conditional 时必须给出 condition；optional 也必须说明收益和不用时的降级路径。"
+    },
+    "excluded_recursive_tools": [
+      {
+        "name": "Skill",
+        "reason": "SkillTool 内再次调用 Skill 会形成递归嵌套"
+      },
+      {
+        "name": "discover_skills",
+        "reason": "运行时发现并调用 Skill，属于递归入口"
+      },
+      {
+        "name": "ReturnSkillResult",
+        "reason": "Harness 内部完成协议，不属于候选辅助工具"
+      },
+      {
+        "name": "generatedSkillActionTools",
+        "reason": "由 Skill 合成得到的动作工具集合"
+      },
+      {
+        "name": "BaselineAssessment",
+        "reason": "已生成的 SkillActionTool 示例"
+      }
+    ],
+    "tools": [
+      {
+        "name": "Agent",
+        "category": "delegation",
+        "description": "启动通用子代理处理独立任务。",
+        "availability": "base"
+      },
+      {
+        "name": "TaskOutput",
+        "category": "delegation",
+        "description": "读取后台任务或子代理输出。",
+        "availability": "base"
+      },
+      {
+        "name": "Bash",
+        "category": "execution",
+        "description": "执行受控 shell 命令。",
+        "availability": "base_non_windows"
+      },
+      {
+        "name": "PowerShell",
+        "category": "execution",
+        "description": "在 Windows 环境执行受控 PowerShell 命令。",
+        "availability": "windows_conditional"
+      },
+      {
+        "name": "REPL",
+        "category": "execution",
+        "description": "执行交互式分析代码。",
+        "availability": "ant_only"
+      },
+      {
+        "name": "Read",
+        "category": "filesystem",
+        "description": "读取文本、代码、文档或图片文件。",
+        "availability": "base"
+      },
+      {
+        "name": "Write",
+        "category": "filesystem",
+        "description": "创建完整文件。",
+        "availability": "base"
+      },
+      {
+        "name": "Edit",
+        "category": "filesystem",
+        "description": "对现有文件做精确修改。",
+        "availability": "base"
+      },
+      {
+        "name": "Glob",
+        "category": "filesystem",
+        "description": "按路径模式查找文件。",
+        "availability": "base_when_no_embedded_search"
+      },
+      {
+        "name": "Grep",
+        "category": "filesystem",
+        "description": "在文件中搜索文本。",
+        "availability": "base_when_no_embedded_search"
+      },
+      {
+        "name": "NotebookEdit",
+        "category": "filesystem",
+        "description": "编辑 Jupyter notebook 单元格。",
+        "availability": "base"
+      },
+      {
+        "name": "LSP",
+        "category": "code_intelligence",
+        "description": "查询代码符号、定义和引用。",
+        "availability": "feature_flag"
+      },
+      {
+        "name": "WebSearch",
+        "category": "web",
+        "description": "搜索公开网络并返回带来源的结果。",
+        "availability": "base"
+      },
+      {
+        "name": "WebFetch",
+        "category": "web",
+        "description": "读取指定网页内容。",
+        "availability": "base"
+      },
+      {
+        "name": "WebBrowser",
+        "category": "web",
+        "description": "操作浏览器完成需要交互的网页任务。",
+        "availability": "feature_flag"
+      },
+      {
+        "name": "ListMcpResourcesTool",
+        "category": "mcp",
+        "description": "列出已连接 MCP 服务的资源。",
+        "availability": "base"
+      },
+      {
+        "name": "ReadMcpResourceTool",
+        "category": "mcp",
+        "description": "读取一个明确的 MCP 资源。",
+        "availability": "base"
+      },
+      {
+        "name": "ToolSearch",
+        "category": "discovery",
+        "description": "按需发现延迟加载的普通工具；不得用于发现 Skill。",
+        "availability": "tool_search_enabled"
+      },
+      {
+        "name": "AskUserQuestion",
+        "category": "interaction",
+        "description": "关键输入缺失时向用户提出结构化问题。",
+        "availability": "base"
+      },
+      {
+        "name": "SendUserMessage",
+        "category": "interaction",
+        "description": "向用户发送阶段性消息或请求。",
+        "availability": "base"
+      },
+      {
+        "name": "send_user_file",
+        "category": "interaction",
+        "description": "向用户交付生成文件。",
+        "availability": "kairos"
+      },
+      {
+        "name": "PushNotification",
+        "category": "interaction",
+        "description": "发送异步推送通知。",
+        "availability": "kairos"
+      },
+      {
+        "name": "ImageGenerate",
+        "category": "media",
+        "description": "根据提示生成或编辑图片。",
+        "availability": "base"
+      },
+      {
+        "name": "VideoGenerate",
+        "category": "media",
+        "description": "根据提示生成视频。",
+        "availability": "base"
+      },
+      {
+        "name": "terminal_capture",
+        "category": "media",
+        "description": "捕获终端面板内容。",
+        "availability": "feature_flag"
+      },
+      {
+        "name": "TodoWrite",
+        "category": "task_management",
+        "description": "维护轻量任务清单。",
+        "availability": "base_legacy_tasks"
+      },
+      {
+        "name": "TaskCreate",
+        "category": "task_management",
+        "description": "创建持久任务。",
+        "availability": "todo_v2"
+      },
+      {
+        "name": "TaskGet",
+        "category": "task_management",
+        "description": "读取任务详情。",
+        "availability": "todo_v2"
+      },
+      {
+        "name": "TaskUpdate",
+        "category": "task_management",
+        "description": "更新任务状态或属性。",
+        "availability": "todo_v2"
+      },
+      {
+        "name": "TaskList",
+        "category": "task_management",
+        "description": "列出任务。",
+        "availability": "todo_v2"
+      },
+      {
+        "name": "TaskStop",
+        "category": "task_management",
+        "description": "停止后台任务。",
+        "availability": "base"
+      },
+      {
+        "name": "EnterPlanMode",
+        "category": "workflow_control",
+        "description": "进入规划模式。",
+        "availability": "base"
+      },
+      {
+        "name": "ExitPlanMode",
+        "category": "workflow_control",
+        "description": "提交并退出规划模式。",
+        "availability": "base"
+      },
+      {
+        "name": "verify_plan_execution",
+        "category": "workflow_control",
+        "description": "验证计划执行结果。",
+        "availability": "environment_flag"
+      },
+      {
+        "name": "workflow",
+        "category": "workflow_control",
+        "description": "运行项目工作流脚本。",
+        "availability": "feature_flag"
+      },
+      {
+        "name": "EnterWorktree",
+        "category": "workspace",
+        "description": "创建或进入隔离工作树。",
+        "availability": "worktree_mode"
+      },
+      {
+        "name": "ExitWorktree",
+        "category": "workspace",
+        "description": "退出隔离工作树。",
+        "availability": "worktree_mode"
+      },
+      {
+        "name": "Config",
+        "category": "configuration",
+        "description": "读取或修改运行配置。",
+        "availability": "ant_only"
+      },
+      {
+        "name": "tungsten",
+        "category": "internal_service",
+        "description": "调用 Tungsten 服务。",
+        "availability": "ant_only"
+      },
+      {
+        "name": "SendMessage",
+        "category": "multi_agent",
+        "description": "向现有代理或队友发送消息。",
+        "availability": "base"
+      },
+      {
+        "name": "TeamCreate",
+        "category": "multi_agent",
+        "description": "创建代理团队。",
+        "availability": "agent_swarms"
+      },
+      {
+        "name": "TeamDelete",
+        "category": "multi_agent",
+        "description": "删除代理团队。",
+        "availability": "agent_swarms"
+      },
+      {
+        "name": "Sleep",
+        "category": "scheduling",
+        "description": "等待外部状态或指定时间。",
+        "availability": "proactive_or_kairos"
+      },
+      {
+        "name": "CronCreate",
+        "category": "scheduling",
+        "description": "创建定时任务。",
+        "availability": "agent_triggers"
+      },
+      {
+        "name": "CronDelete",
+        "category": "scheduling",
+        "description": "删除定时任务。",
+        "availability": "agent_triggers"
+      },
+      {
+        "name": "CronList",
+        "category": "scheduling",
+        "description": "列出定时任务。",
+        "availability": "agent_triggers"
+      },
+      {
+        "name": "RemoteTrigger",
+        "category": "scheduling",
+        "description": "创建远程触发器。",
+        "availability": "remote_triggers"
+      },
+      {
+        "name": "Monitor",
+        "category": "monitoring",
+        "description": "持续监控外部状态。",
+        "availability": "feature_flag"
+      },
+      {
+        "name": "SubscribePR",
+        "category": "monitoring",
+        "description": "订阅 GitHub PR 事件。",
+        "availability": "github_webhooks"
+      },
+      {
+        "name": "SuggestBackgroundPR",
+        "category": "development",
+        "description": "建议把变更转为后台 PR。",
+        "availability": "ant_only"
+      },
+      {
+        "name": "snip",
+        "category": "conversation",
+        "description": "裁剪不再需要的历史上下文。",
+        "availability": "feature_flag"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "stage": "demand_analysis",
+      "status": "completed",
+      "duration_ms": 0
+    },
+    {
+      "stage": "task_synthesis",
+      "status": "completed",
+      "duration_ms": 0
+    },
+    {
+      "stage": "candidate_synthesis",
+      "status": "completed",
+      "duration_ms": 0
+    },
+    {
+      "stage": "dedupe_merge",
+      "status": "completed",
+      "duration_ms": 0
+    },
+    {
+      "stage": "quality_gate",
+      "status": "completed",
+      "duration_ms": 3
+    }
+  ],
+  "demand_analysis": {
+    "scenario_interpretation": {
+      "scenario_goal": "在目标领域开放时形成跨行业、岗位族和组织的机会探索空间",
+      "domain_mode": "open",
+      "explicit_domains": [],
+      "profile_facts_used_as_evidence": [
+        "教育经历",
+        "能力证据",
+        "价值偏好",
+        "生活约束"
+      ],
+      "forbidden_profile_to_scenario_inferences": [
+        "由计算机专业推断目标行业为AI",
+        "由RAG项目推断目标岗位为大模型工程师"
+      ]
+    },
+    "decision_context": {
+      "stage": "graduate_exploration",
+      "primary_decision": "形成2-3个跨领域、值得进一步验证的工作与机会组合",
+      "constraints": [
+        "缺少正式实习",
+        "目标领域开放",
+        "市场信息需要刷新"
+      ],
+      "known_evidence": [
+        "计算机硕士教育背景",
+        "技术项目",
+        "价值偏好",
+        "地点与组织偏好"
+      ],
+      "missing_evidence": [
+        "跨行业岗位样本",
+        "不同工作形态体验",
+        "能力证据的跨领域迁移性"
+      ],
+      "success_definition": [
+        "机会空间覆盖完整",
+        "结论可追溯到证据",
+        "形成可比较的优先级",
+        "给出低成本验证任务"
+      ]
+    },
+    "needs": [
+      {
+        "need_id": "career_stage_clarity",
+        "business_need": "识别当前职业决策阶段和约束",
+        "why_now": "决定探索任务的粒度",
+        "decision_enabled": "选择发散、收敛或验证策略",
+        "evidence_required": [
+          "教育阶段",
+          "经历",
+          "决策期限"
+        ],
+        "priority": "must"
+      },
+      {
+        "need_id": "direction_hypotheses",
+        "business_need": "形成多条跨行业、跨职能且可验证的职业假设",
+        "why_now": "避免把专业当成唯一方向",
+        "decision_enabled": "选择后续探索范围",
+        "evidence_required": [
+          "能力",
+          "动机",
+          "偏好",
+          "约束"
+        ],
+        "priority": "must"
+      },
+      {
+        "need_id": "market_landscape",
+        "business_need": "比较产业问题、价值链和组织生态",
+        "why_now": "目标领域尚未显式确定",
+        "decision_enabled": "选择需要深入的产业问题",
+        "evidence_required": [
+          "当前产业资料",
+          "组织与产品信号"
+        ],
+        "priority": "must"
+      },
+      {
+        "need_id": "role_landscape",
+        "business_need": "比较不同工作形态、岗位族及真实要求",
+        "why_now": "职能偏好尚未通过体验验证",
+        "decision_enabled": "形成岗位族组合",
+        "evidence_required": [
+          "岗位定义",
+          "工作内容",
+          "JD样本"
+        ],
+        "priority": "must"
+      },
+      {
+        "need_id": "opportunity_inventory",
+        "business_need": "发现具体雇主和岗位机会",
+        "why_now": "需要把方向转成可行动对象",
+        "decision_enabled": "建立机会池",
+        "evidence_required": [
+          "招聘页面",
+          "岗位链接",
+          "地点"
+        ],
+        "priority": "should"
+      },
+      {
+        "need_id": "fit_evidence",
+        "business_need": "把个人证据映射到岗位要求",
+        "why_now": "识别可主张优势和未知项",
+        "decision_enabled": "判断哪些机会值得验证",
+        "evidence_required": [
+          "项目证据",
+          "岗位要求"
+        ],
+        "priority": "must"
+      },
+      {
+        "need_id": "portfolio_priority",
+        "business_need": "按匹配、成长性、可进入性和偏好排序",
+        "why_now": "把发散结果收敛为2-3条路径",
+        "decision_enabled": "确定验证优先级",
+        "evidence_required": [
+          "方向、岗位、机会、证据"
+        ],
+        "priority": "must"
+      },
+      {
+        "need_id": "validation_plan",
+        "business_need": "设计低成本验证任务",
+        "why_now": "当前证据不足以做最终选择",
+        "decision_enabled": "用新证据更新方向判断",
+        "evidence_required": [
+          "主要不确定性",
+          "可用时间"
+        ],
+        "priority": "should"
+      }
+    ]
+  },
+  "task_map": {
+    "tasks": [
+      {
+        "task_id": "career_stage_diagnosis",
+        "name": "职业阶段识别",
+        "scene": "行业探索与机会发现（目标领域开放）",
+        "business_goal": "判断当前处于发散、收敛还是验证阶段",
+        "need_ids": [],
+        "inputs": [
+          {
+            "name": "upstream_context",
+            "source": "profile",
+            "available": true,
+            "from_task": null
+          }
+        ],
+        "outputs": [
+          {
+            "name": "career_stage_diagnosis_result",
+            "consumer_tasks": [
+              "direction_hypothesis_formation"
+            ],
+            "final_consumer": null
+          }
+        ],
+        "dependencies": [],
+        "estimated_steps": 4,
+        "fresh_data_required": false
+      },
+      {
+        "task_id": "direction_hypothesis_formation",
+        "name": "跨领域假设形成",
+        "scene": "行业探索与机会发现（目标领域开放）",
+        "business_goal": "形成不受专业预设限制的职业方向集合",
+        "need_ids": [],
+        "inputs": [
+          {
+            "name": "upstream_context",
+            "source": "prior_output",
+            "available": true,
+            "from_task": "career_stage_diagnosis"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "direction_hypothesis_formation_result",
+            "consumer_tasks": [
+              "industry_problem_landscape",
+              "role_family_mapping"
+            ],
+            "final_consumer": null
+          }
+        ],
+        "dependencies": [
+          "career_stage_diagnosis"
+        ],
+        "estimated_steps": 4,
+        "fresh_data_required": false
+      },
+      {
+        "task_id": "industry_problem_landscape",
+        "name": "产业问题与价值链探索",
+        "scene": "行业探索与机会发现（目标领域开放）",
+        "business_goal": "形成跨行业问题、价值链位置和组织生态地图",
+        "need_ids": [],
+        "inputs": [
+          {
+            "name": "upstream_context",
+            "source": "prior_output",
+            "available": true,
+            "from_task": "direction_hypothesis_formation"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "industry_problem_landscape_result",
+            "consumer_tasks": [
+              "employer_segment_mapping"
+            ],
+            "final_consumer": null
+          }
+        ],
+        "dependencies": [
+          "direction_hypothesis_formation"
+        ],
+        "estimated_steps": 4,
+        "fresh_data_required": true
+      },
+      {
+        "task_id": "role_family_mapping",
+        "name": "岗位族与工作形态探索",
+        "scene": "行业探索与机会发现（目标领域开放）",
+        "business_goal": "比较研究、工程、产品、运营、咨询等工作形态",
+        "need_ids": [],
+        "inputs": [
+          {
+            "name": "upstream_context",
+            "source": "prior_output",
+            "available": true,
+            "from_task": "direction_hypothesis_formation"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "role_family_mapping_result",
+            "consumer_tasks": [
+              "opportunity_signal_discovery",
+              "capability_evidence_mapping"
+            ],
+            "final_consumer": null
+          }
+        ],
+        "dependencies": [
+          "direction_hypothesis_formation"
+        ],
+        "estimated_steps": 4,
+        "fresh_data_required": true
+      },
+      {
+        "task_id": "employer_segment_mapping",
+        "name": "组织生态探索",
+        "scene": "行业探索与机会发现（目标领域开放）",
+        "business_goal": "识别适配的组织类型、团队环境和代表组织",
+        "need_ids": [],
+        "inputs": [
+          {
+            "name": "upstream_context",
+            "source": "prior_output",
+            "available": true,
+            "from_task": "industry_problem_landscape"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "employer_segment_mapping_result",
+            "consumer_tasks": [
+              "opportunity_signal_discovery"
+            ],
+            "final_consumer": null
+          }
+        ],
+        "dependencies": [
+          "industry_problem_landscape"
+        ],
+        "estimated_steps": 4,
+        "fresh_data_required": true
+      },
+      {
+        "task_id": "opportunity_signal_discovery",
+        "name": "具体机会发现",
+        "scene": "行业探索与机会发现（目标领域开放）",
+        "business_goal": "形成带来源和时效的岗位机会池",
+        "need_ids": [],
+        "inputs": [
+          {
+            "name": "upstream_context",
+            "source": "prior_output",
+            "available": true,
+            "from_task": "role_family_mapping"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "opportunity_signal_discovery_result",
+            "consumer_tasks": [
+              "opportunity_fit_scoring"
+            ],
+            "final_consumer": null
+          }
+        ],
+        "dependencies": [
+          "role_family_mapping",
+          "employer_segment_mapping"
+        ],
+        "estimated_steps": 4,
+        "fresh_data_required": true
+      },
+      {
+        "task_id": "capability_evidence_mapping",
+        "name": "能力证据映射",
+        "scene": "行业探索与机会发现（目标领域开放）",
+        "business_goal": "将个人证据映射到岗位要求并标记未知项",
+        "need_ids": [],
+        "inputs": [
+          {
+            "name": "upstream_context",
+            "source": "prior_output",
+            "available": true,
+            "from_task": "role_family_mapping"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "capability_evidence_mapping_result",
+            "consumer_tasks": [
+              "opportunity_fit_scoring"
+            ],
+            "final_consumer": null
+          }
+        ],
+        "dependencies": [
+          "role_family_mapping"
+        ],
+        "estimated_steps": 4,
+        "fresh_data_required": false
+      },
+      {
+        "task_id": "opportunity_fit_scoring",
+        "name": "机会组合排序",
+        "scene": "行业探索与机会发现（目标领域开放）",
+        "business_goal": "对方向和机会进行多维比较并形成优先级",
+        "need_ids": [],
+        "inputs": [
+          {
+            "name": "upstream_context",
+            "source": "prior_output",
+            "available": true,
+            "from_task": "opportunity_signal_discovery"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "opportunity_fit_scoring_result",
+            "consumer_tasks": [
+              "exploration_experiment_design"
+            ],
+            "final_consumer": "decision"
+          }
+        ],
+        "dependencies": [
+          "opportunity_signal_discovery",
+          "capability_evidence_mapping"
+        ],
+        "estimated_steps": 4,
+        "fresh_data_required": false
+      },
+      {
+        "task_id": "exploration_experiment_design",
+        "name": "探索实验设计",
+        "scene": "行业探索与机会发现（目标领域开放）",
+        "business_goal": "为高优先级方向设计低成本验证任务",
+        "need_ids": [],
+        "inputs": [
+          {
+            "name": "upstream_context",
+            "source": "prior_output",
+            "available": true,
+            "from_task": "opportunity_fit_scoring"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "exploration_experiment_design_result",
+            "consumer_tasks": [],
+            "final_consumer": "decision"
+          }
+        ],
+        "dependencies": [
+          "opportunity_fit_scoring"
+        ],
+        "estimated_steps": 4,
+        "fresh_data_required": false
+      }
+    ],
+    "coverage": [
+      {
+        "required_output": "职业阶段与决策约束摘要",
+        "covered_by": [
+          "career_stage_diagnosis"
+        ]
+      },
+      {
+        "required_output": "候选方向集合",
+        "covered_by": [
+          "direction_hypothesis_formation"
+        ]
+      },
+      {
+        "required_output": "产业问题与价值链机会地图",
+        "covered_by": [
+          "industry_problem_landscape"
+        ]
+      },
+      {
+        "required_output": "岗位族、工作形态与要求矩阵",
+        "covered_by": [
+          "role_family_mapping"
+        ]
+      },
+      {
+        "required_output": "目标雇主与机会清单",
+        "covered_by": [
+          "employer_segment_mapping",
+          "opportunity_signal_discovery"
+        ]
+      },
+      {
+        "required_output": "优先级结果",
+        "covered_by": [
+          "opportunity_fit_scoring"
+        ]
+      },
+      {
+        "required_output": "下一轮验证任务",
+        "covered_by": [
+          "exploration_experiment_design"
+        ]
+      }
+    ]
+  },
+  "candidate_generation": {
+    "raw_count": 9,
+    "reviewed_count": 9,
+    "final_count": 9,
+    "raw_candidates": [
+      {
+        "skill_id": "career_stage_assessment",
+        "skill_name": "career-stage-assessment",
+        "tool_name": "CareerStageAssessment",
+        "title": "职业阶段识别",
+        "business_goal": "识别用户当前职业决策阶段、约束和需要解决的决策",
+        "when_to_use": "当需要识别用户当前职业决策阶段、约束和需要解决的决策时使用。",
+        "task_ids": [
+          "career_stage_diagnosis"
+        ],
+        "scenario_binding": {
+          "domain_source": "scenario_only",
+          "domain_mode": "open",
+          "explicit_domains": [],
+          "profile_role": "evidence_only"
+        },
+        "scope": {
+          "includes": [
+            "识别用户当前职业决策阶段、约束和需要解决的决策"
+          ],
+          "excludes": [
+            "生成岗位清单",
+            "推荐具体公司"
+          ]
+        },
+        "input_schema": {
+          "profile": {
+            "type": "object",
+            "required": true,
+            "description": "用户教育、能力、经历、偏好和约束画像",
+            "source": "profile",
+            "available": true
+          },
+          "state": {
+            "type": "object",
+            "required": true,
+            "description": "当前职业阶段、假设和决策状态",
+            "source": "state",
+            "available": true
+          }
+        },
+        "output_schema": {
+          "stage_assessment": {
+            "type": "object",
+            "description": "阶段、约束、证据和不确定性"
+          }
+        },
+        "output_consumers": [
+          "career-direction-hypothesis"
+        ],
+        "tool_selection": [],
+        "child_tools": [],
+        "fresh_data_policy": "none",
+        "complexity": {
+          "level": "bounded",
+          "estimated_steps": 4,
+          "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+        },
+        "independence": {
+          "portable": true,
+          "assumptions": [
+            "输入通过JSON契约提供",
+            "模型通过外部API运行"
+          ]
+        },
+        "evaluation_cases": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      },
+      {
+        "skill_id": "career_direction_hypothesis",
+        "skill_name": "career-direction-hypothesis",
+        "tool_name": "CareerDirectionHypothesis",
+        "title": "跨领域职业假设",
+        "business_goal": "基于个人证据形成互相区分且不受专业预设限制的职业方向假设",
+        "when_to_use": "当需要基于个人证据形成互相区分且不受专业预设限制的职业方向假设时使用。",
+        "task_ids": [
+          "direction_hypothesis_formation"
+        ],
+        "scenario_binding": {
+          "domain_source": "scenario_only",
+          "domain_mode": "open",
+          "explicit_domains": [],
+          "profile_role": "evidence_only"
+        },
+        "scope": {
+          "includes": [
+            "基于个人证据形成互相区分且不受专业预设限制的职业方向假设"
+          ],
+          "excludes": [
+            "从专业直接推断目标行业",
+            "只生成技术岗位"
+          ]
+        },
+        "input_schema": {
+          "profile": {
+            "type": "object",
+            "required": true,
+            "description": "用户教育、能力、经历、偏好和约束画像",
+            "source": "profile",
+            "available": true
+          },
+          "scenario": {
+            "type": "object",
+            "required": true,
+            "description": "独立定义的问题空间和领域边界",
+            "source": "scenario",
+            "available": true
+          },
+          "stage_assessment": {
+            "type": "object",
+            "required": true,
+            "description": "职业阶段识别结果",
+            "source": "prior_skill_output",
+            "available": true
+          }
+        },
+        "output_schema": {
+          "direction_hypotheses": {
+            "type": "array",
+            "description": "跨领域方向、依据、反证条件和待验证问题"
+          }
+        },
+        "output_consumers": [
+          "industry-problem-landscape",
+          "role-family-positioning"
+        ],
+        "tool_selection": [],
+        "child_tools": [],
+        "fresh_data_policy": "none",
+        "complexity": {
+          "level": "bounded",
+          "estimated_steps": 4,
+          "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+        },
+        "independence": {
+          "portable": true,
+          "assumptions": [
+            "输入通过JSON契约提供",
+            "模型通过外部API运行"
+          ]
+        },
+        "evaluation_cases": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      },
+      {
+        "skill_id": "industry_problem_landscape",
+        "skill_name": "industry-problem-landscape",
+        "tool_name": "IndustryProblemLandscape",
+        "title": "产业问题与价值链地图",
+        "business_goal": "把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图",
+        "when_to_use": "当需要把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图时使用。",
+        "task_ids": [
+          "industry_problem_landscape"
+        ],
+        "scenario_binding": {
+          "domain_source": "scenario_only",
+          "domain_mode": "open",
+          "explicit_domains": [],
+          "profile_role": "evidence_only"
+        },
+        "scope": {
+          "includes": [
+            "把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图"
+          ],
+          "excludes": [
+            "替用户选定行业",
+            "无来源预测行业增长",
+            "由专业限定产业范围"
+          ]
+        },
+        "input_schema": {
+          "direction_hypotheses": {
+            "type": "object",
+            "required": true,
+            "description": "跨领域职业方向",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "market_evidence": {
+            "type": "array",
+            "required": true,
+            "description": "带来源和时间戳的外部市场证据",
+            "source": "external_data",
+            "available": false
+          }
+        },
+        "output_schema": {
+          "industry_landscape": {
+            "type": "object",
+            "description": "产业问题、价值链位置、信号、风险和来源"
+          }
+        },
+        "output_consumers": [
+          "employer-target-mapping",
+          "opportunity-portfolio-prioritization"
+        ],
+        "tool_selection": [
+          {
+            "tool_name": "WebSearch",
+            "usage_mode": "required",
+            "reason": "场景要求比较当前产业与机会信号，需要带来源的最新公开证据",
+            "condition": null,
+            "fallback": null
+          },
+          {
+            "tool_name": "WebFetch",
+            "usage_mode": "conditional",
+            "reason": "在搜索结果摘要不足以支持判断时读取原始页面",
+            "condition": "候选来源与关键结论需要原文核验",
+            "fallback": "保留摘要来源并降低对应结论置信度"
+          }
+        ],
+        "child_tools": [
+          "WebSearch",
+          "WebFetch"
+        ],
+        "fresh_data_policy": "required",
+        "complexity": {
+          "level": "bounded",
+          "estimated_steps": 4,
+          "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+        },
+        "independence": {
+          "portable": true,
+          "assumptions": [
+            "输入通过JSON契约提供",
+            "模型通过外部API运行"
+          ]
+        },
+        "evaluation_cases": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      },
+      {
+        "skill_id": "role_family_positioning",
+        "skill_name": "role-family-positioning",
+        "tool_name": "RoleFamilyPositioning",
+        "title": "岗位族与工作形态定位",
+        "business_goal": "比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合",
+        "when_to_use": "当需要比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合时使用。",
+        "task_ids": [
+          "role_family_mapping"
+        ],
+        "scenario_binding": {
+          "domain_source": "scenario_only",
+          "domain_mode": "open",
+          "explicit_domains": [],
+          "profile_role": "evidence_only"
+        },
+        "scope": {
+          "includes": [
+            "比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合"
+          ],
+          "excludes": [
+            "替用户做最终决定",
+            "修改主程序状态"
+          ]
+        },
+        "input_schema": {
+          "profile": {
+            "type": "object",
+            "required": true,
+            "description": "用户教育、能力、经历、偏好和约束画像",
+            "source": "profile",
+            "available": true
+          },
+          "direction_hypotheses": {
+            "type": "object",
+            "required": true,
+            "description": "跨领域候选方向",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "job_evidence": {
+            "type": "array",
+            "required": true,
+            "description": "带来源和时间戳的外部市场证据",
+            "source": "external_data",
+            "available": false
+          }
+        },
+        "output_schema": {
+          "role_family_matrix": {
+            "type": "array",
+            "description": "岗位族、工作形态、职责、要求、相邻岗位和证据来源"
+          }
+        },
+        "output_consumers": [
+          "capability-evidence-assessment",
+          "live-opportunity-discovery"
+        ],
+        "tool_selection": [
+          {
+            "tool_name": "WebSearch",
+            "usage_mode": "required",
+            "reason": "场景要求比较当前产业与机会信号，需要带来源的最新公开证据",
+            "condition": null,
+            "fallback": null
+          },
+          {
+            "tool_name": "WebFetch",
+            "usage_mode": "conditional",
+            "reason": "在搜索结果摘要不足以支持判断时读取原始页面",
+            "condition": "候选来源与关键结论需要原文核验",
+            "fallback": "保留摘要来源并降低对应结论置信度"
+          }
+        ],
+        "child_tools": [
+          "WebSearch",
+          "WebFetch"
+        ],
+        "fresh_data_policy": "required",
+        "complexity": {
+          "level": "bounded",
+          "estimated_steps": 4,
+          "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+        },
+        "independence": {
+          "portable": true,
+          "assumptions": [
+            "输入通过JSON契约提供",
+            "模型通过外部API运行"
+          ]
+        },
+        "evaluation_cases": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      },
+      {
+        "skill_id": "employer_target_mapping",
+        "skill_name": "employer-target-mapping",
+        "tool_name": "EmployerTargetMapping",
+        "title": "组织生态地图",
+        "business_goal": "按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层",
+        "when_to_use": "当需要按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层时使用。",
+        "task_ids": [
+          "employer_segment_mapping"
+        ],
+        "scenario_binding": {
+          "domain_source": "scenario_only",
+          "domain_mode": "open",
+          "explicit_domains": [],
+          "profile_role": "evidence_only"
+        },
+        "scope": {
+          "includes": [
+            "按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层"
+          ],
+          "excludes": [
+            "替用户做最终决定",
+            "修改主程序状态"
+          ]
+        },
+        "input_schema": {
+          "profile": {
+            "type": "object",
+            "required": true,
+            "description": "用户教育、能力、经历、偏好和约束画像",
+            "source": "profile",
+            "available": true
+          },
+          "industry_landscape": {
+            "type": "object",
+            "required": true,
+            "description": "产业问题与价值链地图",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "organization_evidence": {
+            "type": "array",
+            "required": true,
+            "description": "带来源和时间戳的外部市场证据",
+            "source": "external_data",
+            "available": false
+          }
+        },
+        "output_schema": {
+          "employer_segments": {
+            "type": "array",
+            "description": "组织分层、代表组织、环境特征、适配理由和验证项"
+          }
+        },
+        "output_consumers": [
+          "live-opportunity-discovery"
+        ],
+        "tool_selection": [
+          {
+            "tool_name": "WebSearch",
+            "usage_mode": "required",
+            "reason": "场景要求比较当前产业与机会信号，需要带来源的最新公开证据",
+            "condition": null,
+            "fallback": null
+          },
+          {
+            "tool_name": "WebFetch",
+            "usage_mode": "conditional",
+            "reason": "在搜索结果摘要不足以支持判断时读取原始页面",
+            "condition": "候选来源与关键结论需要原文核验",
+            "fallback": "保留摘要来源并降低对应结论置信度"
+          }
+        ],
+        "child_tools": [
+          "WebSearch",
+          "WebFetch"
+        ],
+        "fresh_data_policy": "required",
+        "complexity": {
+          "level": "bounded",
+          "estimated_steps": 4,
+          "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+        },
+        "independence": {
+          "portable": true,
+          "assumptions": [
+            "输入通过JSON契约提供",
+            "模型通过外部API运行"
+          ]
+        },
+        "evaluation_cases": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      },
+      {
+        "skill_id": "live_opportunity_discovery",
+        "skill_name": "live-opportunity-discovery",
+        "tool_name": "LiveOpportunityDiscovery",
+        "title": "实时机会发现",
+        "business_goal": "基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会",
+        "when_to_use": "当需要基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会时使用。",
+        "task_ids": [
+          "opportunity_signal_discovery"
+        ],
+        "scenario_binding": {
+          "domain_source": "scenario_only",
+          "domain_mode": "open",
+          "explicit_domains": [],
+          "profile_role": "evidence_only"
+        },
+        "scope": {
+          "includes": [
+            "基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会"
+          ],
+          "excludes": [
+            "自动投递",
+            "虚构机会状态"
+          ]
+        },
+        "input_schema": {
+          "role_family_matrix": {
+            "type": "object",
+            "required": true,
+            "description": "岗位族矩阵",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "employer_segments": {
+            "type": "object",
+            "required": true,
+            "description": "目标组织分层",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "search_constraints": {
+            "type": "object",
+            "required": true,
+            "description": "地点、时间、机会类型和组织偏好",
+            "source": "profile",
+            "available": true
+          }
+        },
+        "output_schema": {
+          "opportunity_inventory": {
+            "type": "array",
+            "description": "机会类型、角色、组织、链接、发布时间、要求摘要和来源"
+          }
+        },
+        "output_consumers": [
+          "capability-evidence-assessment",
+          "opportunity-portfolio-prioritization"
+        ],
+        "tool_selection": [
+          {
+            "tool_name": "WebSearch",
+            "usage_mode": "required",
+            "reason": "发现当前公开岗位、项目或组织机会",
+            "condition": null,
+            "fallback": null
+          },
+          {
+            "tool_name": "WebFetch",
+            "usage_mode": "conditional",
+            "reason": "核验具体机会页面的要求与时效",
+            "condition": "搜索结果提供可访问的具体机会链接",
+            "fallback": "将机会标记为未核验，不把它纳入高置信度结果"
+          }
+        ],
+        "child_tools": [
+          "WebSearch",
+          "WebFetch"
+        ],
+        "fresh_data_policy": "required",
+        "complexity": {
+          "level": "bounded",
+          "estimated_steps": 4,
+          "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+        },
+        "independence": {
+          "portable": true,
+          "assumptions": [
+            "输入通过JSON契约提供",
+            "模型通过外部API运行"
+          ]
+        },
+        "evaluation_cases": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      },
+      {
+        "skill_id": "capability_evidence_assessment",
+        "skill_name": "capability-evidence-assessment",
+        "tool_name": "CapabilityEvidenceAssessment",
+        "title": "能力证据评估",
+        "business_goal": "把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项",
+        "when_to_use": "当需要把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项时使用。",
+        "task_ids": [
+          "capability_evidence_mapping"
+        ],
+        "scenario_binding": {
+          "domain_source": "scenario_only",
+          "domain_mode": "open",
+          "explicit_domains": [],
+          "profile_role": "evidence_only"
+        },
+        "scope": {
+          "includes": [
+            "把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项"
+          ],
+          "excludes": [
+            "制定完整学习计划",
+            "采集新的能力证据"
+          ]
+        },
+        "input_schema": {
+          "profile": {
+            "type": "object",
+            "required": true,
+            "description": "用户教育、能力、经历、偏好和约束画像",
+            "source": "profile",
+            "available": true
+          },
+          "role_family_matrix": {
+            "type": "object",
+            "required": true,
+            "description": "岗位要求矩阵",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "opportunity_inventory": {
+            "type": "array",
+            "required": false,
+            "description": "可选的具体岗位机会",
+            "source": "prior_skill_output",
+            "available": true
+          }
+        },
+        "output_schema": {
+          "evidence_matrix": {
+            "type": "array",
+            "description": "要求、证据、证据强度、未知项和冲突"
+          }
+        },
+        "output_consumers": [
+          "opportunity-portfolio-prioritization",
+          "exploration-experiment-design"
+        ],
+        "tool_selection": [],
+        "child_tools": [],
+        "fresh_data_policy": "none",
+        "complexity": {
+          "level": "bounded",
+          "estimated_steps": 4,
+          "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+        },
+        "independence": {
+          "portable": true,
+          "assumptions": [
+            "输入通过JSON契约提供",
+            "模型通过外部API运行"
+          ]
+        },
+        "evaluation_cases": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      },
+      {
+        "skill_id": "opportunity_portfolio_prioritization",
+        "skill_name": "opportunity-portfolio-prioritization",
+        "tool_name": "OpportunityPortfolioPrioritization",
+        "title": "机会组合优先级",
+        "business_goal": "按匹配度、成长性、可进入性、偏好和证据质量比较机会组合",
+        "when_to_use": "当需要按匹配度、成长性、可进入性、偏好和证据质量比较机会组合时使用。",
+        "task_ids": [
+          "opportunity_fit_scoring"
+        ],
+        "scenario_binding": {
+          "domain_source": "scenario_only",
+          "domain_mode": "open",
+          "explicit_domains": [],
+          "profile_role": "evidence_only"
+        },
+        "scope": {
+          "includes": [
+            "按匹配度、成长性、可进入性、偏好和证据质量比较机会组合"
+          ],
+          "excludes": [
+            "替用户做最终决定",
+            "修改主程序状态"
+          ]
+        },
+        "input_schema": {
+          "profile": {
+            "type": "object",
+            "required": true,
+            "description": "用户教育、能力、经历、偏好和约束画像",
+            "source": "profile",
+            "available": true
+          },
+          "industry_landscape": {
+            "type": "object",
+            "required": true,
+            "description": "行业地图",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "role_family_matrix": {
+            "type": "object",
+            "required": true,
+            "description": "岗位族矩阵",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "opportunity_inventory": {
+            "type": "object",
+            "required": true,
+            "description": "机会池",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "evidence_matrix": {
+            "type": "object",
+            "required": true,
+            "description": "能力证据矩阵",
+            "source": "prior_skill_output",
+            "available": true
+          }
+        },
+        "output_schema": {
+          "ranked_portfolio": {
+            "type": "array",
+            "description": "带分项依据、置信度和敏感性的优先机会组合"
+          }
+        },
+        "output_consumers": [
+          "user_decision",
+          "exploration-experiment-design"
+        ],
+        "tool_selection": [],
+        "child_tools": [],
+        "fresh_data_policy": "none",
+        "complexity": {
+          "level": "bounded",
+          "estimated_steps": 5,
+          "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+        },
+        "independence": {
+          "portable": true,
+          "assumptions": [
+            "输入通过JSON契约提供",
+            "模型通过外部API运行"
+          ]
+        },
+        "evaluation_cases": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      },
+      {
+        "skill_id": "exploration_experiment_design",
+        "skill_name": "exploration-experiment-design",
+        "tool_name": "ExplorationExperimentDesign",
+        "title": "探索实验设计",
+        "business_goal": "针对高优先级方向的关键不确定性设计低成本、可判定的验证任务",
+        "when_to_use": "当需要针对高优先级方向的关键不确定性设计低成本、可判定的验证任务时使用。",
+        "task_ids": [
+          "exploration_experiment_design"
+        ],
+        "scenario_binding": {
+          "domain_source": "scenario_only",
+          "domain_mode": "open",
+          "explicit_domains": [],
+          "profile_role": "evidence_only"
+        },
+        "scope": {
+          "includes": [
+            "针对高优先级方向的关键不确定性设计低成本、可判定的验证任务"
+          ],
+          "excludes": [
+            "生成长期课程表",
+            "保证求职结果"
+          ]
+        },
+        "input_schema": {
+          "ranked_portfolio": {
+            "type": "object",
+            "required": true,
+            "description": "优先机会组合",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "evidence_matrix": {
+            "type": "object",
+            "required": true,
+            "description": "能力证据矩阵",
+            "source": "prior_skill_output",
+            "available": true
+          },
+          "time_budget": {
+            "type": "string",
+            "required": true,
+            "description": "可用于探索的时间预算",
+            "source": "state",
+            "available": true
+          }
+        },
+        "output_schema": {
+          "validation_experiments": {
+            "type": "array",
+            "description": "任务、假设、成功信号、成本、期限和决策规则"
+          }
+        },
+        "output_consumers": [
+          "user_decision"
+        ],
+        "tool_selection": [],
+        "child_tools": [],
+        "fresh_data_policy": "none",
+        "complexity": {
+          "level": "bounded",
+          "estimated_steps": 4,
+          "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+        },
+        "independence": {
+          "portable": true,
+          "assumptions": [
+            "输入通过JSON契约提供",
+            "模型通过外部API运行"
+          ]
+        },
+        "evaluation_cases": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    ],
+    "dedupe_decisions": [
+      {
+        "candidate_ids": [
+          "career_stage_assessment"
+        ],
+        "action": "keep",
+        "reason": "业务目标和输出消费边界独立",
+        "result_ids": [
+          "career_stage_assessment"
+        ]
+      },
+      {
+        "candidate_ids": [
+          "career_direction_hypothesis"
+        ],
+        "action": "keep",
+        "reason": "业务目标和输出消费边界独立",
+        "result_ids": [
+          "career_direction_hypothesis"
+        ]
+      },
+      {
+        "candidate_ids": [
+          "industry_problem_landscape"
+        ],
+        "action": "keep",
+        "reason": "业务目标和输出消费边界独立",
+        "result_ids": [
+          "industry_problem_landscape"
+        ]
+      },
+      {
+        "candidate_ids": [
+          "role_family_positioning"
+        ],
+        "action": "keep",
+        "reason": "业务目标和输出消费边界独立",
+        "result_ids": [
+          "role_family_positioning"
+        ]
+      },
+      {
+        "candidate_ids": [
+          "employer_target_mapping"
+        ],
+        "action": "keep",
+        "reason": "业务目标和输出消费边界独立",
+        "result_ids": [
+          "employer_target_mapping"
+        ]
+      },
+      {
+        "candidate_ids": [
+          "live_opportunity_discovery"
+        ],
+        "action": "keep",
+        "reason": "业务目标和输出消费边界独立",
+        "result_ids": [
+          "live_opportunity_discovery"
+        ]
+      },
+      {
+        "candidate_ids": [
+          "capability_evidence_assessment"
+        ],
+        "action": "keep",
+        "reason": "业务目标和输出消费边界独立",
+        "result_ids": [
+          "capability_evidence_assessment"
+        ]
+      },
+      {
+        "candidate_ids": [
+          "opportunity_portfolio_prioritization"
+        ],
+        "action": "keep",
+        "reason": "业务目标和输出消费边界独立",
+        "result_ids": [
+          "opportunity_portfolio_prioritization"
+        ]
+      },
+      {
+        "candidate_ids": [
+          "exploration_experiment_design"
+        ],
+        "action": "keep",
+        "reason": "业务目标和输出消费边界独立",
+        "result_ids": [
+          "exploration_experiment_design"
+        ]
+      }
+    ],
+    "deterministic_merges": [],
+    "portfolio_notes": [
+      "数据采集类和个人决策类 SkillTool 已分离",
+      "所有输出均有下游消费者"
+    ]
+  },
+  "final_candidates": [
+    {
+      "skill_id": "career_stage_assessment",
+      "skill_name": "career-stage-assessment",
+      "tool_name": "CareerStageAssessment",
+      "title": "职业阶段识别",
+      "business_goal": "识别用户当前职业决策阶段、约束和需要解决的决策",
+      "when_to_use": "当需要识别用户当前职业决策阶段、约束和需要解决的决策时使用。",
+      "task_ids": [
+        "career_stage_diagnosis"
+      ],
+      "scenario_binding": {
+        "domain_source": "scenario_only",
+        "domain_mode": "open",
+        "explicit_domains": [],
+        "profile_role": "evidence_only"
+      },
+      "scope": {
+        "includes": [
+          "识别用户当前职业决策阶段、约束和需要解决的决策"
+        ],
+        "excludes": [
+          "生成岗位清单",
+          "推荐具体公司"
+        ]
+      },
+      "input_schema": {
+        "profile": {
+          "type": "object",
+          "required": true,
+          "description": "用户教育、能力、经历、偏好和约束画像",
+          "source": "profile",
+          "available": true
+        },
+        "state": {
+          "type": "object",
+          "required": true,
+          "description": "当前职业阶段、假设和决策状态",
+          "source": "state",
+          "available": true
+        }
+      },
+      "output_schema": {
+        "stage_assessment": {
+          "type": "object",
+          "description": "阶段、约束、证据和不确定性"
+        }
+      },
+      "output_consumers": [
+        "career-direction-hypothesis"
+      ],
+      "tool_selection": [],
+      "child_tools": [],
+      "fresh_data_policy": "none",
+      "complexity": {
+        "level": "bounded",
+        "estimated_steps": 4,
+        "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+      },
+      "independence": {
+        "portable": true,
+        "assumptions": [
+          "输入通过JSON契约提供",
+          "模型通过外部API运行"
+        ]
+      },
+      "evaluation_cases": [
+        {
+          "case": "输入完整且证据充分",
+          "expected_outcome": "success"
+        },
+        {
+          "case": "缺少关键必需输入",
+          "expected_outcome": "insufficient_input"
+        }
+      ]
+    },
+    {
+      "skill_id": "career_direction_hypothesis",
+      "skill_name": "career-direction-hypothesis",
+      "tool_name": "CareerDirectionHypothesis",
+      "title": "跨领域职业假设",
+      "business_goal": "基于个人证据形成互相区分且不受专业预设限制的职业方向假设",
+      "when_to_use": "当需要基于个人证据形成互相区分且不受专业预设限制的职业方向假设时使用。",
+      "task_ids": [
+        "direction_hypothesis_formation"
+      ],
+      "scenario_binding": {
+        "domain_source": "scenario_only",
+        "domain_mode": "open",
+        "explicit_domains": [],
+        "profile_role": "evidence_only"
+      },
+      "scope": {
+        "includes": [
+          "基于个人证据形成互相区分且不受专业预设限制的职业方向假设"
+        ],
+        "excludes": [
+          "从专业直接推断目标行业",
+          "只生成技术岗位"
+        ]
+      },
+      "input_schema": {
+        "profile": {
+          "type": "object",
+          "required": true,
+          "description": "用户教育、能力、经历、偏好和约束画像",
+          "source": "profile",
+          "available": true
+        },
+        "scenario": {
+          "type": "object",
+          "required": true,
+          "description": "独立定义的问题空间和领域边界",
+          "source": "scenario",
+          "available": true
+        },
+        "stage_assessment": {
+          "type": "object",
+          "required": true,
+          "description": "职业阶段识别结果",
+          "source": "prior_skill_output",
+          "available": true
+        }
+      },
+      "output_schema": {
+        "direction_hypotheses": {
+          "type": "array",
+          "description": "跨领域方向、依据、反证条件和待验证问题"
+        }
+      },
+      "output_consumers": [
+        "industry-problem-landscape",
+        "role-family-positioning"
+      ],
+      "tool_selection": [],
+      "child_tools": [],
+      "fresh_data_policy": "none",
+      "complexity": {
+        "level": "bounded",
+        "estimated_steps": 4,
+        "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+      },
+      "independence": {
+        "portable": true,
+        "assumptions": [
+          "输入通过JSON契约提供",
+          "模型通过外部API运行"
+        ]
+      },
+      "evaluation_cases": [
+        {
+          "case": "输入完整且证据充分",
+          "expected_outcome": "success"
+        },
+        {
+          "case": "缺少关键必需输入",
+          "expected_outcome": "insufficient_input"
+        }
+      ]
+    },
+    {
+      "skill_id": "industry_problem_landscape",
+      "skill_name": "industry-problem-landscape",
+      "tool_name": "IndustryProblemLandscape",
+      "title": "产业问题与价值链地图",
+      "business_goal": "把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图",
+      "when_to_use": "当需要把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图时使用。",
+      "task_ids": [
+        "industry_problem_landscape"
+      ],
+      "scenario_binding": {
+        "domain_source": "scenario_only",
+        "domain_mode": "open",
+        "explicit_domains": [],
+        "profile_role": "evidence_only"
+      },
+      "scope": {
+        "includes": [
+          "把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图"
+        ],
+        "excludes": [
+          "替用户选定行业",
+          "无来源预测行业增长",
+          "由专业限定产业范围"
+        ]
+      },
+      "input_schema": {
+        "direction_hypotheses": {
+          "type": "object",
+          "required": true,
+          "description": "跨领域职业方向",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "market_evidence": {
+          "type": "array",
+          "required": true,
+          "description": "带来源和时间戳的外部市场证据",
+          "source": "external_data",
+          "available": false
+        }
+      },
+      "output_schema": {
+        "industry_landscape": {
+          "type": "object",
+          "description": "产业问题、价值链位置、信号、风险和来源"
+        }
+      },
+      "output_consumers": [
+        "employer-target-mapping",
+        "opportunity-portfolio-prioritization"
+      ],
+      "tool_selection": [
+        {
+          "tool_name": "WebSearch",
+          "usage_mode": "required",
+          "reason": "场景要求比较当前产业与机会信号，需要带来源的最新公开证据",
+          "condition": null,
+          "fallback": null
+        },
+        {
+          "tool_name": "WebFetch",
+          "usage_mode": "conditional",
+          "reason": "在搜索结果摘要不足以支持判断时读取原始页面",
+          "condition": "候选来源与关键结论需要原文核验",
+          "fallback": "保留摘要来源并降低对应结论置信度"
+        }
+      ],
+      "child_tools": [
+        "WebSearch",
+        "WebFetch"
+      ],
+      "fresh_data_policy": "required",
+      "complexity": {
+        "level": "bounded",
+        "estimated_steps": 4,
+        "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+      },
+      "independence": {
+        "portable": true,
+        "assumptions": [
+          "输入通过JSON契约提供",
+          "模型通过外部API运行"
+        ]
+      },
+      "evaluation_cases": [
+        {
+          "case": "输入完整且证据充分",
+          "expected_outcome": "success"
+        },
+        {
+          "case": "缺少关键必需输入",
+          "expected_outcome": "insufficient_input"
+        }
+      ]
+    },
+    {
+      "skill_id": "role_family_positioning",
+      "skill_name": "role-family-positioning",
+      "tool_name": "RoleFamilyPositioning",
+      "title": "岗位族与工作形态定位",
+      "business_goal": "比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合",
+      "when_to_use": "当需要比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合时使用。",
+      "task_ids": [
+        "role_family_mapping"
+      ],
+      "scenario_binding": {
+        "domain_source": "scenario_only",
+        "domain_mode": "open",
+        "explicit_domains": [],
+        "profile_role": "evidence_only"
+      },
+      "scope": {
+        "includes": [
+          "比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合"
+        ],
+        "excludes": [
+          "替用户做最终决定",
+          "修改主程序状态"
+        ]
+      },
+      "input_schema": {
+        "profile": {
+          "type": "object",
+          "required": true,
+          "description": "用户教育、能力、经历、偏好和约束画像",
+          "source": "profile",
+          "available": true
+        },
+        "direction_hypotheses": {
+          "type": "object",
+          "required": true,
+          "description": "跨领域候选方向",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "job_evidence": {
+          "type": "array",
+          "required": true,
+          "description": "带来源和时间戳的外部市场证据",
+          "source": "external_data",
+          "available": false
+        }
+      },
+      "output_schema": {
+        "role_family_matrix": {
+          "type": "array",
+          "description": "岗位族、工作形态、职责、要求、相邻岗位和证据来源"
+        }
+      },
+      "output_consumers": [
+        "capability-evidence-assessment",
+        "live-opportunity-discovery"
+      ],
+      "tool_selection": [
+        {
+          "tool_name": "WebSearch",
+          "usage_mode": "required",
+          "reason": "场景要求比较当前产业与机会信号，需要带来源的最新公开证据",
+          "condition": null,
+          "fallback": null
+        },
+        {
+          "tool_name": "WebFetch",
+          "usage_mode": "conditional",
+          "reason": "在搜索结果摘要不足以支持判断时读取原始页面",
+          "condition": "候选来源与关键结论需要原文核验",
+          "fallback": "保留摘要来源并降低对应结论置信度"
+        }
+      ],
+      "child_tools": [
+        "WebSearch",
+        "WebFetch"
+      ],
+      "fresh_data_policy": "required",
+      "complexity": {
+        "level": "bounded",
+        "estimated_steps": 4,
+        "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+      },
+      "independence": {
+        "portable": true,
+        "assumptions": [
+          "输入通过JSON契约提供",
+          "模型通过外部API运行"
+        ]
+      },
+      "evaluation_cases": [
+        {
+          "case": "输入完整且证据充分",
+          "expected_outcome": "success"
+        },
+        {
+          "case": "缺少关键必需输入",
+          "expected_outcome": "insufficient_input"
+        }
+      ]
+    },
+    {
+      "skill_id": "employer_target_mapping",
+      "skill_name": "employer-target-mapping",
+      "tool_name": "EmployerTargetMapping",
+      "title": "组织生态地图",
+      "business_goal": "按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层",
+      "when_to_use": "当需要按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层时使用。",
+      "task_ids": [
+        "employer_segment_mapping"
+      ],
+      "scenario_binding": {
+        "domain_source": "scenario_only",
+        "domain_mode": "open",
+        "explicit_domains": [],
+        "profile_role": "evidence_only"
+      },
+      "scope": {
+        "includes": [
+          "按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层"
+        ],
+        "excludes": [
+          "替用户做最终决定",
+          "修改主程序状态"
+        ]
+      },
+      "input_schema": {
+        "profile": {
+          "type": "object",
+          "required": true,
+          "description": "用户教育、能力、经历、偏好和约束画像",
+          "source": "profile",
+          "available": true
+        },
+        "industry_landscape": {
+          "type": "object",
+          "required": true,
+          "description": "产业问题与价值链地图",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "organization_evidence": {
+          "type": "array",
+          "required": true,
+          "description": "带来源和时间戳的外部市场证据",
+          "source": "external_data",
+          "available": false
+        }
+      },
+      "output_schema": {
+        "employer_segments": {
+          "type": "array",
+          "description": "组织分层、代表组织、环境特征、适配理由和验证项"
+        }
+      },
+      "output_consumers": [
+        "live-opportunity-discovery"
+      ],
+      "tool_selection": [
+        {
+          "tool_name": "WebSearch",
+          "usage_mode": "required",
+          "reason": "场景要求比较当前产业与机会信号，需要带来源的最新公开证据",
+          "condition": null,
+          "fallback": null
+        },
+        {
+          "tool_name": "WebFetch",
+          "usage_mode": "conditional",
+          "reason": "在搜索结果摘要不足以支持判断时读取原始页面",
+          "condition": "候选来源与关键结论需要原文核验",
+          "fallback": "保留摘要来源并降低对应结论置信度"
+        }
+      ],
+      "child_tools": [
+        "WebSearch",
+        "WebFetch"
+      ],
+      "fresh_data_policy": "required",
+      "complexity": {
+        "level": "bounded",
+        "estimated_steps": 4,
+        "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+      },
+      "independence": {
+        "portable": true,
+        "assumptions": [
+          "输入通过JSON契约提供",
+          "模型通过外部API运行"
+        ]
+      },
+      "evaluation_cases": [
+        {
+          "case": "输入完整且证据充分",
+          "expected_outcome": "success"
+        },
+        {
+          "case": "缺少关键必需输入",
+          "expected_outcome": "insufficient_input"
+        }
+      ]
+    },
+    {
+      "skill_id": "live_opportunity_discovery",
+      "skill_name": "live-opportunity-discovery",
+      "tool_name": "LiveOpportunityDiscovery",
+      "title": "实时机会发现",
+      "business_goal": "基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会",
+      "when_to_use": "当需要基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会时使用。",
+      "task_ids": [
+        "opportunity_signal_discovery"
+      ],
+      "scenario_binding": {
+        "domain_source": "scenario_only",
+        "domain_mode": "open",
+        "explicit_domains": [],
+        "profile_role": "evidence_only"
+      },
+      "scope": {
+        "includes": [
+          "基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会"
+        ],
+        "excludes": [
+          "自动投递",
+          "虚构机会状态"
+        ]
+      },
+      "input_schema": {
+        "role_family_matrix": {
+          "type": "object",
+          "required": true,
+          "description": "岗位族矩阵",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "employer_segments": {
+          "type": "object",
+          "required": true,
+          "description": "目标组织分层",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "search_constraints": {
+          "type": "object",
+          "required": true,
+          "description": "地点、时间、机会类型和组织偏好",
+          "source": "profile",
+          "available": true
+        }
+      },
+      "output_schema": {
+        "opportunity_inventory": {
+          "type": "array",
+          "description": "机会类型、角色、组织、链接、发布时间、要求摘要和来源"
+        }
+      },
+      "output_consumers": [
+        "capability-evidence-assessment",
+        "opportunity-portfolio-prioritization"
+      ],
+      "tool_selection": [
+        {
+          "tool_name": "WebSearch",
+          "usage_mode": "required",
+          "reason": "发现当前公开岗位、项目或组织机会",
+          "condition": null,
+          "fallback": null
+        },
+        {
+          "tool_name": "WebFetch",
+          "usage_mode": "conditional",
+          "reason": "核验具体机会页面的要求与时效",
+          "condition": "搜索结果提供可访问的具体机会链接",
+          "fallback": "将机会标记为未核验，不把它纳入高置信度结果"
+        }
+      ],
+      "child_tools": [
+        "WebSearch",
+        "WebFetch"
+      ],
+      "fresh_data_policy": "required",
+      "complexity": {
+        "level": "bounded",
+        "estimated_steps": 4,
+        "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+      },
+      "independence": {
+        "portable": true,
+        "assumptions": [
+          "输入通过JSON契约提供",
+          "模型通过外部API运行"
+        ]
+      },
+      "evaluation_cases": [
+        {
+          "case": "输入完整且证据充分",
+          "expected_outcome": "success"
+        },
+        {
+          "case": "缺少关键必需输入",
+          "expected_outcome": "insufficient_input"
+        }
+      ]
+    },
+    {
+      "skill_id": "capability_evidence_assessment",
+      "skill_name": "capability-evidence-assessment",
+      "tool_name": "CapabilityEvidenceAssessment",
+      "title": "能力证据评估",
+      "business_goal": "把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项",
+      "when_to_use": "当需要把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项时使用。",
+      "task_ids": [
+        "capability_evidence_mapping"
+      ],
+      "scenario_binding": {
+        "domain_source": "scenario_only",
+        "domain_mode": "open",
+        "explicit_domains": [],
+        "profile_role": "evidence_only"
+      },
+      "scope": {
+        "includes": [
+          "把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项"
+        ],
+        "excludes": [
+          "制定完整学习计划",
+          "采集新的能力证据"
+        ]
+      },
+      "input_schema": {
+        "profile": {
+          "type": "object",
+          "required": true,
+          "description": "用户教育、能力、经历、偏好和约束画像",
+          "source": "profile",
+          "available": true
+        },
+        "role_family_matrix": {
+          "type": "object",
+          "required": true,
+          "description": "岗位要求矩阵",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "opportunity_inventory": {
+          "type": "array",
+          "required": false,
+          "description": "可选的具体岗位机会",
+          "source": "prior_skill_output",
+          "available": true
+        }
+      },
+      "output_schema": {
+        "evidence_matrix": {
+          "type": "array",
+          "description": "要求、证据、证据强度、未知项和冲突"
+        }
+      },
+      "output_consumers": [
+        "opportunity-portfolio-prioritization",
+        "exploration-experiment-design"
+      ],
+      "tool_selection": [],
+      "child_tools": [],
+      "fresh_data_policy": "none",
+      "complexity": {
+        "level": "bounded",
+        "estimated_steps": 4,
+        "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+      },
+      "independence": {
+        "portable": true,
+        "assumptions": [
+          "输入通过JSON契约提供",
+          "模型通过外部API运行"
+        ]
+      },
+      "evaluation_cases": [
+        {
+          "case": "输入完整且证据充分",
+          "expected_outcome": "success"
+        },
+        {
+          "case": "缺少关键必需输入",
+          "expected_outcome": "insufficient_input"
+        }
+      ]
+    },
+    {
+      "skill_id": "opportunity_portfolio_prioritization",
+      "skill_name": "opportunity-portfolio-prioritization",
+      "tool_name": "OpportunityPortfolioPrioritization",
+      "title": "机会组合优先级",
+      "business_goal": "按匹配度、成长性、可进入性、偏好和证据质量比较机会组合",
+      "when_to_use": "当需要按匹配度、成长性、可进入性、偏好和证据质量比较机会组合时使用。",
+      "task_ids": [
+        "opportunity_fit_scoring"
+      ],
+      "scenario_binding": {
+        "domain_source": "scenario_only",
+        "domain_mode": "open",
+        "explicit_domains": [],
+        "profile_role": "evidence_only"
+      },
+      "scope": {
+        "includes": [
+          "按匹配度、成长性、可进入性、偏好和证据质量比较机会组合"
+        ],
+        "excludes": [
+          "替用户做最终决定",
+          "修改主程序状态"
+        ]
+      },
+      "input_schema": {
+        "profile": {
+          "type": "object",
+          "required": true,
+          "description": "用户教育、能力、经历、偏好和约束画像",
+          "source": "profile",
+          "available": true
+        },
+        "industry_landscape": {
+          "type": "object",
+          "required": true,
+          "description": "行业地图",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "role_family_matrix": {
+          "type": "object",
+          "required": true,
+          "description": "岗位族矩阵",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "opportunity_inventory": {
+          "type": "object",
+          "required": true,
+          "description": "机会池",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "evidence_matrix": {
+          "type": "object",
+          "required": true,
+          "description": "能力证据矩阵",
+          "source": "prior_skill_output",
+          "available": true
+        }
+      },
+      "output_schema": {
+        "ranked_portfolio": {
+          "type": "array",
+          "description": "带分项依据、置信度和敏感性的优先机会组合"
+        }
+      },
+      "output_consumers": [
+        "user_decision",
+        "exploration-experiment-design"
+      ],
+      "tool_selection": [],
+      "child_tools": [],
+      "fresh_data_policy": "none",
+      "complexity": {
+        "level": "bounded",
+        "estimated_steps": 5,
+        "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+      },
+      "independence": {
+        "portable": true,
+        "assumptions": [
+          "输入通过JSON契约提供",
+          "模型通过外部API运行"
+        ]
+      },
+      "evaluation_cases": [
+        {
+          "case": "输入完整且证据充分",
+          "expected_outcome": "success"
+        },
+        {
+          "case": "缺少关键必需输入",
+          "expected_outcome": "insufficient_input"
+        }
+      ]
+    },
+    {
+      "skill_id": "exploration_experiment_design",
+      "skill_name": "exploration-experiment-design",
+      "tool_name": "ExplorationExperimentDesign",
+      "title": "探索实验设计",
+      "business_goal": "针对高优先级方向的关键不确定性设计低成本、可判定的验证任务",
+      "when_to_use": "当需要针对高优先级方向的关键不确定性设计低成本、可判定的验证任务时使用。",
+      "task_ids": [
+        "exploration_experiment_design"
+      ],
+      "scenario_binding": {
+        "domain_source": "scenario_only",
+        "domain_mode": "open",
+        "explicit_domains": [],
+        "profile_role": "evidence_only"
+      },
+      "scope": {
+        "includes": [
+          "针对高优先级方向的关键不确定性设计低成本、可判定的验证任务"
+        ],
+        "excludes": [
+          "生成长期课程表",
+          "保证求职结果"
+        ]
+      },
+      "input_schema": {
+        "ranked_portfolio": {
+          "type": "object",
+          "required": true,
+          "description": "优先机会组合",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "evidence_matrix": {
+          "type": "object",
+          "required": true,
+          "description": "能力证据矩阵",
+          "source": "prior_skill_output",
+          "available": true
+        },
+        "time_budget": {
+          "type": "string",
+          "required": true,
+          "description": "可用于探索的时间预算",
+          "source": "state",
+          "available": true
+        }
+      },
+      "output_schema": {
+        "validation_experiments": {
+          "type": "array",
+          "description": "任务、假设、成功信号、成本、期限和决策规则"
+        }
+      },
+      "output_consumers": [
+        "user_decision"
+      ],
+      "tool_selection": [],
+      "child_tools": [],
+      "fresh_data_policy": "none",
+      "complexity": {
+        "level": "bounded",
+        "estimated_steps": 4,
+        "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+      },
+      "independence": {
+        "portable": true,
+        "assumptions": [
+          "输入通过JSON契约提供",
+          "模型通过外部API运行"
+        ]
+      },
+      "evaluation_cases": [
+        {
+          "case": "输入完整且证据充分",
+          "expected_outcome": "success"
+        },
+        {
+          "case": "缺少关键必需输入",
+          "expected_outcome": "insufficient_input"
+        }
+      ]
+    }
+  ],
+  "quality": {
+    "passed": true,
+    "score": 100.0,
+    "candidate_reports": [
+      {
+        "skill_id": "career_stage_assessment",
+        "tool_name": "CareerStageAssessment",
+        "passed": true,
+        "score": 100,
+        "issues": [],
+        "checks": {
+          "goal_bounded": true,
+          "inputs_obtainable": true,
+          "outputs_consumable": true,
+          "main_program_independent": true,
+          "tools_valid_and_justified": true,
+          "profile_scenario_decoupled": true
+        }
+      },
+      {
+        "skill_id": "career_direction_hypothesis",
+        "tool_name": "CareerDirectionHypothesis",
+        "passed": true,
+        "score": 100,
+        "issues": [],
+        "checks": {
+          "goal_bounded": true,
+          "inputs_obtainable": true,
+          "outputs_consumable": true,
+          "main_program_independent": true,
+          "tools_valid_and_justified": true,
+          "profile_scenario_decoupled": true
+        }
+      },
+      {
+        "skill_id": "industry_problem_landscape",
+        "tool_name": "IndustryProblemLandscape",
+        "passed": true,
+        "score": 100,
+        "issues": [],
+        "checks": {
+          "goal_bounded": true,
+          "inputs_obtainable": true,
+          "outputs_consumable": true,
+          "main_program_independent": true,
+          "tools_valid_and_justified": true,
+          "profile_scenario_decoupled": true
+        }
+      },
+      {
+        "skill_id": "role_family_positioning",
+        "tool_name": "RoleFamilyPositioning",
+        "passed": true,
+        "score": 100,
+        "issues": [],
+        "checks": {
+          "goal_bounded": true,
+          "inputs_obtainable": true,
+          "outputs_consumable": true,
+          "main_program_independent": true,
+          "tools_valid_and_justified": true,
+          "profile_scenario_decoupled": true
+        }
+      },
+      {
+        "skill_id": "employer_target_mapping",
+        "tool_name": "EmployerTargetMapping",
+        "passed": true,
+        "score": 100,
+        "issues": [],
+        "checks": {
+          "goal_bounded": true,
+          "inputs_obtainable": true,
+          "outputs_consumable": true,
+          "main_program_independent": true,
+          "tools_valid_and_justified": true,
+          "profile_scenario_decoupled": true
+        }
+      },
+      {
+        "skill_id": "live_opportunity_discovery",
+        "tool_name": "LiveOpportunityDiscovery",
+        "passed": true,
+        "score": 100,
+        "issues": [],
+        "checks": {
+          "goal_bounded": true,
+          "inputs_obtainable": true,
+          "outputs_consumable": true,
+          "main_program_independent": true,
+          "tools_valid_and_justified": true,
+          "profile_scenario_decoupled": true
+        }
+      },
+      {
+        "skill_id": "capability_evidence_assessment",
+        "tool_name": "CapabilityEvidenceAssessment",
+        "passed": true,
+        "score": 100,
+        "issues": [],
+        "checks": {
+          "goal_bounded": true,
+          "inputs_obtainable": true,
+          "outputs_consumable": true,
+          "main_program_independent": true,
+          "tools_valid_and_justified": true,
+          "profile_scenario_decoupled": true
+        }
+      },
+      {
+        "skill_id": "opportunity_portfolio_prioritization",
+        "tool_name": "OpportunityPortfolioPrioritization",
+        "passed": true,
+        "score": 100,
+        "issues": [],
+        "checks": {
+          "goal_bounded": true,
+          "inputs_obtainable": true,
+          "outputs_consumable": true,
+          "main_program_independent": true,
+          "tools_valid_and_justified": true,
+          "profile_scenario_decoupled": true
+        }
+      },
+      {
+        "skill_id": "exploration_experiment_design",
+        "tool_name": "ExplorationExperimentDesign",
+        "passed": true,
+        "score": 100,
+        "issues": [],
+        "checks": {
+          "goal_bounded": true,
+          "inputs_obtainable": true,
+          "outputs_consumable": true,
+          "main_program_independent": true,
+          "tools_valid_and_justified": true,
+          "profile_scenario_decoupled": true
+        }
+      }
+    ],
+    "redundancy": [],
+    "portfolio_issues": [],
+    "coverage": {
+      "total_tasks": 9,
+      "covered_tasks": 9,
+      "missing_tasks": []
+    }
+  },
+  "artifacts": [
+    {
+      "skill_name": "career-stage-assessment",
+      "files": {
+        "SKILL.md": "---\nname: career-stage-assessment\ndescription: 当需要识别用户当前职业决策阶段、约束和需要解决的决策时使用。\nmodel-entry: action-tool\n---\n\n# 职业阶段识别\n\n## Business goal\n\n识别用户当前职业决策阶段、约束和需要解决的决策\n\n## Scope\n\nIncluded:\n- 识别用户当前职业决策阶段、约束和需要解决的决策\n\nExcluded:\n- 生成岗位清单\n- 推荐具体公司\n\n## Scenario binding\n\n```json\n{\n  \"domain_source\": \"scenario_only\",\n  \"domain_mode\": \"open\",\n  \"explicit_domains\": [],\n  \"profile_role\": \"evidence_only\"\n}\n```\n\nThe scenario defines the domain. Profile data is evidence only and must never silently redefine the scenario.\n\n## Runtime contract\n\n- Run as a standalone child model through the configured external API.\n- Treat `<skill-action-input>` as the invocation input.\n- Use only the declared non-Skill child tools: none.\n- Never discover or invoke another Skill from inside this SkillTool.\n- Do not depend on main-program routes, state, databases, or implementation details.\n- Preserve evidence sources and expose material uncertainty.\n- Call `ReturnSkillResult` exactly once before completing.\n\n## Auxiliary tool policy\n\n```json\n[]\n```\n\n`required` tools are part of the normal path. `optional` and `conditional` tools must only be called under their declared conditions; otherwise follow their fallback. An empty list means the child model must reason only over supplied inputs.\n\n## Input schema\n\n```json\n{\n  \"profile\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"用户教育、能力、经历、偏好和约束画像\",\n    \"source\": \"profile\",\n    \"available\": true\n  },\n  \"state\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"当前职业阶段、假设和决策状态\",\n    \"source\": \"state\",\n    \"available\": true\n  }\n}\n```\n\nIf a required input cannot be obtained under the declared tool policy, return `insufficient_input`.\n\n## Output schema\n\nPass a JSON object matching this schema-like contract as `result`:\n\n```json\n{\n  \"stage_assessment\": {\n    \"type\": \"object\",\n    \"description\": \"阶段、约束、证据和不确定性\"\n  }\n}\n```\n\nDeclared consumers:\n- career-direction-hypothesis\n\n## Completion\n\nCall `ReturnSkillResult` with the Harness-provided `skill_call_id` and `skill_name`, one of `success`, `insufficient_input`, or `error`, a concise summary, and the structured result.\n",
+        "action-tool.json": {
+          "tool_name": "CareerStageAssessment",
+          "user_facing_name": "职业阶段识别",
+          "search_hint": "识别用户当前职业决策阶段、约束和需要解决的决策",
+          "preserve_existing": false,
+          "always_load": false,
+          "read_only": true,
+          "child_tools": [],
+          "input": {
+            "profile": {
+              "type": "json",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像"
+            },
+            "state": {
+              "type": "json",
+              "required": true,
+              "description": "当前职业阶段、假设和决策状态"
+            }
+          }
+        },
+        "skilltool.json": {
+          "skill_id": "career_stage_assessment",
+          "skill_name": "career-stage-assessment",
+          "tool_name": "CareerStageAssessment",
+          "title": "职业阶段识别",
+          "business_goal": "识别用户当前职业决策阶段、约束和需要解决的决策",
+          "when_to_use": "当需要识别用户当前职业决策阶段、约束和需要解决的决策时使用。",
+          "task_ids": [
+            "career_stage_diagnosis"
+          ],
+          "scenario_binding": {
+            "domain_source": "scenario_only",
+            "domain_mode": "open",
+            "explicit_domains": [],
+            "profile_role": "evidence_only"
+          },
+          "scope": {
+            "includes": [
+              "识别用户当前职业决策阶段、约束和需要解决的决策"
+            ],
+            "excludes": [
+              "生成岗位清单",
+              "推荐具体公司"
+            ]
+          },
+          "input_schema": {
+            "profile": {
+              "type": "object",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像",
+              "source": "profile",
+              "available": true
+            },
+            "state": {
+              "type": "object",
+              "required": true,
+              "description": "当前职业阶段、假设和决策状态",
+              "source": "state",
+              "available": true
+            }
+          },
+          "output_schema": {
+            "stage_assessment": {
+              "type": "object",
+              "description": "阶段、约束、证据和不确定性"
+            }
+          },
+          "output_consumers": [
+            "career-direction-hypothesis"
+          ],
+          "tool_selection": [],
+          "child_tools": [],
+          "fresh_data_policy": "none",
+          "complexity": {
+            "level": "bounded",
+            "estimated_steps": 4,
+            "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+          },
+          "independence": {
+            "portable": true,
+            "assumptions": [
+              "输入通过JSON契约提供",
+              "模型通过外部API运行"
+            ]
+          },
+          "evaluation_cases": [
+            {
+              "case": "输入完整且证据充分",
+              "expected_outcome": "success"
+            },
+            {
+              "case": "缺少关键必需输入",
+              "expected_outcome": "insufficient_input"
+            }
+          ]
+        },
+        "tests/eval_cases.json": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    },
+    {
+      "skill_name": "career-direction-hypothesis",
+      "files": {
+        "SKILL.md": "---\nname: career-direction-hypothesis\ndescription: 当需要基于个人证据形成互相区分且不受专业预设限制的职业方向假设时使用。\nmodel-entry: action-tool\n---\n\n# 跨领域职业假设\n\n## Business goal\n\n基于个人证据形成互相区分且不受专业预设限制的职业方向假设\n\n## Scope\n\nIncluded:\n- 基于个人证据形成互相区分且不受专业预设限制的职业方向假设\n\nExcluded:\n- 从专业直接推断目标行业\n- 只生成技术岗位\n\n## Scenario binding\n\n```json\n{\n  \"domain_source\": \"scenario_only\",\n  \"domain_mode\": \"open\",\n  \"explicit_domains\": [],\n  \"profile_role\": \"evidence_only\"\n}\n```\n\nThe scenario defines the domain. Profile data is evidence only and must never silently redefine the scenario.\n\n## Runtime contract\n\n- Run as a standalone child model through the configured external API.\n- Treat `<skill-action-input>` as the invocation input.\n- Use only the declared non-Skill child tools: none.\n- Never discover or invoke another Skill from inside this SkillTool.\n- Do not depend on main-program routes, state, databases, or implementation details.\n- Preserve evidence sources and expose material uncertainty.\n- Call `ReturnSkillResult` exactly once before completing.\n\n## Auxiliary tool policy\n\n```json\n[]\n```\n\n`required` tools are part of the normal path. `optional` and `conditional` tools must only be called under their declared conditions; otherwise follow their fallback. An empty list means the child model must reason only over supplied inputs.\n\n## Input schema\n\n```json\n{\n  \"profile\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"用户教育、能力、经历、偏好和约束画像\",\n    \"source\": \"profile\",\n    \"available\": true\n  },\n  \"scenario\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"独立定义的问题空间和领域边界\",\n    \"source\": \"scenario\",\n    \"available\": true\n  },\n  \"stage_assessment\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"职业阶段识别结果\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  }\n}\n```\n\nIf a required input cannot be obtained under the declared tool policy, return `insufficient_input`.\n\n## Output schema\n\nPass a JSON object matching this schema-like contract as `result`:\n\n```json\n{\n  \"direction_hypotheses\": {\n    \"type\": \"array\",\n    \"description\": \"跨领域方向、依据、反证条件和待验证问题\"\n  }\n}\n```\n\nDeclared consumers:\n- industry-problem-landscape\n- role-family-positioning\n\n## Completion\n\nCall `ReturnSkillResult` with the Harness-provided `skill_call_id` and `skill_name`, one of `success`, `insufficient_input`, or `error`, a concise summary, and the structured result.\n",
+        "action-tool.json": {
+          "tool_name": "CareerDirectionHypothesis",
+          "user_facing_name": "跨领域职业假设",
+          "search_hint": "基于个人证据形成互相区分且不受专业预设限制的职业方向假设",
+          "preserve_existing": false,
+          "always_load": false,
+          "read_only": true,
+          "child_tools": [],
+          "input": {
+            "profile": {
+              "type": "json",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像"
+            },
+            "scenario": {
+              "type": "json",
+              "required": true,
+              "description": "独立定义的问题空间和领域边界"
+            },
+            "stage_assessment": {
+              "type": "json",
+              "required": true,
+              "description": "职业阶段识别结果"
+            }
+          }
+        },
+        "skilltool.json": {
+          "skill_id": "career_direction_hypothesis",
+          "skill_name": "career-direction-hypothesis",
+          "tool_name": "CareerDirectionHypothesis",
+          "title": "跨领域职业假设",
+          "business_goal": "基于个人证据形成互相区分且不受专业预设限制的职业方向假设",
+          "when_to_use": "当需要基于个人证据形成互相区分且不受专业预设限制的职业方向假设时使用。",
+          "task_ids": [
+            "direction_hypothesis_formation"
+          ],
+          "scenario_binding": {
+            "domain_source": "scenario_only",
+            "domain_mode": "open",
+            "explicit_domains": [],
+            "profile_role": "evidence_only"
+          },
+          "scope": {
+            "includes": [
+              "基于个人证据形成互相区分且不受专业预设限制的职业方向假设"
+            ],
+            "excludes": [
+              "从专业直接推断目标行业",
+              "只生成技术岗位"
+            ]
+          },
+          "input_schema": {
+            "profile": {
+              "type": "object",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像",
+              "source": "profile",
+              "available": true
+            },
+            "scenario": {
+              "type": "object",
+              "required": true,
+              "description": "独立定义的问题空间和领域边界",
+              "source": "scenario",
+              "available": true
+            },
+            "stage_assessment": {
+              "type": "object",
+              "required": true,
+              "description": "职业阶段识别结果",
+              "source": "prior_skill_output",
+              "available": true
+            }
+          },
+          "output_schema": {
+            "direction_hypotheses": {
+              "type": "array",
+              "description": "跨领域方向、依据、反证条件和待验证问题"
+            }
+          },
+          "output_consumers": [
+            "industry-problem-landscape",
+            "role-family-positioning"
+          ],
+          "tool_selection": [],
+          "child_tools": [],
+          "fresh_data_policy": "none",
+          "complexity": {
+            "level": "bounded",
+            "estimated_steps": 4,
+            "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+          },
+          "independence": {
+            "portable": true,
+            "assumptions": [
+              "输入通过JSON契约提供",
+              "模型通过外部API运行"
+            ]
+          },
+          "evaluation_cases": [
+            {
+              "case": "输入完整且证据充分",
+              "expected_outcome": "success"
+            },
+            {
+              "case": "缺少关键必需输入",
+              "expected_outcome": "insufficient_input"
+            }
+          ]
+        },
+        "tests/eval_cases.json": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    },
+    {
+      "skill_name": "industry-problem-landscape",
+      "files": {
+        "SKILL.md": "---\nname: industry-problem-landscape\ndescription: 当需要把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图时使用。\nmodel-entry: action-tool\n---\n\n# 产业问题与价值链地图\n\n## Business goal\n\n把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图\n\n## Scope\n\nIncluded:\n- 把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图\n\nExcluded:\n- 替用户选定行业\n- 无来源预测行业增长\n- 由专业限定产业范围\n\n## Scenario binding\n\n```json\n{\n  \"domain_source\": \"scenario_only\",\n  \"domain_mode\": \"open\",\n  \"explicit_domains\": [],\n  \"profile_role\": \"evidence_only\"\n}\n```\n\nThe scenario defines the domain. Profile data is evidence only and must never silently redefine the scenario.\n\n## Runtime contract\n\n- Run as a standalone child model through the configured external API.\n- Treat `<skill-action-input>` as the invocation input.\n- Use only the declared non-Skill child tools: WebSearch, WebFetch.\n- Never discover or invoke another Skill from inside this SkillTool.\n- Do not depend on main-program routes, state, databases, or implementation details.\n- Preserve evidence sources and expose material uncertainty.\n- Call `ReturnSkillResult` exactly once before completing.\n\n## Auxiliary tool policy\n\n```json\n[\n  {\n    \"tool_name\": \"WebSearch\",\n    \"usage_mode\": \"required\",\n    \"reason\": \"场景要求比较当前产业与机会信号，需要带来源的最新公开证据\",\n    \"condition\": null,\n    \"fallback\": null\n  },\n  {\n    \"tool_name\": \"WebFetch\",\n    \"usage_mode\": \"conditional\",\n    \"reason\": \"在搜索结果摘要不足以支持判断时读取原始页面\",\n    \"condition\": \"候选来源与关键结论需要原文核验\",\n    \"fallback\": \"保留摘要来源并降低对应结论置信度\"\n  }\n]\n```\n\n`required` tools are part of the normal path. `optional` and `conditional` tools must only be called under their declared conditions; otherwise follow their fallback. An empty list means the child model must reason only over supplied inputs.\n\n## Input schema\n\n```json\n{\n  \"direction_hypotheses\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"跨领域职业方向\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"market_evidence\": {\n    \"type\": \"array\",\n    \"required\": true,\n    \"description\": \"带来源和时间戳的外部市场证据\",\n    \"source\": \"external_data\",\n    \"available\": false\n  }\n}\n```\n\nIf a required input cannot be obtained under the declared tool policy, return `insufficient_input`.\n\n## Output schema\n\nPass a JSON object matching this schema-like contract as `result`:\n\n```json\n{\n  \"industry_landscape\": {\n    \"type\": \"object\",\n    \"description\": \"产业问题、价值链位置、信号、风险和来源\"\n  }\n}\n```\n\nDeclared consumers:\n- employer-target-mapping\n- opportunity-portfolio-prioritization\n\n## Completion\n\nCall `ReturnSkillResult` with the Harness-provided `skill_call_id` and `skill_name`, one of `success`, `insufficient_input`, or `error`, a concise summary, and the structured result.\n",
+        "action-tool.json": {
+          "tool_name": "IndustryProblemLandscape",
+          "user_facing_name": "产业问题与价值链地图",
+          "search_hint": "把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图",
+          "preserve_existing": false,
+          "always_load": false,
+          "read_only": false,
+          "child_tools": [
+            "WebSearch",
+            "WebFetch"
+          ],
+          "input": {
+            "direction_hypotheses": {
+              "type": "json",
+              "required": true,
+              "description": "跨领域职业方向"
+            },
+            "market_evidence": {
+              "type": "json",
+              "required": true,
+              "description": "带来源和时间戳的外部市场证据"
+            }
+          }
+        },
+        "skilltool.json": {
+          "skill_id": "industry_problem_landscape",
+          "skill_name": "industry-problem-landscape",
+          "tool_name": "IndustryProblemLandscape",
+          "title": "产业问题与价值链地图",
+          "business_goal": "把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图",
+          "when_to_use": "当需要把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图时使用。",
+          "task_ids": [
+            "industry_problem_landscape"
+          ],
+          "scenario_binding": {
+            "domain_source": "scenario_only",
+            "domain_mode": "open",
+            "explicit_domains": [],
+            "profile_role": "evidence_only"
+          },
+          "scope": {
+            "includes": [
+              "把当前外部证据组织为跨行业问题、价值链位置和组织生态的可比较地图"
+            ],
+            "excludes": [
+              "替用户选定行业",
+              "无来源预测行业增长",
+              "由专业限定产业范围"
+            ]
+          },
+          "input_schema": {
+            "direction_hypotheses": {
+              "type": "object",
+              "required": true,
+              "description": "跨领域职业方向",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "market_evidence": {
+              "type": "array",
+              "required": true,
+              "description": "带来源和时间戳的外部市场证据",
+              "source": "external_data",
+              "available": false
+            }
+          },
+          "output_schema": {
+            "industry_landscape": {
+              "type": "object",
+              "description": "产业问题、价值链位置、信号、风险和来源"
+            }
+          },
+          "output_consumers": [
+            "employer-target-mapping",
+            "opportunity-portfolio-prioritization"
+          ],
+          "tool_selection": [
+            {
+              "tool_name": "WebSearch",
+              "usage_mode": "required",
+              "reason": "场景要求比较当前产业与机会信号，需要带来源的最新公开证据",
+              "condition": null,
+              "fallback": null
+            },
+            {
+              "tool_name": "WebFetch",
+              "usage_mode": "conditional",
+              "reason": "在搜索结果摘要不足以支持判断时读取原始页面",
+              "condition": "候选来源与关键结论需要原文核验",
+              "fallback": "保留摘要来源并降低对应结论置信度"
+            }
+          ],
+          "child_tools": [
+            "WebSearch",
+            "WebFetch"
+          ],
+          "fresh_data_policy": "required",
+          "complexity": {
+            "level": "bounded",
+            "estimated_steps": 4,
+            "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+          },
+          "independence": {
+            "portable": true,
+            "assumptions": [
+              "输入通过JSON契约提供",
+              "模型通过外部API运行"
+            ]
+          },
+          "evaluation_cases": [
+            {
+              "case": "输入完整且证据充分",
+              "expected_outcome": "success"
+            },
+            {
+              "case": "缺少关键必需输入",
+              "expected_outcome": "insufficient_input"
+            }
+          ]
+        },
+        "tests/eval_cases.json": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    },
+    {
+      "skill_name": "role-family-positioning",
+      "files": {
+        "SKILL.md": "---\nname: role-family-positioning\ndescription: 当需要比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合时使用。\nmodel-entry: action-tool\n---\n\n# 岗位族与工作形态定位\n\n## Business goal\n\n比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合\n\n## Scope\n\nIncluded:\n- 比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合\n\nExcluded:\n- 替用户做最终决定\n- 修改主程序状态\n\n## Scenario binding\n\n```json\n{\n  \"domain_source\": \"scenario_only\",\n  \"domain_mode\": \"open\",\n  \"explicit_domains\": [],\n  \"profile_role\": \"evidence_only\"\n}\n```\n\nThe scenario defines the domain. Profile data is evidence only and must never silently redefine the scenario.\n\n## Runtime contract\n\n- Run as a standalone child model through the configured external API.\n- Treat `<skill-action-input>` as the invocation input.\n- Use only the declared non-Skill child tools: WebSearch, WebFetch.\n- Never discover or invoke another Skill from inside this SkillTool.\n- Do not depend on main-program routes, state, databases, or implementation details.\n- Preserve evidence sources and expose material uncertainty.\n- Call `ReturnSkillResult` exactly once before completing.\n\n## Auxiliary tool policy\n\n```json\n[\n  {\n    \"tool_name\": \"WebSearch\",\n    \"usage_mode\": \"required\",\n    \"reason\": \"场景要求比较当前产业与机会信号，需要带来源的最新公开证据\",\n    \"condition\": null,\n    \"fallback\": null\n  },\n  {\n    \"tool_name\": \"WebFetch\",\n    \"usage_mode\": \"conditional\",\n    \"reason\": \"在搜索结果摘要不足以支持判断时读取原始页面\",\n    \"condition\": \"候选来源与关键结论需要原文核验\",\n    \"fallback\": \"保留摘要来源并降低对应结论置信度\"\n  }\n]\n```\n\n`required` tools are part of the normal path. `optional` and `conditional` tools must only be called under their declared conditions; otherwise follow their fallback. An empty list means the child model must reason only over supplied inputs.\n\n## Input schema\n\n```json\n{\n  \"profile\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"用户教育、能力、经历、偏好和约束画像\",\n    \"source\": \"profile\",\n    \"available\": true\n  },\n  \"direction_hypotheses\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"跨领域候选方向\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"job_evidence\": {\n    \"type\": \"array\",\n    \"required\": true,\n    \"description\": \"带来源和时间戳的外部市场证据\",\n    \"source\": \"external_data\",\n    \"available\": false\n  }\n}\n```\n\nIf a required input cannot be obtained under the declared tool policy, return `insufficient_input`.\n\n## Output schema\n\nPass a JSON object matching this schema-like contract as `result`:\n\n```json\n{\n  \"role_family_matrix\": {\n    \"type\": \"array\",\n    \"description\": \"岗位族、工作形态、职责、要求、相邻岗位和证据来源\"\n  }\n}\n```\n\nDeclared consumers:\n- capability-evidence-assessment\n- live-opportunity-discovery\n\n## Completion\n\nCall `ReturnSkillResult` with the Harness-provided `skill_call_id` and `skill_name`, one of `success`, `insufficient_input`, or `error`, a concise summary, and the structured result.\n",
+        "action-tool.json": {
+          "tool_name": "RoleFamilyPositioning",
+          "user_facing_name": "岗位族与工作形态定位",
+          "search_hint": "比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合",
+          "preserve_existing": false,
+          "always_load": false,
+          "read_only": false,
+          "child_tools": [
+            "WebSearch",
+            "WebFetch"
+          ],
+          "input": {
+            "profile": {
+              "type": "json",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像"
+            },
+            "direction_hypotheses": {
+              "type": "json",
+              "required": true,
+              "description": "跨领域候选方向"
+            },
+            "job_evidence": {
+              "type": "json",
+              "required": true,
+              "description": "带来源和时间戳的外部市场证据"
+            }
+          }
+        },
+        "skilltool.json": {
+          "skill_id": "role_family_positioning",
+          "skill_name": "role-family-positioning",
+          "tool_name": "RoleFamilyPositioning",
+          "title": "岗位族与工作形态定位",
+          "business_goal": "比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合",
+          "when_to_use": "当需要比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合时使用。",
+          "task_ids": [
+            "role_family_mapping"
+          ],
+          "scenario_binding": {
+            "domain_source": "scenario_only",
+            "domain_mode": "open",
+            "explicit_domains": [],
+            "profile_role": "evidence_only"
+          },
+          "scope": {
+            "includes": [
+              "比较候选岗位族的工作内容、责任、能力要求和进入路径并形成岗位组合"
+            ],
+            "excludes": [
+              "替用户做最终决定",
+              "修改主程序状态"
+            ]
+          },
+          "input_schema": {
+            "profile": {
+              "type": "object",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像",
+              "source": "profile",
+              "available": true
+            },
+            "direction_hypotheses": {
+              "type": "object",
+              "required": true,
+              "description": "跨领域候选方向",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "job_evidence": {
+              "type": "array",
+              "required": true,
+              "description": "带来源和时间戳的外部市场证据",
+              "source": "external_data",
+              "available": false
+            }
+          },
+          "output_schema": {
+            "role_family_matrix": {
+              "type": "array",
+              "description": "岗位族、工作形态、职责、要求、相邻岗位和证据来源"
+            }
+          },
+          "output_consumers": [
+            "capability-evidence-assessment",
+            "live-opportunity-discovery"
+          ],
+          "tool_selection": [
+            {
+              "tool_name": "WebSearch",
+              "usage_mode": "required",
+              "reason": "场景要求比较当前产业与机会信号，需要带来源的最新公开证据",
+              "condition": null,
+              "fallback": null
+            },
+            {
+              "tool_name": "WebFetch",
+              "usage_mode": "conditional",
+              "reason": "在搜索结果摘要不足以支持判断时读取原始页面",
+              "condition": "候选来源与关键结论需要原文核验",
+              "fallback": "保留摘要来源并降低对应结论置信度"
+            }
+          ],
+          "child_tools": [
+            "WebSearch",
+            "WebFetch"
+          ],
+          "fresh_data_policy": "required",
+          "complexity": {
+            "level": "bounded",
+            "estimated_steps": 4,
+            "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+          },
+          "independence": {
+            "portable": true,
+            "assumptions": [
+              "输入通过JSON契约提供",
+              "模型通过外部API运行"
+            ]
+          },
+          "evaluation_cases": [
+            {
+              "case": "输入完整且证据充分",
+              "expected_outcome": "success"
+            },
+            {
+              "case": "缺少关键必需输入",
+              "expected_outcome": "insufficient_input"
+            }
+          ]
+        },
+        "tests/eval_cases.json": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    },
+    {
+      "skill_name": "employer-target-mapping",
+      "files": {
+        "SKILL.md": "---\nname: employer-target-mapping\ndescription: 当需要按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层时使用。\nmodel-entry: action-tool\n---\n\n# 组织生态地图\n\n## Business goal\n\n按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层\n\n## Scope\n\nIncluded:\n- 按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层\n\nExcluded:\n- 替用户做最终决定\n- 修改主程序状态\n\n## Scenario binding\n\n```json\n{\n  \"domain_source\": \"scenario_only\",\n  \"domain_mode\": \"open\",\n  \"explicit_domains\": [],\n  \"profile_role\": \"evidence_only\"\n}\n```\n\nThe scenario defines the domain. Profile data is evidence only and must never silently redefine the scenario.\n\n## Runtime contract\n\n- Run as a standalone child model through the configured external API.\n- Treat `<skill-action-input>` as the invocation input.\n- Use only the declared non-Skill child tools: WebSearch, WebFetch.\n- Never discover or invoke another Skill from inside this SkillTool.\n- Do not depend on main-program routes, state, databases, or implementation details.\n- Preserve evidence sources and expose material uncertainty.\n- Call `ReturnSkillResult` exactly once before completing.\n\n## Auxiliary tool policy\n\n```json\n[\n  {\n    \"tool_name\": \"WebSearch\",\n    \"usage_mode\": \"required\",\n    \"reason\": \"场景要求比较当前产业与机会信号，需要带来源的最新公开证据\",\n    \"condition\": null,\n    \"fallback\": null\n  },\n  {\n    \"tool_name\": \"WebFetch\",\n    \"usage_mode\": \"conditional\",\n    \"reason\": \"在搜索结果摘要不足以支持判断时读取原始页面\",\n    \"condition\": \"候选来源与关键结论需要原文核验\",\n    \"fallback\": \"保留摘要来源并降低对应结论置信度\"\n  }\n]\n```\n\n`required` tools are part of the normal path. `optional` and `conditional` tools must only be called under their declared conditions; otherwise follow their fallback. An empty list means the child model must reason only over supplied inputs.\n\n## Input schema\n\n```json\n{\n  \"profile\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"用户教育、能力、经历、偏好和约束画像\",\n    \"source\": \"profile\",\n    \"available\": true\n  },\n  \"industry_landscape\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"产业问题与价值链地图\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"organization_evidence\": {\n    \"type\": \"array\",\n    \"required\": true,\n    \"description\": \"带来源和时间戳的外部市场证据\",\n    \"source\": \"external_data\",\n    \"available\": false\n  }\n}\n```\n\nIf a required input cannot be obtained under the declared tool policy, return `insufficient_input`.\n\n## Output schema\n\nPass a JSON object matching this schema-like contract as `result`:\n\n```json\n{\n  \"employer_segments\": {\n    \"type\": \"array\",\n    \"description\": \"组织分层、代表组织、环境特征、适配理由和验证项\"\n  }\n}\n```\n\nDeclared consumers:\n- live-opportunity-discovery\n\n## Completion\n\nCall `ReturnSkillResult` with the Harness-provided `skill_call_id` and `skill_name`, one of `success`, `insufficient_input`, or `error`, a concise summary, and the structured result.\n",
+        "action-tool.json": {
+          "tool_name": "EmployerTargetMapping",
+          "user_facing_name": "组织生态地图",
+          "search_hint": "按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层",
+          "preserve_existing": false,
+          "always_load": false,
+          "read_only": false,
+          "child_tools": [
+            "WebSearch",
+            "WebFetch"
+          ],
+          "input": {
+            "profile": {
+              "type": "json",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像"
+            },
+            "industry_landscape": {
+              "type": "json",
+              "required": true,
+              "description": "产业问题与价值链地图"
+            },
+            "organization_evidence": {
+              "type": "json",
+              "required": true,
+              "description": "带来源和时间戳的外部市场证据"
+            }
+          }
+        },
+        "skilltool.json": {
+          "skill_id": "employer_target_mapping",
+          "skill_name": "employer-target-mapping",
+          "tool_name": "EmployerTargetMapping",
+          "title": "组织生态地图",
+          "business_goal": "按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层",
+          "when_to_use": "当需要按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层时使用。",
+          "task_ids": [
+            "employer_segment_mapping"
+          ],
+          "scenario_binding": {
+            "domain_source": "scenario_only",
+            "domain_mode": "open",
+            "explicit_domains": [],
+            "profile_role": "evidence_only"
+          },
+          "scope": {
+            "includes": [
+              "按产业问题、组织类型、地点和团队环境形成可解释的目标组织分层"
+            ],
+            "excludes": [
+              "替用户做最终决定",
+              "修改主程序状态"
+            ]
+          },
+          "input_schema": {
+            "profile": {
+              "type": "object",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像",
+              "source": "profile",
+              "available": true
+            },
+            "industry_landscape": {
+              "type": "object",
+              "required": true,
+              "description": "产业问题与价值链地图",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "organization_evidence": {
+              "type": "array",
+              "required": true,
+              "description": "带来源和时间戳的外部市场证据",
+              "source": "external_data",
+              "available": false
+            }
+          },
+          "output_schema": {
+            "employer_segments": {
+              "type": "array",
+              "description": "组织分层、代表组织、环境特征、适配理由和验证项"
+            }
+          },
+          "output_consumers": [
+            "live-opportunity-discovery"
+          ],
+          "tool_selection": [
+            {
+              "tool_name": "WebSearch",
+              "usage_mode": "required",
+              "reason": "场景要求比较当前产业与机会信号，需要带来源的最新公开证据",
+              "condition": null,
+              "fallback": null
+            },
+            {
+              "tool_name": "WebFetch",
+              "usage_mode": "conditional",
+              "reason": "在搜索结果摘要不足以支持判断时读取原始页面",
+              "condition": "候选来源与关键结论需要原文核验",
+              "fallback": "保留摘要来源并降低对应结论置信度"
+            }
+          ],
+          "child_tools": [
+            "WebSearch",
+            "WebFetch"
+          ],
+          "fresh_data_policy": "required",
+          "complexity": {
+            "level": "bounded",
+            "estimated_steps": 4,
+            "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+          },
+          "independence": {
+            "portable": true,
+            "assumptions": [
+              "输入通过JSON契约提供",
+              "模型通过外部API运行"
+            ]
+          },
+          "evaluation_cases": [
+            {
+              "case": "输入完整且证据充分",
+              "expected_outcome": "success"
+            },
+            {
+              "case": "缺少关键必需输入",
+              "expected_outcome": "insufficient_input"
+            }
+          ]
+        },
+        "tests/eval_cases.json": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    },
+    {
+      "skill_name": "live-opportunity-discovery",
+      "files": {
+        "SKILL.md": "---\nname: live-opportunity-discovery\ndescription: 当需要基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会时使用。\nmodel-entry: action-tool\n---\n\n# 实时机会发现\n\n## Business goal\n\n基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会\n\n## Scope\n\nIncluded:\n- 基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会\n\nExcluded:\n- 自动投递\n- 虚构机会状态\n\n## Scenario binding\n\n```json\n{\n  \"domain_source\": \"scenario_only\",\n  \"domain_mode\": \"open\",\n  \"explicit_domains\": [],\n  \"profile_role\": \"evidence_only\"\n}\n```\n\nThe scenario defines the domain. Profile data is evidence only and must never silently redefine the scenario.\n\n## Runtime contract\n\n- Run as a standalone child model through the configured external API.\n- Treat `<skill-action-input>` as the invocation input.\n- Use only the declared non-Skill child tools: WebSearch, WebFetch.\n- Never discover or invoke another Skill from inside this SkillTool.\n- Do not depend on main-program routes, state, databases, or implementation details.\n- Preserve evidence sources and expose material uncertainty.\n- Call `ReturnSkillResult` exactly once before completing.\n\n## Auxiliary tool policy\n\n```json\n[\n  {\n    \"tool_name\": \"WebSearch\",\n    \"usage_mode\": \"required\",\n    \"reason\": \"发现当前公开岗位、项目或组织机会\",\n    \"condition\": null,\n    \"fallback\": null\n  },\n  {\n    \"tool_name\": \"WebFetch\",\n    \"usage_mode\": \"conditional\",\n    \"reason\": \"核验具体机会页面的要求与时效\",\n    \"condition\": \"搜索结果提供可访问的具体机会链接\",\n    \"fallback\": \"将机会标记为未核验，不把它纳入高置信度结果\"\n  }\n]\n```\n\n`required` tools are part of the normal path. `optional` and `conditional` tools must only be called under their declared conditions; otherwise follow their fallback. An empty list means the child model must reason only over supplied inputs.\n\n## Input schema\n\n```json\n{\n  \"role_family_matrix\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"岗位族矩阵\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"employer_segments\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"目标组织分层\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"search_constraints\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"地点、时间、机会类型和组织偏好\",\n    \"source\": \"profile\",\n    \"available\": true\n  }\n}\n```\n\nIf a required input cannot be obtained under the declared tool policy, return `insufficient_input`.\n\n## Output schema\n\nPass a JSON object matching this schema-like contract as `result`:\n\n```json\n{\n  \"opportunity_inventory\": {\n    \"type\": \"array\",\n    \"description\": \"机会类型、角色、组织、链接、发布时间、要求摘要和来源\"\n  }\n}\n```\n\nDeclared consumers:\n- capability-evidence-assessment\n- opportunity-portfolio-prioritization\n\n## Completion\n\nCall `ReturnSkillResult` with the Harness-provided `skill_call_id` and `skill_name`, one of `success`, `insufficient_input`, or `error`, a concise summary, and the structured result.\n",
+        "action-tool.json": {
+          "tool_name": "LiveOpportunityDiscovery",
+          "user_facing_name": "实时机会发现",
+          "search_hint": "基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会",
+          "preserve_existing": false,
+          "always_load": false,
+          "read_only": false,
+          "child_tools": [
+            "WebSearch",
+            "WebFetch"
+          ],
+          "input": {
+            "role_family_matrix": {
+              "type": "json",
+              "required": true,
+              "description": "岗位族矩阵"
+            },
+            "employer_segments": {
+              "type": "json",
+              "required": true,
+              "description": "目标组织分层"
+            },
+            "search_constraints": {
+              "type": "json",
+              "required": true,
+              "description": "地点、时间、机会类型和组织偏好"
+            }
+          }
+        },
+        "skilltool.json": {
+          "skill_id": "live_opportunity_discovery",
+          "skill_name": "live-opportunity-discovery",
+          "tool_name": "LiveOpportunityDiscovery",
+          "title": "实时机会发现",
+          "business_goal": "基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会",
+          "when_to_use": "当需要基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会时使用。",
+          "task_ids": [
+            "opportunity_signal_discovery"
+          ],
+          "scenario_binding": {
+            "domain_source": "scenario_only",
+            "domain_mode": "open",
+            "explicit_domains": [],
+            "profile_role": "evidence_only"
+          },
+          "scope": {
+            "includes": [
+              "基于目标问题、岗位族和组织范围发现带链接、时间与证据的岗位、项目或实习机会"
+            ],
+            "excludes": [
+              "自动投递",
+              "虚构机会状态"
+            ]
+          },
+          "input_schema": {
+            "role_family_matrix": {
+              "type": "object",
+              "required": true,
+              "description": "岗位族矩阵",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "employer_segments": {
+              "type": "object",
+              "required": true,
+              "description": "目标组织分层",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "search_constraints": {
+              "type": "object",
+              "required": true,
+              "description": "地点、时间、机会类型和组织偏好",
+              "source": "profile",
+              "available": true
+            }
+          },
+          "output_schema": {
+            "opportunity_inventory": {
+              "type": "array",
+              "description": "机会类型、角色、组织、链接、发布时间、要求摘要和来源"
+            }
+          },
+          "output_consumers": [
+            "capability-evidence-assessment",
+            "opportunity-portfolio-prioritization"
+          ],
+          "tool_selection": [
+            {
+              "tool_name": "WebSearch",
+              "usage_mode": "required",
+              "reason": "发现当前公开岗位、项目或组织机会",
+              "condition": null,
+              "fallback": null
+            },
+            {
+              "tool_name": "WebFetch",
+              "usage_mode": "conditional",
+              "reason": "核验具体机会页面的要求与时效",
+              "condition": "搜索结果提供可访问的具体机会链接",
+              "fallback": "将机会标记为未核验，不把它纳入高置信度结果"
+            }
+          ],
+          "child_tools": [
+            "WebSearch",
+            "WebFetch"
+          ],
+          "fresh_data_policy": "required",
+          "complexity": {
+            "level": "bounded",
+            "estimated_steps": 4,
+            "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+          },
+          "independence": {
+            "portable": true,
+            "assumptions": [
+              "输入通过JSON契约提供",
+              "模型通过外部API运行"
+            ]
+          },
+          "evaluation_cases": [
+            {
+              "case": "输入完整且证据充分",
+              "expected_outcome": "success"
+            },
+            {
+              "case": "缺少关键必需输入",
+              "expected_outcome": "insufficient_input"
+            }
+          ]
+        },
+        "tests/eval_cases.json": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    },
+    {
+      "skill_name": "capability-evidence-assessment",
+      "files": {
+        "SKILL.md": "---\nname: capability-evidence-assessment\ndescription: 当需要把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项时使用。\nmodel-entry: action-tool\n---\n\n# 能力证据评估\n\n## Business goal\n\n把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项\n\n## Scope\n\nIncluded:\n- 把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项\n\nExcluded:\n- 制定完整学习计划\n- 采集新的能力证据\n\n## Scenario binding\n\n```json\n{\n  \"domain_source\": \"scenario_only\",\n  \"domain_mode\": \"open\",\n  \"explicit_domains\": [],\n  \"profile_role\": \"evidence_only\"\n}\n```\n\nThe scenario defines the domain. Profile data is evidence only and must never silently redefine the scenario.\n\n## Runtime contract\n\n- Run as a standalone child model through the configured external API.\n- Treat `<skill-action-input>` as the invocation input.\n- Use only the declared non-Skill child tools: none.\n- Never discover or invoke another Skill from inside this SkillTool.\n- Do not depend on main-program routes, state, databases, or implementation details.\n- Preserve evidence sources and expose material uncertainty.\n- Call `ReturnSkillResult` exactly once before completing.\n\n## Auxiliary tool policy\n\n```json\n[]\n```\n\n`required` tools are part of the normal path. `optional` and `conditional` tools must only be called under their declared conditions; otherwise follow their fallback. An empty list means the child model must reason only over supplied inputs.\n\n## Input schema\n\n```json\n{\n  \"profile\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"用户教育、能力、经历、偏好和约束画像\",\n    \"source\": \"profile\",\n    \"available\": true\n  },\n  \"role_family_matrix\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"岗位要求矩阵\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"opportunity_inventory\": {\n    \"type\": \"array\",\n    \"required\": false,\n    \"description\": \"可选的具体岗位机会\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  }\n}\n```\n\nIf a required input cannot be obtained under the declared tool policy, return `insufficient_input`.\n\n## Output schema\n\nPass a JSON object matching this schema-like contract as `result`:\n\n```json\n{\n  \"evidence_matrix\": {\n    \"type\": \"array\",\n    \"description\": \"要求、证据、证据强度、未知项和冲突\"\n  }\n}\n```\n\nDeclared consumers:\n- opportunity-portfolio-prioritization\n- exploration-experiment-design\n\n## Completion\n\nCall `ReturnSkillResult` with the Harness-provided `skill_call_id` and `skill_name`, one of `success`, `insufficient_input`, or `error`, a concise summary, and the structured result.\n",
+        "action-tool.json": {
+          "tool_name": "CapabilityEvidenceAssessment",
+          "user_facing_name": "能力证据评估",
+          "search_hint": "把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项",
+          "preserve_existing": false,
+          "always_load": false,
+          "read_only": true,
+          "child_tools": [],
+          "input": {
+            "profile": {
+              "type": "json",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像"
+            },
+            "role_family_matrix": {
+              "type": "json",
+              "required": true,
+              "description": "岗位要求矩阵"
+            },
+            "opportunity_inventory": {
+              "type": "json",
+              "required": false,
+              "description": "可选的具体岗位机会"
+            }
+          }
+        },
+        "skilltool.json": {
+          "skill_id": "capability_evidence_assessment",
+          "skill_name": "capability-evidence-assessment",
+          "tool_name": "CapabilityEvidenceAssessment",
+          "title": "能力证据评估",
+          "business_goal": "把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项",
+          "when_to_use": "当需要把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项时使用。",
+          "task_ids": [
+            "capability_evidence_mapping"
+          ],
+          "scenario_binding": {
+            "domain_source": "scenario_only",
+            "domain_mode": "open",
+            "explicit_domains": [],
+            "profile_role": "evidence_only"
+          },
+          "scope": {
+            "includes": [
+              "把用户已有能力证据映射到目标岗位要求并区分优势、未知和未证实项"
+            ],
+            "excludes": [
+              "制定完整学习计划",
+              "采集新的能力证据"
+            ]
+          },
+          "input_schema": {
+            "profile": {
+              "type": "object",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像",
+              "source": "profile",
+              "available": true
+            },
+            "role_family_matrix": {
+              "type": "object",
+              "required": true,
+              "description": "岗位要求矩阵",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "opportunity_inventory": {
+              "type": "array",
+              "required": false,
+              "description": "可选的具体岗位机会",
+              "source": "prior_skill_output",
+              "available": true
+            }
+          },
+          "output_schema": {
+            "evidence_matrix": {
+              "type": "array",
+              "description": "要求、证据、证据强度、未知项和冲突"
+            }
+          },
+          "output_consumers": [
+            "opportunity-portfolio-prioritization",
+            "exploration-experiment-design"
+          ],
+          "tool_selection": [],
+          "child_tools": [],
+          "fresh_data_policy": "none",
+          "complexity": {
+            "level": "bounded",
+            "estimated_steps": 4,
+            "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+          },
+          "independence": {
+            "portable": true,
+            "assumptions": [
+              "输入通过JSON契约提供",
+              "模型通过外部API运行"
+            ]
+          },
+          "evaluation_cases": [
+            {
+              "case": "输入完整且证据充分",
+              "expected_outcome": "success"
+            },
+            {
+              "case": "缺少关键必需输入",
+              "expected_outcome": "insufficient_input"
+            }
+          ]
+        },
+        "tests/eval_cases.json": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    },
+    {
+      "skill_name": "opportunity-portfolio-prioritization",
+      "files": {
+        "SKILL.md": "---\nname: opportunity-portfolio-prioritization\ndescription: 当需要按匹配度、成长性、可进入性、偏好和证据质量比较机会组合时使用。\nmodel-entry: action-tool\n---\n\n# 机会组合优先级\n\n## Business goal\n\n按匹配度、成长性、可进入性、偏好和证据质量比较机会组合\n\n## Scope\n\nIncluded:\n- 按匹配度、成长性、可进入性、偏好和证据质量比较机会组合\n\nExcluded:\n- 替用户做最终决定\n- 修改主程序状态\n\n## Scenario binding\n\n```json\n{\n  \"domain_source\": \"scenario_only\",\n  \"domain_mode\": \"open\",\n  \"explicit_domains\": [],\n  \"profile_role\": \"evidence_only\"\n}\n```\n\nThe scenario defines the domain. Profile data is evidence only and must never silently redefine the scenario.\n\n## Runtime contract\n\n- Run as a standalone child model through the configured external API.\n- Treat `<skill-action-input>` as the invocation input.\n- Use only the declared non-Skill child tools: none.\n- Never discover or invoke another Skill from inside this SkillTool.\n- Do not depend on main-program routes, state, databases, or implementation details.\n- Preserve evidence sources and expose material uncertainty.\n- Call `ReturnSkillResult` exactly once before completing.\n\n## Auxiliary tool policy\n\n```json\n[]\n```\n\n`required` tools are part of the normal path. `optional` and `conditional` tools must only be called under their declared conditions; otherwise follow their fallback. An empty list means the child model must reason only over supplied inputs.\n\n## Input schema\n\n```json\n{\n  \"profile\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"用户教育、能力、经历、偏好和约束画像\",\n    \"source\": \"profile\",\n    \"available\": true\n  },\n  \"industry_landscape\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"行业地图\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"role_family_matrix\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"岗位族矩阵\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"opportunity_inventory\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"机会池\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"evidence_matrix\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"能力证据矩阵\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  }\n}\n```\n\nIf a required input cannot be obtained under the declared tool policy, return `insufficient_input`.\n\n## Output schema\n\nPass a JSON object matching this schema-like contract as `result`:\n\n```json\n{\n  \"ranked_portfolio\": {\n    \"type\": \"array\",\n    \"description\": \"带分项依据、置信度和敏感性的优先机会组合\"\n  }\n}\n```\n\nDeclared consumers:\n- user_decision\n- exploration-experiment-design\n\n## Completion\n\nCall `ReturnSkillResult` with the Harness-provided `skill_call_id` and `skill_name`, one of `success`, `insufficient_input`, or `error`, a concise summary, and the structured result.\n",
+        "action-tool.json": {
+          "tool_name": "OpportunityPortfolioPrioritization",
+          "user_facing_name": "机会组合优先级",
+          "search_hint": "按匹配度、成长性、可进入性、偏好和证据质量比较机会组合",
+          "preserve_existing": false,
+          "always_load": false,
+          "read_only": true,
+          "child_tools": [],
+          "input": {
+            "profile": {
+              "type": "json",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像"
+            },
+            "industry_landscape": {
+              "type": "json",
+              "required": true,
+              "description": "行业地图"
+            },
+            "role_family_matrix": {
+              "type": "json",
+              "required": true,
+              "description": "岗位族矩阵"
+            },
+            "opportunity_inventory": {
+              "type": "json",
+              "required": true,
+              "description": "机会池"
+            },
+            "evidence_matrix": {
+              "type": "json",
+              "required": true,
+              "description": "能力证据矩阵"
+            }
+          }
+        },
+        "skilltool.json": {
+          "skill_id": "opportunity_portfolio_prioritization",
+          "skill_name": "opportunity-portfolio-prioritization",
+          "tool_name": "OpportunityPortfolioPrioritization",
+          "title": "机会组合优先级",
+          "business_goal": "按匹配度、成长性、可进入性、偏好和证据质量比较机会组合",
+          "when_to_use": "当需要按匹配度、成长性、可进入性、偏好和证据质量比较机会组合时使用。",
+          "task_ids": [
+            "opportunity_fit_scoring"
+          ],
+          "scenario_binding": {
+            "domain_source": "scenario_only",
+            "domain_mode": "open",
+            "explicit_domains": [],
+            "profile_role": "evidence_only"
+          },
+          "scope": {
+            "includes": [
+              "按匹配度、成长性、可进入性、偏好和证据质量比较机会组合"
+            ],
+            "excludes": [
+              "替用户做最终决定",
+              "修改主程序状态"
+            ]
+          },
+          "input_schema": {
+            "profile": {
+              "type": "object",
+              "required": true,
+              "description": "用户教育、能力、经历、偏好和约束画像",
+              "source": "profile",
+              "available": true
+            },
+            "industry_landscape": {
+              "type": "object",
+              "required": true,
+              "description": "行业地图",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "role_family_matrix": {
+              "type": "object",
+              "required": true,
+              "description": "岗位族矩阵",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "opportunity_inventory": {
+              "type": "object",
+              "required": true,
+              "description": "机会池",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "evidence_matrix": {
+              "type": "object",
+              "required": true,
+              "description": "能力证据矩阵",
+              "source": "prior_skill_output",
+              "available": true
+            }
+          },
+          "output_schema": {
+            "ranked_portfolio": {
+              "type": "array",
+              "description": "带分项依据、置信度和敏感性的优先机会组合"
+            }
+          },
+          "output_consumers": [
+            "user_decision",
+            "exploration-experiment-design"
+          ],
+          "tool_selection": [],
+          "child_tools": [],
+          "fresh_data_policy": "none",
+          "complexity": {
+            "level": "bounded",
+            "estimated_steps": 5,
+            "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+          },
+          "independence": {
+            "portable": true,
+            "assumptions": [
+              "输入通过JSON契约提供",
+              "模型通过外部API运行"
+            ]
+          },
+          "evaluation_cases": [
+            {
+              "case": "输入完整且证据充分",
+              "expected_outcome": "success"
+            },
+            {
+              "case": "缺少关键必需输入",
+              "expected_outcome": "insufficient_input"
+            }
+          ]
+        },
+        "tests/eval_cases.json": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    },
+    {
+      "skill_name": "exploration-experiment-design",
+      "files": {
+        "SKILL.md": "---\nname: exploration-experiment-design\ndescription: 当需要针对高优先级方向的关键不确定性设计低成本、可判定的验证任务时使用。\nmodel-entry: action-tool\n---\n\n# 探索实验设计\n\n## Business goal\n\n针对高优先级方向的关键不确定性设计低成本、可判定的验证任务\n\n## Scope\n\nIncluded:\n- 针对高优先级方向的关键不确定性设计低成本、可判定的验证任务\n\nExcluded:\n- 生成长期课程表\n- 保证求职结果\n\n## Scenario binding\n\n```json\n{\n  \"domain_source\": \"scenario_only\",\n  \"domain_mode\": \"open\",\n  \"explicit_domains\": [],\n  \"profile_role\": \"evidence_only\"\n}\n```\n\nThe scenario defines the domain. Profile data is evidence only and must never silently redefine the scenario.\n\n## Runtime contract\n\n- Run as a standalone child model through the configured external API.\n- Treat `<skill-action-input>` as the invocation input.\n- Use only the declared non-Skill child tools: none.\n- Never discover or invoke another Skill from inside this SkillTool.\n- Do not depend on main-program routes, state, databases, or implementation details.\n- Preserve evidence sources and expose material uncertainty.\n- Call `ReturnSkillResult` exactly once before completing.\n\n## Auxiliary tool policy\n\n```json\n[]\n```\n\n`required` tools are part of the normal path. `optional` and `conditional` tools must only be called under their declared conditions; otherwise follow their fallback. An empty list means the child model must reason only over supplied inputs.\n\n## Input schema\n\n```json\n{\n  \"ranked_portfolio\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"优先机会组合\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"evidence_matrix\": {\n    \"type\": \"object\",\n    \"required\": true,\n    \"description\": \"能力证据矩阵\",\n    \"source\": \"prior_skill_output\",\n    \"available\": true\n  },\n  \"time_budget\": {\n    \"type\": \"string\",\n    \"required\": true,\n    \"description\": \"可用于探索的时间预算\",\n    \"source\": \"state\",\n    \"available\": true\n  }\n}\n```\n\nIf a required input cannot be obtained under the declared tool policy, return `insufficient_input`.\n\n## Output schema\n\nPass a JSON object matching this schema-like contract as `result`:\n\n```json\n{\n  \"validation_experiments\": {\n    \"type\": \"array\",\n    \"description\": \"任务、假设、成功信号、成本、期限和决策规则\"\n  }\n}\n```\n\nDeclared consumers:\n- user_decision\n\n## Completion\n\nCall `ReturnSkillResult` with the Harness-provided `skill_call_id` and `skill_name`, one of `success`, `insufficient_input`, or `error`, a concise summary, and the structured result.\n",
+        "action-tool.json": {
+          "tool_name": "ExplorationExperimentDesign",
+          "user_facing_name": "探索实验设计",
+          "search_hint": "针对高优先级方向的关键不确定性设计低成本、可判定的验证任务",
+          "preserve_existing": false,
+          "always_load": false,
+          "read_only": true,
+          "child_tools": [],
+          "input": {
+            "ranked_portfolio": {
+              "type": "json",
+              "required": true,
+              "description": "优先机会组合"
+            },
+            "evidence_matrix": {
+              "type": "json",
+              "required": true,
+              "description": "能力证据矩阵"
+            },
+            "time_budget": {
+              "type": "string",
+              "required": true,
+              "description": "可用于探索的时间预算"
+            }
+          }
+        },
+        "skilltool.json": {
+          "skill_id": "exploration_experiment_design",
+          "skill_name": "exploration-experiment-design",
+          "tool_name": "ExplorationExperimentDesign",
+          "title": "探索实验设计",
+          "business_goal": "针对高优先级方向的关键不确定性设计低成本、可判定的验证任务",
+          "when_to_use": "当需要针对高优先级方向的关键不确定性设计低成本、可判定的验证任务时使用。",
+          "task_ids": [
+            "exploration_experiment_design"
+          ],
+          "scenario_binding": {
+            "domain_source": "scenario_only",
+            "domain_mode": "open",
+            "explicit_domains": [],
+            "profile_role": "evidence_only"
+          },
+          "scope": {
+            "includes": [
+              "针对高优先级方向的关键不确定性设计低成本、可判定的验证任务"
+            ],
+            "excludes": [
+              "生成长期课程表",
+              "保证求职结果"
+            ]
+          },
+          "input_schema": {
+            "ranked_portfolio": {
+              "type": "object",
+              "required": true,
+              "description": "优先机会组合",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "evidence_matrix": {
+              "type": "object",
+              "required": true,
+              "description": "能力证据矩阵",
+              "source": "prior_skill_output",
+              "available": true
+            },
+            "time_budget": {
+              "type": "string",
+              "required": true,
+              "description": "可用于探索的时间预算",
+              "source": "state",
+              "available": true
+            }
+          },
+          "output_schema": {
+            "validation_experiments": {
+              "type": "array",
+              "description": "任务、假设、成功信号、成本、期限和决策规则"
+            }
+          },
+          "output_consumers": [
+            "user_decision"
+          ],
+          "tool_selection": [],
+          "child_tools": [],
+          "fresh_data_policy": "none",
+          "complexity": {
+            "level": "bounded",
+            "estimated_steps": 4,
+            "rationale": "形成一个可独立验证、可被后续任务消费的业务结果。"
+          },
+          "independence": {
+            "portable": true,
+            "assumptions": [
+              "输入通过JSON契约提供",
+              "模型通过外部API运行"
+            ]
+          },
+          "evaluation_cases": [
+            {
+              "case": "输入完整且证据充分",
+              "expected_outcome": "success"
+            },
+            {
+              "case": "缺少关键必需输入",
+              "expected_outcome": "insufficient_input"
+            }
+          ]
+        },
+        "tests/eval_cases.json": [
+          {
+            "case": "输入完整且证据充分",
+            "expected_outcome": "success"
+          },
+          {
+            "case": "缺少关键必需输入",
+            "expected_outcome": "insufficient_input"
+          }
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "needs": 8,
+    "tasks": 9,
+    "skilltools": 9,
+    "eligible_artifacts": 9,
+    "quality_score": 100.0
+  }
+}

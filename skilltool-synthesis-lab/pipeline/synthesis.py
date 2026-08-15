@@ -6,15 +6,16 @@ import json
 from pathlib import Path
 from typing import Any, Protocol
 
-from .artifacts import build_artifact_preview, persist_run
-from .prompts import (
+from .artifact_store import persist_step_json
+from .step1_synthesis_prompts import (
     SYSTEM_PROMPT,
     candidate_synthesis_prompt,
     dedupe_merge_prompt,
     demand_analysis_prompt,
     task_synthesis_prompt,
 )
-from .quality import consolidate_candidates, evaluate_portfolio
+from .step2_quality_gate import consolidate_candidates, evaluate_portfolio
+from .step3_artifact_generation import build_artifact_preview, persist_run
 
 
 class JsonModel(Protocol):
@@ -90,13 +91,36 @@ class SynthesisPipeline:
         if not profile or not state or not scenario:
             raise PipelineError("input", "profile, state, and scenario are required")
 
+        run_id = f"run-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"
         stage_meta: list[dict[str, Any]] = []
+        demand_prompt = demand_analysis_prompt(profile, state, scenario)
         demand_analysis, meta = self._stage(
             "demand_analysis",
-            demand_analysis_prompt(profile, state, scenario),
+            demand_prompt,
         )
         _array("demand_analysis", demand_analysis, "needs")
         stage_meta.append(meta)
+        if persist:
+            if self.runs_root is None:
+                raise PipelineError("persist", "runs_root is not configured")
+            persist_step_json(
+                self.runs_root,
+                run_id,
+                "step1_demand_analysis",
+                {
+                    "request.json": {
+                        "model_mode": model_mode,
+                        "inputs": {
+                            "profile": profile,
+                            "state": state,
+                            "scenario": scenario,
+                        },
+                        "system_prompt": SYSTEM_PROMPT,
+                        "user_prompt": demand_prompt,
+                    },
+                    "demand_analysis.json": demand_analysis,
+                },
+            )
 
         task_map, meta = self._stage(
             "task_synthesis",
@@ -152,7 +176,6 @@ class SynthesisPipeline:
             if report_by_skill.get(candidate.get("skill_id"), {}).get("passed")
         ]
         artifacts = [build_artifact_preview(candidate) for candidate in eligible]
-        run_id = f"run-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"
         result: dict[str, Any] = {
             "run_id": run_id,
             "model_mode": model_mode,

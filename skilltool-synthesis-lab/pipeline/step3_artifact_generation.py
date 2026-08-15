@@ -131,7 +131,7 @@ def build_artifact_preview(candidate: dict[str, Any]) -> dict[str, Any]:
 
 def persist_run(runs_root: Path, run_id: str, payload: dict[str, Any]) -> Path:
     run_dir = runs_root / run_id
-    run_dir.mkdir(parents=True, exist_ok=False)
+    run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "run.json").write_text(_json(payload) + "\n", encoding="utf-8")
     skills_dir = run_dir / "generated-skills"
     for artifact in payload.get("artifacts") or []:
