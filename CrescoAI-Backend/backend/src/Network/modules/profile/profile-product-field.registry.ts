@@ -3,11 +3,11 @@ import type {
   ProfileProductValue,
 } from './profile-product.types';
 
-export type ProfileProductCodec = 'text' | 'string_list' | 'line_list' | 'number';
+export type ProfileProductCodec = 'text' | 'string_list' | 'line_list' | 'number' | 'date';
 
 export interface ProfileProductFieldDefinition {
   fieldKey: ProfileProductFieldKey;
-  storage: 'base' | 'memory';
+  storage: 'base' | 'education' | 'memory';
   codec: ProfileProductCodec;
   baseProperty?:
     | 'name'
@@ -15,7 +15,14 @@ export interface ProfileProductFieldDefinition {
     | 'currentCity'
     | 'currentStatus'
     | 'currentIndustry'
-    | 'yearsOfExperience';
+    | 'yearsOfExperience'
+    | 'educationLevel';
+  educationProperty?:
+    | 'school'
+    | 'major'
+    | 'degree'
+    | 'graduationDate'
+    | 'description';
   slotKey?: string;
   aliases?: readonly string[];
   category: string;
@@ -32,6 +39,12 @@ const definitions: ProfileProductFieldDefinition[] = [
   { fieldKey: 'base.currentStatus', storage: 'base', codec: 'text', baseProperty: 'currentStatus', category: 'career', appliesTo: ['career', 'job'], timeScope: 'short_term', priority: 'normal', internalLevel: 'L3' },
   { fieldKey: 'base.currentIndustry', storage: 'base', codec: 'text', baseProperty: 'currentIndustry', category: 'career', appliesTo: ['career', 'job'], timeScope: 'long_term', priority: 'normal', internalLevel: 'L3' },
   { fieldKey: 'base.yearsOfExperience', storage: 'base', codec: 'number', baseProperty: 'yearsOfExperience', category: 'career', appliesTo: ['career', 'job', 'resume'], timeScope: 'long_term', priority: 'normal', internalLevel: 'L3' },
+  { fieldKey: 'base.educationLevel', storage: 'base', codec: 'text', baseProperty: 'educationLevel', category: 'education', appliesTo: ['profile', 'career', 'job', 'resume'], timeScope: 'long_term', priority: 'normal', internalLevel: 'L3' },
+  { fieldKey: 'education.school', storage: 'education', codec: 'text', educationProperty: 'school', category: 'education', appliesTo: ['profile', 'career', 'job', 'resume'], timeScope: 'long_term', priority: 'high', internalLevel: 'L3' },
+  { fieldKey: 'education.major', storage: 'education', codec: 'text', educationProperty: 'major', category: 'education', appliesTo: ['profile', 'career', 'job', 'resume', 'learning'], timeScope: 'long_term', priority: 'high', internalLevel: 'L3' },
+  { fieldKey: 'education.degree', storage: 'education', codec: 'text', educationProperty: 'degree', category: 'education', appliesTo: ['profile', 'career', 'job', 'resume'], timeScope: 'long_term', priority: 'normal', internalLevel: 'L3' },
+  { fieldKey: 'education.graduationDate', storage: 'education', codec: 'date', educationProperty: 'graduationDate', category: 'education', appliesTo: ['profile', 'career', 'job', 'resume'], timeScope: 'long_term', priority: 'normal', internalLevel: 'L3' },
+  { fieldKey: 'education.description', storage: 'education', codec: 'text', educationProperty: 'description', category: 'education', appliesTo: ['profile', 'career', 'job', 'resume', 'learning'], timeScope: 'long_term', priority: 'normal', internalLevel: 'L3' },
   { fieldKey: 'profile.summary', storage: 'memory', codec: 'text', slotKey: 'profile.summary', aliases: ['legacy.artifacts.resumeSummary'], category: 'summary', appliesTo: ['profile', 'career', 'resume'], timeScope: 'long_term', priority: 'normal', internalLevel: 'L2' },
   { fieldKey: 'career.skills', storage: 'memory', codec: 'string_list', slotKey: 'career.skills', aliases: ['legacy.careerProfile.skills'], category: 'skill', appliesTo: ['career', 'job', 'resume', 'learning'], timeScope: 'long_term', priority: 'high', internalLevel: 'L2' },
   { fieldKey: 'career.workExperience', storage: 'memory', codec: 'line_list', slotKey: 'career.work_experience', aliases: ['legacy.careerProfile.workExperience'], category: 'experience', appliesTo: ['career', 'job', 'resume', 'interview'], timeScope: 'long_term', priority: 'high', internalLevel: 'L2' },
@@ -73,6 +86,19 @@ export function normalizeProfileProductValue(
   definition: ProfileProductFieldDefinition,
   value: unknown,
 ): ProfileProductValue {
+  if (definition.codec === 'date') {
+    if (value === null || value === '' || value === undefined) return null;
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value.trim())) {
+      throw new Error(`${definition.fieldKey} must use YYYY-MM-DD`);
+    }
+    const normalized = value.trim();
+    const parsed = new Date(`${normalized}T00:00:00Z`);
+    if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== normalized) {
+      throw new Error(`${definition.fieldKey} must be a valid date`);
+    }
+    return normalized;
+  }
+
   if (definition.codec === 'number') {
     if (value === null || value === '' || value === undefined) return null;
     const numberValue = typeof value === 'number' ? value : Number(value);

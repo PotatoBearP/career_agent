@@ -28,6 +28,106 @@ describe('OpenAI compatibility adapter', () => {
     expect(translated.stream_options).toEqual({ include_usage: true })
   })
 
+  test('turns Anthropic tool references into actionable OpenAI tool results', () => {
+    const translated = translateAnthropicRequestToOpenAI({
+      model: 'GLM-5.2',
+      messages: [
+        {
+          role: 'assistant',
+          content: [{
+            type: 'tool_use',
+            id: 'tool-search-1',
+            name: 'ToolSearch',
+            input: { query: 'github repository information' },
+          }],
+        },
+        {
+          role: 'user',
+          content: [{
+            type: 'tool_result',
+            tool_use_id: 'tool-search-1',
+            content: [
+              { type: 'tool_reference', tool_name: 'mcp__github__get_me' },
+              { type: 'tool_reference', tool_name: 'mcp__github__search_repositories' },
+            ],
+          }],
+        },
+      ],
+      tools: [
+        {
+          name: 'ToolSearch',
+          input_schema: { type: 'object', properties: { query: { type: 'string' } } },
+        },
+        {
+          name: 'mcp__github__get_me',
+          description: 'Get the authenticated GitHub user',
+          input_schema: { type: 'object', properties: {} },
+        },
+        {
+          name: 'mcp__github__search_repositories',
+          description: 'Search GitHub repositories',
+          input_schema: { type: 'object', properties: { query: { type: 'string' } } },
+        },
+      ],
+    })
+
+    const messages = translated.messages as any[]
+    const toolResult = messages.find(message => message.role === 'tool')
+    expect(toolResult.tool_call_id).toBe('tool-search-1')
+    expect(toolResult.content).toContain('mcp__github__get_me')
+    expect(toolResult.content).toContain('mcp__github__search_repositories')
+    expect(toolResult.content).toContain('direct function calls')
+    expect(toolResult.content).not.toContain('tool_reference')
+
+    const toolNames = (translated.tools as any[])
+      .map(tool => tool.function.name)
+    expect(toolNames).toContain('mcp__github__get_me')
+    expect(toolNames).toContain('mcp__github__search_repositories')
+    expect(toolNames).not.toContain('ToolSearch')
+    expect(translated.tool_choice).toBe('required')
+  })
+
+  test('restores the normal OpenAI tool pool after a referenced tool returns', () => {
+    const translated = translateAnthropicRequestToOpenAI({
+      model: 'GLM-5.2',
+      messages: [
+        {
+          role: 'user',
+          content: [{
+            type: 'tool_result',
+            tool_use_id: 'tool-search-1',
+            content: [{ type: 'tool_reference', tool_name: 'mcp__github__get_me' }],
+          }],
+        },
+        {
+          role: 'assistant',
+          content: [{
+            type: 'tool_use',
+            id: 'github-1',
+            name: 'mcp__github__get_me',
+            input: {},
+          }],
+        },
+        {
+          role: 'user',
+          content: [{
+            type: 'tool_result',
+            tool_use_id: 'github-1',
+            content: '{"login":"test-user"}',
+          }],
+        },
+      ],
+      tools: [
+        { name: 'ToolSearch', input_schema: { type: 'object', properties: {} } },
+        { name: 'mcp__github__get_me', input_schema: { type: 'object', properties: {} } },
+      ],
+    })
+
+    const toolNames = (translated.tools as any[]).map(tool => tool.function.name)
+    expect(toolNames).toEqual(['ToolSearch', 'mcp__github__get_me'])
+    expect(translated.tool_choice).toBeUndefined()
+  })
+
   test('translates a non-streaming OpenAI response without losing its prefix', () => {
     const translated = translateOpenAIResponseToAnthropic({
       id: 'chatcmpl-1',

@@ -22,6 +22,7 @@ import { accumulateUsage, updateUsage } from '../services/api/claude.js'
 import { EMPTY_USAGE, type NonNullableUsage } from '../services/api/logging.js'
 import type { ToolUseContext } from '../Tool.js'
 import type { AgentDefinition } from '../tools/AgentTool/loadAgentsDir.js'
+import { GENERAL_PURPOSE_AGENT } from '../tools/AgentTool/built-in/generalPurposeAgent.js'
 import type { AgentId } from '../types/ids.js'
 import type { Message } from '../types/message.js'
 import { createChildAbortController } from './abortController.js'
@@ -214,11 +215,8 @@ export async function prepareForkedCommandContext(
   const baseAgent =
     agents.find(a => a.agentType === agentTypeName) ??
     agents.find(a => a.agentType === 'general-purpose') ??
-    agents[0]
-
-  if (!baseAgent) {
-    throw new Error('No agent available for forked execution')
-  }
+    agents[0] ??
+    GENERAL_PURPOSE_AGENT
 
   // Prepare prompt messages
   const promptMessages = [createUserMessage({ content: skillContent })]

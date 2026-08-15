@@ -19,6 +19,7 @@ import { ProfileEvidenceLinkEntity } from './modules/profile/entities/profile-ev
 import { ProfileRefreshJobEntity } from './modules/profile/entities/profile-refresh-job.entity.js';
 import { ResourceEntity } from './modules/resource/entities/resource.entity.js';
 import { ApiSettingsEntity } from './modules/settings/entities/api-settings.entity.js';
+import { McpSettingEntity } from './modules/settings/entities/mcp-setting.entity.js';
 import { TeamEntity } from './modules/team/entities/team.entity.js';
 import { UserEntity } from './modules/user/entities/user.entity.js';
 
@@ -37,6 +38,7 @@ export const careerAgentEntities = [
   TeamEntity,
   MemoryEntity,
   ApiSettingsEntity,
+  McpSettingEntity,
   ResourceEntity,
   GeneratedAppEntity,
   ProfileSuggestionEntity,

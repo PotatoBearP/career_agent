@@ -57,6 +57,7 @@ export function createProfileRefreshTools(input: {
     buildTool({
       ...common,
       name: 'profile_read',
+      schemaCacheNamespace: 'product-profile-refresh',
       isReadOnly: () => true,
       searchHint: 'read the staged Profile refresh snapshot',
       async description() { return 'Read the current Profile snapshot including mutations staged in this refresh job.'; },
@@ -68,9 +69,10 @@ export function createProfileRefreshTools(input: {
     buildTool({
       ...common,
       name: 'profile_update',
+      schemaCacheNamespace: 'product-profile-refresh',
       searchHint: 'stage one evidence-grounded Profile refresh mutation',
       async description() { return 'Stage one Profile field add, set, clear, remove, or same-value verification with job-local evidence references.'; },
-      async prompt() { return 'Use only E-number references from the supplied catalog. One field per call. Same value plus evidenceRefs is a verification. Prefer list add/remove over set.'; },
+      async prompt() { return 'Use only E-number references from the supplied catalog. One field per call. Same value plus evidenceRefs is a verification. Prefer list add/remove over set. Save education facts with base.educationLevel or education.school, education.major, education.degree, education.graduationDate, and education.description; never put school, major, degree, or study year in base.currentRole or infer base.currentCity from a school location.'; },
       get inputSchema() { return updateInput(); },
       get outputSchema() { return resultSchema(); },
       async call(value) {

@@ -1383,12 +1383,12 @@ export const connectToServer = memoize(
         // Clear the memoization cache so next operation reconnects
         const key = getServerCacheKey(name, serverRef)
 
-        // Also clear fetch caches (keyed by server name). Reconnection
+        // Also clear fetch caches (keyed by server name and config). Reconnection
         // creates a new connection object; without clearing, the next
         // fetch would return stale tools/resources from the old connection.
-        fetchToolsForClient.cache.delete(name)
-        fetchResourcesForClient.cache.delete(name)
-        fetchCommandsForClient.cache.delete(name)
+        fetchToolsForClient.cache.delete(key)
+        fetchResourcesForClient.cache.delete(key)
+        fetchCommandsForClient.cache.delete(key)
         if (feature('MCP_SKILLS')) {
           fetchMcpSkillsForClient!.cache.delete(name)
         }
@@ -1664,9 +1664,9 @@ export async function clearServerCache(
   // Clear from cache (both connection and fetch caches so reconnect
   // fetches fresh tools/resources/commands instead of stale ones)
   connectToServer.cache.delete(key)
-  fetchToolsForClient.cache.delete(name)
-  fetchResourcesForClient.cache.delete(name)
-  fetchCommandsForClient.cache.delete(name)
+  fetchToolsForClient.cache.delete(key)
+  fetchResourcesForClient.cache.delete(key)
+  fetchCommandsForClient.cache.delete(key)
   if (feature('MCP_SKILLS')) {
     fetchMcpSkillsForClient!.cache.delete(name)
   }
@@ -1721,9 +1721,13 @@ export function areMcpConfigsEqual(
   return jsonStringify(configA) === jsonStringify(configB)
 }
 
-// Max cache size for fetch* caches. Keyed by server name (stable across
-// reconnects), bounded to prevent unbounded growth with many MCP servers.
+// Max cache size for fetch* caches. The full configuration signature is part
+// of the key so same-named servers cannot share user-specific tool closures.
 const MCP_FETCH_CACHE_SIZE = 20
+
+function getMcpFetchCacheKey(client: MCPServerConnection): string {
+  return getServerCacheKey(client.name, client.config)
+}
 
 /**
  * Encode MCP tool input for the auto-mode security classifier.
@@ -1993,7 +1997,7 @@ export const fetchToolsForClient = memoizeWithLRU(
       return []
     }
   },
-  (client: MCPServerConnection) => client.name,
+  getMcpFetchCacheKey,
   MCP_FETCH_CACHE_SIZE,
 )
 
@@ -2026,7 +2030,7 @@ export const fetchResourcesForClient = memoizeWithLRU(
       return []
     }
   },
-  (client: MCPServerConnection) => client.name,
+  getMcpFetchCacheKey,
   MCP_FETCH_CACHE_SIZE,
 )
 
@@ -2102,7 +2106,7 @@ export const fetchCommandsForClient = memoizeWithLRU(
       return []
     }
   },
-  (client: MCPServerConnection) => client.name,
+  getMcpFetchCacheKey,
   MCP_FETCH_CACHE_SIZE,
 )
 

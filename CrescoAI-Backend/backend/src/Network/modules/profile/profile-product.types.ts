@@ -7,6 +7,12 @@ export const PROFILE_PRODUCT_FIELD_KEYS = [
   'base.currentStatus',
   'base.currentIndustry',
   'base.yearsOfExperience',
+  'base.educationLevel',
+  'education.school',
+  'education.major',
+  'education.degree',
+  'education.graduationDate',
+  'education.description',
   'profile.summary',
   'career.skills',
   'career.workExperience',
@@ -65,6 +71,14 @@ export interface CareerProfileProductView {
     currentStatus: ProfileProductField<string>;
     currentIndustry: ProfileProductField<string>;
     yearsOfExperience: ProfileProductField<number | null>;
+  };
+  education: {
+    level: ProfileProductField<string>;
+    school: ProfileProductField<string>;
+    major: ProfileProductField<string>;
+    degree: ProfileProductField<string>;
+    graduationDate: ProfileProductField<string | null>;
+    description: ProfileProductField<string>;
   };
   summary: ProfileProductField<string>;
   skills: ProfileProductListField;

@@ -3,6 +3,7 @@ import type { AppState } from 'src/state/AppState.js'
 import { logForDebugging } from '../debug.js'
 import type { HooksSettings } from '../settings/types.js'
 import { addSessionHook, removeSessionHook } from './sessionHooks.js'
+import { getState } from '../../bootstrap/state.js'
 
 /**
  * Registers hooks from a skill's frontmatter as session hooks.
@@ -32,6 +33,18 @@ export function registerSkillHooks(
 
     for (const matcher of matchers) {
       for (const hook of matcher.hooks) {
+        const registrationKey = JSON.stringify([
+          sessionId,
+          skillName,
+          eventName,
+          matcher.matcher || '',
+          skillRoot ?? '',
+          hook,
+        ])
+        const registeredSkillHookKeys = getState().registeredSkillHookKeys
+        if (registeredSkillHookKeys.has(registrationKey)) continue
+        registeredSkillHookKeys.add(registrationKey)
+
         // For once: true hooks, use onHookSuccess callback to remove after execution
         const onHookSuccess = hook.once
           ? () => {

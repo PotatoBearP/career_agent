@@ -554,7 +554,8 @@ export function getMcpSkillCommands(
       cmd =>
         cmd.type === 'prompt' &&
         cmd.loadedFrom === 'mcp' &&
-        !cmd.disableModelInvocation,
+        !cmd.disableModelInvocation &&
+        cmd.modelEntry !== 'action-tool',
     )
   }
   return []
@@ -569,6 +570,7 @@ export const getSkillToolCommands = memoize(
       cmd =>
         cmd.type === 'prompt' &&
         !cmd.disableModelInvocation &&
+        cmd.modelEntry !== 'action-tool' &&
         cmd.source !== 'builtin' &&
         // Always include skills from /skills/ dirs, bundled skills, and legacy /commands/ entries
         // (they all get an auto-derived description from the first line if frontmatter is missing).

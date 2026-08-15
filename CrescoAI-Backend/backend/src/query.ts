@@ -110,6 +110,7 @@ import {
 } from './bootstrap/state.js'
 import { createBudgetTracker, checkTokenBudget } from './query/tokenBudget.js'
 import { count } from './utils/array.js'
+import { finalizeActiveSkillInvocations } from './skills/skillLifecycle.js'
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const snipModule = feature('HISTORY_SNIP')
@@ -227,15 +228,24 @@ export async function* query(
   Terminal
 > {
   const consumedCommandUuids: string[] = []
-  const terminal = yield* queryLoop(params, consumedCommandUuids)
-  // Only reached if queryLoop returned normally. Skipped on throw (error
-  // propagates through yield*) and on .return() (Return completion closes
-  // both generators). This gives the same asymmetric started-without-completed
-  // signal as print.ts's drainCommandQueue when the turn fails.
-  for (const uuid of consumedCommandUuids) {
-    notifyCommandLifecycle(uuid, 'completed')
+  try {
+    const terminal = yield* queryLoop(params, consumedCommandUuids)
+    // Only reached if queryLoop returned normally. Skipped on throw (error
+    // propagates through yield*) and on .return() (Return completion closes
+    // both generators). This gives the same asymmetric started-without-completed
+    // signal as print.ts's drainCommandQueue when the turn fails.
+    for (const uuid of consumedCommandUuids) {
+      notifyCommandLifecycle(uuid, 'completed')
+    }
+    return terminal
+  } finally {
+    finalizeActiveSkillInvocations(
+      params.toolUseContext.agentId ?? null,
+      params.toolUseContext.abortController.signal.aborted
+        ? 'cancelled'
+        : 'unreported',
+    )
   }
-  return terminal
 }
 
 async function* queryLoop(

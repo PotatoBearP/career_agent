@@ -34,11 +34,7 @@ import {
 } from 'src/utils/plugins/pluginIdentifier.js'
 import { buildPluginCommandTelemetryFields } from 'src/utils/telemetry/pluginTelemetry.js'
 import { z } from 'zod/v4'
-import {
-  addInvokedSkill,
-  clearInvokedSkillsForAgent,
-  getSessionId,
-} from '../../bootstrap/state.js'
+import { getSessionId } from '../../bootstrap/state.js'
 import { COMMAND_MESSAGE_TAG } from '../../constants/xml.js'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
 import {
@@ -48,18 +44,19 @@ import {
 } from '../../services/analytics/index.js'
 import { getAgentContext } from '../../utils/agentContext.js'
 import { errorMessage } from '../../utils/errors.js'
-import {
-  extractResultText,
-  prepareForkedCommandContext,
-} from '../../utils/forkedAgent.js'
 import { parseFrontmatter } from '../../utils/frontmatterParser.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 import { createUserMessage, normalizeMessages } from '../../utils/messages.js'
-import type { ModelAlias } from '../../utils/model/aliases.js'
 import { resolveSkillModelOverride } from '../../utils/model/model.js'
 import { recordSkillUsage } from '../../utils/suggestions/skillUsageTracking.js'
 import { createAgentId } from '../../utils/uuid.js'
-import { runAgent } from '../AgentTool/runAgent.js'
+import { executeForkedPromptSkill } from '../../skills/forkedSkillExecutor.js'
+import {
+  beginSkillInvocation,
+  buildSkillInvocationEnvelope,
+  failSkillInvocationLoading,
+  markSkillInvocationRunning,
+} from '../../skills/skillLifecycle.js'
 import { registerSessionSkillReadOnlyRoot } from '../../server/SessionContext.js'
 import {
   getToolUseIDFromParentMessage,
@@ -203,89 +200,52 @@ async function executeForkedSkill(
     }),
   })
 
-  const { modifiedGetAppState, baseAgent, promptMessages, skillContent } =
-    await prepareForkedCommandContext(command, args || '', context)
-
-  // Merge skill's effort into the agent definition so runAgent applies it
-  const agentDefinition =
-    command.effort !== undefined
-      ? { ...baseAgent, effort: command.effort }
-      : baseAgent
-
-  // Collect messages from the forked agent
-  const agentMessages: Message[] = []
-
-  logForDebugging(
-    `SkillTool executing forked skill ${commandName} with agent ${agentDefinition.agentType}`,
-  )
-
-  try {
-    // Run the sub-agent
-    for await (const message of runAgent({
-      agentDefinition,
-      promptMessages,
-      toolUseContext: {
-        ...context,
-        getAppState: modifiedGetAppState,
-      },
-      canUseTool,
-      isAsync: false,
-      querySource: 'agent:custom',
-      model: command.model as ModelAlias | undefined,
-      availableTools: context.options.tools,
-      override: { agentId },
-    })) {
-      agentMessages.push(message)
-
-      // Report progress for tool uses (like AgentTool does)
+  const execution = await executeForkedPromptSkill({
+    command,
+    commandName,
+    args,
+    agentId,
+    contextMode: 'isolated',
+    context,
+    canUseTool,
+    onMessage(message, details) {
       if (
-        (message.type === 'assistant' || message.type === 'user') &&
-        onProgress
+        (message.type !== 'assistant' && message.type !== 'user') ||
+        !onProgress
       ) {
-        const normalizedNew = normalizeMessages([message])
-        for (const m of normalizedNew) {
-          const hasToolContent = m.message.content.some(
-            c => c.type === 'tool_use' || c.type === 'tool_result',
-          )
-          if (hasToolContent) {
-            onProgress({
-              toolUseID: `skill_${parentMessage.message.id}`,
-              data: {
-                message: m,
-                type: 'skill_progress',
-                prompt: skillContent,
-                agentId,
-              },
-            })
-          }
-        }
+        return
       }
-    }
+      for (const normalized of normalizeMessages([message])) {
+        const hasToolContent = normalized.message.content.some(
+          content =>
+            content.type === 'tool_use' || content.type === 'tool_result',
+        )
+        if (!hasToolContent) continue
+        onProgress({
+          toolUseID: `skill_${parentMessage.message.id}`,
+          data: {
+            message: normalized,
+            type: 'skill_progress',
+            prompt: details.skillContent,
+            agentId: details.agentId,
+          },
+        })
+      }
+    },
+  })
 
-    const resultText = extractResultText(
-      agentMessages,
-      'Skill execution completed',
-    )
-    // Release message memory after extracting result
-    agentMessages.length = 0
-
-    const durationMs = Date.now() - startTime
-    logForDebugging(
-      `SkillTool forked skill ${commandName} completed in ${durationMs}ms`,
-    )
-
-    return {
-      data: {
-        success: true,
-        commandName,
-        status: 'forked',
-        agentId,
-        result: resultText,
-      },
-    }
-  } finally {
-    // Release skill content from invokedSkills state
-    clearInvokedSkillsForAgent(agentId)
+  const durationMs = Date.now() - startTime
+  logForDebugging(
+    `SkillTool forked skill ${commandName} completed in ${durationMs}ms`,
+  )
+  return {
+    data: {
+      success: true,
+      commandName,
+      status: 'forked',
+      agentId: execution.agentId,
+      result: execution.resultText,
+    },
   }
 }
 
@@ -406,6 +366,17 @@ export const SkillTool: Tool<InputSchema, Output, Progress> = buildTool({
         result: false,
         message: `Unknown skill: ${normalizedCommandName}`,
         errorCode: 2,
+      }
+    }
+
+    if (
+      foundCommand.type === 'prompt' &&
+      foundCommand.modelEntry === 'action-tool'
+    ) {
+      return {
+        result: false,
+        message: `Skill ${normalizedCommandName} has a dedicated action tool and cannot be invoked through ${SKILL_TOOL_NAME}`,
+        errorCode: 7,
       }
     }
 
@@ -615,6 +586,12 @@ export const SkillTool: Tool<InputSchema, Output, Progress> = buildTool({
 
     const commands = await getAllCommands(context)
     const command = findCommand(commandName, commands)
+
+    if (command?.type === 'prompt' && command.modelEntry === 'action-tool') {
+      throw new Error(
+        `Skill ${commandName} has a dedicated action tool and cannot be invoked through ${SKILL_TOOL_NAME}`,
+      )
+    }
 
     if (command?.type === 'prompt' && command.skillRoot) {
       await registerSessionSkillReadOnlyRoot(command.skillRoot)
@@ -890,6 +867,7 @@ const SAFE_SKILL_PROPERTIES = new Set([
   'disableNonInteractive',
   'skillRoot',
   'context',
+  'modelEntry',
   'agent',
   'getPromptForCommand',
   'frontmatterKeys',
@@ -965,8 +943,7 @@ function extractUrlScheme(url: string): 'gs' | 'http' | 'https' | 's3' {
  * for !command / $ARGUMENTS expansion), remote skills are declarative markdown
  * — we wrap the content directly in a user message.
  *
- * The skill is also registered with addInvokedSkill so it survives compaction
- * (same as local skills).
+ * The lifecycle manager also registers the active prompt for compaction.
  *
  * Only called from within a feature('EXPERIMENTAL_SKILL_SEARCH') guard in
  * call() — remoteSkillModules is non-null here.
@@ -983,11 +960,17 @@ async function executeRemoteSkill(
   // validateInput already confirmed this slug is in session state, but we
   // re-fetch here to get the URL. If it's somehow gone (e.g., state cleared
   // mid-session), fail with a clear error rather than crashing.
+  const lifecycleInvocation = beginSkillInvocation(
+    commandName,
+    context.agentId ?? getAgentContext()?.agentId ?? null,
+  )
   const meta = getDiscoveredRemoteSkill(slug)
   if (!meta) {
-    throw new Error(
+    const error = new Error(
       `Remote skill ${slug} was not discovered in this session. Use DiscoverSkills to find remote skills first.`,
     )
+    failSkillInvocationLoading(lifecycleInvocation.skillCallId, error)
+    throw error
   }
 
   const urlScheme = extractUrlScheme(meta.url)
@@ -1003,7 +986,9 @@ async function executeRemoteSkill(
       urlScheme,
       error: msg,
     })
-    throw new Error(`Failed to load remote skill ${slug}: ${msg}`)
+    const error = new Error(`Failed to load remote skill ${slug}: ${msg}`)
+    failSkillInvocationLoading(lifecycleInvocation.skillCallId, error)
+    throw error
   }
 
   const {
@@ -1070,33 +1055,36 @@ async function executeRemoteSkill(
   // Strip YAML frontmatter (---\nname: x\n---) before prepending the header
   // (matches loadSkillsDir.ts:333). parseFrontmatter returns the original
   // content unchanged if no frontmatter is present.
-  const { content: bodyContent } = parseFrontmatter(content, skillPath)
+  let finalContent: string
+  try {
+    const { content: bodyContent } = parseFrontmatter(content, skillPath)
 
-  // Inject base directory header + ${CLAUDE_SKILL_DIR}/${CLAUDE_SESSION_ID}
-  // substitution (matches loadSkillsDir.ts) so the model can resolve relative
-  // refs like ./schemas/foo.json against the cache dir.
-  const skillDir = dirname(skillPath)
-  await registerSessionSkillReadOnlyRoot(skillDir)
-  const normalizedDir =
-    process.platform === 'win32' ? skillDir.replace(/\\/g, '/') : skillDir
-  let finalContent = `Base directory for this skill: ${normalizedDir}\n\n${bodyContent}`
-  finalContent = finalContent.replace(/\$\{CLAUDE_SKILL_DIR\}/g, normalizedDir)
-  finalContent = finalContent.replace(
-    /\$\{CLAUDE_SESSION_ID\}/g,
-    getSessionId(),
-  )
+    // Inject base directory header + ${CLAUDE_SKILL_DIR}/${CLAUDE_SESSION_ID}
+    // substitution (matches loadSkillsDir.ts) so the model can resolve relative
+    // refs like ./schemas/foo.json against the cache dir.
+    const skillDir = dirname(skillPath)
+    await registerSessionSkillReadOnlyRoot(skillDir)
+    const normalizedDir =
+      process.platform === 'win32' ? skillDir.replace(/\\/g, '/') : skillDir
+    finalContent = `Base directory for this skill: ${normalizedDir}\n\n${bodyContent}`
+    finalContent = finalContent.replace(/\$\{CLAUDE_SKILL_DIR\}/g, normalizedDir)
+    finalContent = finalContent.replace(
+      /\$\{CLAUDE_SESSION_ID\}/g,
+      getSessionId(),
+    )
+    finalContent += buildSkillInvocationEnvelope(lifecycleInvocation)
 
-  // Register with compaction-preservation state. Use the cached file path so
-  // post-compact restoration knows where the content came from. Must use
-  // finalContent (not raw content) so the base directory header and
-  // ${CLAUDE_SKILL_DIR} substitutions survive compaction — matches how local
-  // skills store their already-transformed content via processSlashCommand.
-  addInvokedSkill(
-    commandName,
-    skillPath,
-    finalContent,
-    getAgentContext()?.agentId ?? null,
-  )
+    // Register with compaction-preservation state. Use the cached file path so
+    // post-compact restoration knows where the content came from.
+    markSkillInvocationRunning({
+      skillCallId: lifecycleInvocation.skillCallId,
+      injectedContent: finalContent,
+      skillPath,
+    })
+  } catch (error) {
+    failSkillInvocationLoading(lifecycleInvocation.skillCallId, error)
+    throw error
+  }
 
   // Direct injection — wrap SKILL.md content in a meta user message. Matches
   // the shape of what processPromptSlashCommand produces for simple skills.

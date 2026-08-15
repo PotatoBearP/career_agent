@@ -184,9 +184,13 @@ function addHookToSession(
 
     let updatedMatchers: SessionHookMatcher[]
     if (existingMatcherIndex >= 0) {
-      // Add to existing matcher
+      // Skill prompts may be loaded more than once in the same session. Keep
+      // hook registration idempotent for the same event/matcher/root/content.
       updatedMatchers = [...eventMatchers]
       const existingMatcher = updatedMatchers[existingMatcherIndex]!
+      if (existingMatcher.hooks.some(entry => isHookEqual(entry.hook, hook))) {
+        return prev
+      }
       updatedMatchers[existingMatcherIndex] = {
         matcher: existingMatcher.matcher,
         skillRoot: existingMatcher.skillRoot,

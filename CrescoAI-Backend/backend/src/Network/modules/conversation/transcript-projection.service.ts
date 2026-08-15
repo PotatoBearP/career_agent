@@ -5,6 +5,7 @@ import {
   loadTranscriptFile,
 } from '../../../utils/sessionStorage.js';
 import type { TranscriptMessage } from '../../../types/logs.js';
+import { generatedSkillActionToolNames } from '../../../tools/generatedSkillActionTools.js';
 import {
   looksLikeServerPhysicalPath,
   sanitizeServerPhysicalPaths,
@@ -127,6 +128,8 @@ export class ConversationTranscriptProjectionService {
     const map = new Map<string, ProjectedConversationMessage>();
     let activeAssistantMessageId: string | null = null;
     const hiddenSkillToolUseIds = new Set<string>();
+    const skillResultToolUseIds = new Set<string>();
+    let pendingSkillResults: Array<Record<string, unknown>> = [];
     const hiddenConversationMemoryToolUseIds = new Set<string>();
     const privateConversationIds =
       collectConversationMemoryPrivateIdentifiers(events, sessionId);
@@ -147,6 +150,27 @@ export class ConversationTranscriptProjectionService {
           continue;
         }
       }
+      const metaSkillResult = this.normalizeSkillResult(
+        (event as any).toolUseResult,
+      );
+      if (metaSkillResult) {
+        if (activeAssistantMessageId) {
+          const existing = map.get(activeAssistantMessageId);
+          if (existing) {
+            map.set(activeAssistantMessageId, {
+              ...existing,
+              raw: this.mergeProjectedRaw(existing.raw, {
+                skillResults: [metaSkillResult],
+              }),
+            });
+          }
+        } else {
+          pendingSkillResults = this.mergeProjectedRaw(
+            { skillResults: pendingSkillResults },
+            { skillResults: [metaSkillResult] },
+          )?.skillResults as Array<Record<string, unknown>>;
+        }
+      }
       if (isInternalTranscriptMessage(event)) {
         // Internal prompts are part of the model chain, not the public chat.
         // Other internal prompts do not split the active public trajectory.
@@ -157,6 +181,10 @@ export class ConversationTranscriptProjectionService {
 
       if (event.type === 'assistant') {
         this.collectHiddenSkillToolUseIds(event, hiddenSkillToolUseIds);
+        this.collectSkillResultToolUseIds(
+          event,
+          skillResultToolUseIds,
+        );
         const message = (event as any).message as Record<string, unknown> | undefined;
         if (
           isConversationMemoryMaintenanceMessage(
@@ -170,6 +198,19 @@ export class ConversationTranscriptProjectionService {
       }
 
       if (event.type === 'user') {
+        const skillResults = this.extractSkillResultsFromUserMessage(
+          event,
+          skillResultToolUseIds,
+        );
+        if (skillResults.length && activeAssistantMessageId) {
+          const existing = map.get(activeAssistantMessageId);
+          if (existing) {
+            map.set(activeAssistantMessageId, {
+              ...existing,
+              raw: this.mergeProjectedRaw(existing.raw, { skillResults }),
+            });
+          }
+        }
         const toolResultBlocks = this.projectToolResultBlocksFromUserMessage(
           event,
           hiddenSkillToolUseIds,
@@ -199,11 +240,20 @@ export class ConversationTranscriptProjectionService {
       }
       if (projected.role === 'assistant') {
         const targetMessageId = activeAssistantMessageId ?? projected.id;
+        const projectedWithSkillResults = pendingSkillResults.length
+          ? {
+              ...projected,
+              raw: this.mergeProjectedRaw(projected.raw, {
+                skillResults: pendingSkillResults,
+              }),
+            }
+          : projected;
         this.upsertProjectedMessage(
-          { ...projected, id: targetMessageId },
+          { ...projectedWithSkillResults, id: targetMessageId },
           map,
           order,
         );
+        pendingSkillResults = [];
         activeAssistantMessageId = targetMessageId;
       } else {
         this.upsertProjectedMessage(projected, map, order);
@@ -627,6 +677,119 @@ export class ConversationTranscriptProjectionService {
     }
   }
 
+  private collectSkillResultToolUseIds(
+    event: TranscriptMessage,
+    skillResultToolUseIds: Set<string>,
+  ) {
+    const message = (event as any).message as Record<string, unknown> | undefined;
+    const content = message?.content;
+    if (!Array.isArray(content)) {
+      return;
+    }
+
+    for (const item of content) {
+      if (!this.isRecord(item) || !this.isSkillResultAssistantBlock(item)) {
+        continue;
+      }
+      const toolUseId = this.readToolUseId(item);
+      if (toolUseId) {
+        skillResultToolUseIds.add(toolUseId);
+      }
+    }
+  }
+
+  private isSkillResultAssistantBlock(
+    block: Record<string, unknown>,
+  ): boolean {
+    const toolName = this.readToolName(block)?.toLowerCase();
+    return (
+      toolName === 'returnskillresult' ||
+      (toolName !== undefined && generatedSkillActionToolNames.has(toolName))
+    );
+  }
+
+  private extractSkillResultsFromUserMessage(
+    event: TranscriptMessage,
+    skillResultToolUseIds: Set<string>,
+  ): Array<Record<string, unknown>> {
+    const message = (event as any).message as Record<string, unknown> | undefined;
+    const content = message?.content;
+    if (!Array.isArray(content)) {
+      return [];
+    }
+
+    const results: Array<Record<string, unknown>> = [];
+    for (const item of content) {
+      if (!this.isRecord(item) || !this.isToolResultContentBlock(item)) {
+        continue;
+      }
+      const toolUseId = this.readToolUseId(item);
+      if (!toolUseId || !skillResultToolUseIds.has(toolUseId)) {
+        continue;
+      }
+      const value = this.parseJsonRecord(
+        this.stringifyAssistantToolResultValue(
+          item.content ?? item.result ?? item.output ?? '',
+        ),
+      );
+      const normalized = this.normalizeSkillResult(value);
+      if (normalized) results.push(normalized);
+    }
+    return results;
+  }
+
+  private normalizeSkillResult(
+    value: unknown,
+  ): Record<string, unknown> | null {
+    if (!this.isRecord(value)) return null;
+    const skillCallId = value.skill_call_id;
+    const skillName = value.skill_name;
+    const outcome = value.outcome;
+    const summary = value.summary;
+    const completedAt = value.completed_at;
+    const durationMs = Number(value.duration_ms);
+    if (
+      (value.accepted !== true && value.execution_status !== 'completed')
+      || typeof skillCallId !== 'string'
+      || typeof skillName !== 'string'
+      || (outcome !== 'success'
+        && outcome !== 'insufficient_input'
+        && outcome !== 'error')
+      || typeof summary !== 'string'
+      || typeof completedAt !== 'string'
+      || !Number.isFinite(durationMs)
+    ) {
+      return null;
+    }
+    const completedAtMs = Date.parse(completedAt);
+    const normalizedDurationMs = Math.max(0, durationMs);
+    const startedAt = Number.isFinite(completedAtMs)
+      ? new Date(completedAtMs - normalizedDurationMs).toISOString()
+      : completedAt;
+    return {
+      skillCallId,
+      skillName,
+      outcome,
+      summary: sanitizeServerPhysicalPaths(summary),
+      ...(value.result !== undefined
+        ? { result: sanitizeServerPhysicalPathsInValue(value.result) }
+        : {}),
+      startedAt,
+      completedAt,
+      durationMs: normalizedDurationMs,
+      source: 'agent',
+    };
+  }
+
+  private parseJsonRecord(value: string): Record<string, unknown> | null {
+    try {
+      const parsed = JSON.parse(value);
+      return this.isRecord(parsed) ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
   private isInternalSkillAssistantBlock(block: Record<string, unknown>): boolean {
     const toolName = this.readToolName(block)?.toLowerCase();
     if (toolName === 'skill') {
@@ -752,9 +915,37 @@ export class ConversationTranscriptProjectionService {
       think: reasoning ?? undefined,
       actions: this.mergeMessageActions(existing.actions, message.actions),
       blocks: this.mergeBlocks(existing.blocks, message.blocks),
+      raw: this.mergeProjectedRaw(existing.raw, message.raw),
       created_at: existing.created_at,
       createdAt: existing.createdAt,
     });
+  }
+
+  private mergeProjectedRaw(
+    existing: Record<string, unknown> | undefined,
+    incoming: Record<string, unknown> | undefined,
+  ): Record<string, unknown> | undefined {
+    if (!existing && !incoming) {
+      return undefined;
+    }
+    const merged = { ...(existing ?? {}), ...(incoming ?? {}) };
+    const skillResultsByCallId = new Map<string, Record<string, unknown>>();
+    for (const raw of [existing, incoming]) {
+      const skillResults = raw?.skillResults;
+      if (!Array.isArray(skillResults)) {
+        continue;
+      }
+      for (const result of skillResults) {
+        if (!this.isRecord(result) || typeof result.skillCallId !== 'string') {
+          continue;
+        }
+        skillResultsByCallId.set(result.skillCallId, result);
+      }
+    }
+    if (skillResultsByCallId.size) {
+      merged.skillResults = Array.from(skillResultsByCallId.values());
+    }
+    return merged;
   }
 
   private attachMedia(

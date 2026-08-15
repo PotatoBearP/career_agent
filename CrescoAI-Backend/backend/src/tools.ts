@@ -2,6 +2,8 @@
 import { toolMatchesName, type Tool, type Tools } from './Tool.js'
 import { AgentTool } from './tools/AgentTool/AgentTool.js'
 import { SkillTool } from './tools/SkillTool/SkillTool.js'
+import { ReturnSkillResultTool } from './tools/ReturnSkillResultTool/ReturnSkillResultTool.js'
+import { generatedSkillActionTools } from './tools/generatedSkillActionTools.js'
 import { BashTool } from './tools/BashTool/BashTool.js'
 import { FileEditTool } from './tools/FileEditTool/FileEditTool.js'
 import { FileReadTool } from './tools/FileReadTool/FileReadTool.js'
@@ -212,6 +214,8 @@ export function getAllBaseTools(): Tools {
     TaskStopTool,
     AskUserQuestionTool,
     SkillTool,
+    ...generatedSkillActionTools,
+    ReturnSkillResultTool,
     EnterPlanModeTool,
     ...(process.env.USER_TYPE === 'ant' ? [ConfigTool] : []),
     ...(process.env.USER_TYPE === 'ant' ? [TungstenTool] : []),
@@ -279,16 +283,22 @@ export const getTools = (permissionContext: ToolPermissionContext): Tools => {
     // return REPL instead of the raw primitives. Matches the non-bare path
     // below which also hides REPL_ONLY_TOOLS when REPL is enabled.
     if (isReplModeEnabled() && REPLTool) {
-      const replSimple: Tool[] = [REPLTool]
+      const replSimple: Tool[] = [REPLTool, ReturnSkillResultTool]
       if (
         feature('COORDINATOR_MODE') &&
         coordinatorModeModule?.isCoordinatorMode()
       ) {
         replSimple.push(TaskStopTool, getSendMessageTool())
       }
-      return filterToolsByDenyRules(replSimple, permissionContext)
+      const filteredReplSimple = filterToolsByDenyRules(
+        replSimple,
+        permissionContext,
+      )
+      return filteredReplSimple.includes(ReturnSkillResultTool)
+        ? filteredReplSimple
+        : [...filteredReplSimple, ReturnSkillResultTool]
     }
-    const simpleTools: Tool[] = [BashTool, FileReadTool, FileEditTool]
+    const simpleTools: Tool[] = [BashTool, FileReadTool, FileEditTool, ReturnSkillResultTool]
     // When coordinator mode is also active, include AgentTool and TaskStopTool
     // so the coordinator gets Task+TaskStop (via useMergedTools filtering) and
     // workers get Bash/Read/Edit (via filterToolsForAgent filtering).
@@ -298,7 +308,10 @@ export const getTools = (permissionContext: ToolPermissionContext): Tools => {
     ) {
       simpleTools.push(AgentTool, TaskStopTool, getSendMessageTool())
     }
-    return filterToolsByDenyRules(simpleTools, permissionContext)
+    const filteredSimpleTools = filterToolsByDenyRules(simpleTools, permissionContext)
+    return filteredSimpleTools.includes(ReturnSkillResultTool)
+      ? filteredSimpleTools
+      : [...filteredSimpleTools, ReturnSkillResultTool]
   }
 
   // Get all base tools and filter out special tools that get added conditionally
@@ -327,7 +340,10 @@ export const getTools = (permissionContext: ToolPermissionContext): Tools => {
   }
 
   const isEnabled = allowedTools.map(_ => _.isEnabled())
-  return allowedTools.filter((_, i) => isEnabled[i])
+  const enabledTools = allowedTools.filter((_, i) => isEnabled[i])
+  return enabledTools.includes(ReturnSkillResultTool)
+    ? enabledTools
+    : [...enabledTools, ReturnSkillResultTool]
 }
 
 /**

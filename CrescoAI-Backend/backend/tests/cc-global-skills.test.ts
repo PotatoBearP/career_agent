@@ -6,27 +6,13 @@ import {
   USER_DEFINED_SKILLS_ENABLED,
 } from '../src/Network/modules/skill/skill.service.js'
 import { SkillRegistry } from '../src/Network/modules/skill/skill.registry.js'
+import { registerBuiltinSkills } from '../src/Network/modules/skill/built-in-skills.js'
+import { getSkillToolCommands } from '../src/commands.js'
+import { SkillTool } from '../src/tools/SkillTool/SkillTool.js'
 
-const CAREER_AGENT_SKILL_NAMES = [
-  'career_direction_exploration',
-  'career_path_simulation',
-  'code-analysis',
-  'develop-web-game',
-  'image-generation',
-  'industry_opportunity_analysis',
-  'learning-plan',
-  'role_cognition_analysis',
-  'target_role_positioning',
-  'video-generation',
-].sort()
+const CAREER_AGENT_SKILL_NAMES = ['baseline-assessment', 'code-analysis'].sort()
 
-const PACKAGED_GLOBAL_SKILL_NAMES = [
-  'career_direction_exploration',
-  'career_path_simulation',
-  'industry_opportunity_analysis',
-  'role_cognition_analysis',
-  'target_role_positioning',
-]
+const PACKAGED_GLOBAL_SKILL_NAMES = ['baseline-assessment']
 
 registerCareerAgentSkills()
 
@@ -67,21 +53,33 @@ describe('CareerAgent skills on the native CC skill chain', () => {
     for (const name of PACKAGED_GLOBAL_SKILL_NAMES) {
       expect(names).toContain(name)
     }
+
+    expect(names).not.toContain('image-generation')
+    expect(names).not.toContain('video-generation')
+    expect(names).not.toContain('help')
+    expect(skills.find(skill => skill.name === 'baseline-assessment')?.category).toBe('analysis')
   })
 
-  test('loads a packaged root skill prompt with its reference-file base directory', async () => {
+  test('keeps code-defined built-in skills in the Network registry', () => {
+    const registry = new SkillRegistry()
+    registerBuiltinSkills(entry => registry.register(entry))
+
+    expect(registry.getAll().map(skill => skill.name)).toEqual(['code-analysis'])
+  })
+
+  test('loads the hyphenated baseline-assessment prompt with its evidence boundary', async () => {
     const skill = getBundledSkills().find(
-      item => item.name === 'career_direction_exploration',
+      item => item.name === 'baseline-assessment',
     )
 
     expect(skill).toBeDefined()
     expect(skill?.userInvocable).toBe(true)
     if (!skill || skill.type !== 'prompt') {
-      throw new Error('career_direction_exploration was not registered')
+      throw new Error('baseline-assessment was not registered as a prompt skill')
     }
 
     const blocks = await skill.getPromptForCommand(
-      'Compare several realistic directions for me.',
+      'Assess my backend baseline from existing evidence.',
       {} as never,
     )
     const text = blocks
@@ -89,73 +87,41 @@ describe('CareerAgent skills on the native CC skill chain', () => {
       .map(block => block.text)
       .join('\n')
 
+    expect(skill.name).toBe('baseline-assessment')
+    expect(skill.modelEntry).toBe('action-tool')
     expect(text).toContain('Base directory for this skill:')
-    expect(text).toContain('Career Direction Exploration')
-    expect(text).toContain('references/output_contract.md')
-    expect(text).toContain('Compare several realistic directions for me.')
+    expect(text).toContain('Freeze the evidence boundary at invocation time.')
+    expect(text).toContain('Use `ReturnSkillResult` as the only tool call')
+    expect(text).toContain(
+      'Assess my backend baseline from existing evidence.',
+    )
   })
 
-  test('keeps the canonical underscore name on CC invocation', async () => {
-    let prompt = ''
-    const agentService = {
-      async runIsolatedPrompt(input: { content: string }) {
-        prompt = input.content
-        return { success: true, reply: 'ok' }
-      },
+  test('keeps baseline-assessment out of the generic model Skill entry', async () => {
+    const previousApiKey = process.env.ANTHROPIC_API_KEY
+    process.env.ANTHROPIC_API_KEY = 'catalog-test-key'
+    try {
+      const modelSkills = await getSkillToolCommands(process.cwd())
+      expect(
+        modelSkills.some(skill => skill.name === 'baseline-assessment'),
+      ).toBe(false)
+
+      const validation = await SkillTool.validateInput(
+        { skill: 'baseline-assessment' },
+        {
+          getAppState() {
+            return { mcp: { commands: [] } }
+          },
+        } as never,
+      )
+      expect(validation).toMatchObject({
+        result: false,
+        errorCode: 7,
+      })
+    } finally {
+      if (previousApiKey === undefined) delete process.env.ANTHROPIC_API_KEY
+      else process.env.ANTHROPIC_API_KEY = previousApiKey
     }
-    const service = new SkillService(
-      new SkillRegistry(),
-      undefined,
-      agentService as never,
-    )
-
-    const result = await service.invokeSkillThroughCc(
-      'career_direction_exploration',
-      'test request',
-      { userId: 42 },
-    )
-
-    expect(result.success).toBe(true)
-    expect(prompt).toBe('/career_direction_exploration test request')
   })
 
-  test('loads the disk-backed learning-plan prompt and appends slash arguments', async () => {
-    const skill = getBundledSkills().find(item => item.name === 'learning-plan')
-
-    expect(skill).toBeDefined()
-    if (!skill || skill.type !== 'prompt') {
-      throw new Error('learning-plan was not registered as a prompt skill')
-    }
-    const blocks = await skill.getPromptForCommand(
-      '为后端面试制定三个月学习计划',
-      {} as never,
-    )
-    const text = blocks
-      .filter(block => block.type === 'text')
-      .map(block => block.text)
-      .join('\n')
-
-    expect(text).toContain('Base directory for this skill:')
-    expect(text).toContain('为后端面试制定三个月学习计划')
-  })
-
-  test('resolves CLAUDE_SKILL_DIR for the web-game skill', async () => {
-    const skill = getBundledSkills().find(
-      item => item.name === 'develop-web-game',
-    )
-
-    expect(skill).toBeDefined()
-    if (!skill || skill.type !== 'prompt') {
-      throw new Error('develop-web-game was not registered as a prompt skill')
-    }
-    const blocks = await skill.getPromptForCommand('构建贪吃蛇游戏', {} as never)
-    const text = blocks
-      .filter(block => block.type === 'text')
-      .map(block => block.text)
-      .join('\n')
-
-    expect(text).toContain('构建贪吃蛇游戏')
-    expect(text).not.toContain('${CLAUDE_SKILL_DIR}')
-    expect(text).toContain('web_game_playwright_client.js')
-  })
 })

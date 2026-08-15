@@ -21,7 +21,9 @@
     "dev:restore-check": "bun run ./src/dev-entry.ts",
     "network:dev": "bun run network:migrate && bun run ./src/Network/main.ts",
     "network:start": "bun run ./src/Network/main.ts",
-    "network:migrate": "bun run ./src/Network/run-migrations.ts"
+    "network:migrate": "bun run ./src/Network/run-migrations.ts",
+    "skill-tools:plan": "bun run ./scripts/generate-skill-action-tools.ts",
+    "skill-tools:generate": "bun run ./scripts/generate-skill-action-tools.ts --write"
   },
   "dependencies": {
     "@alcalzone/ansi-tokenize": "*",

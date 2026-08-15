@@ -18,6 +18,7 @@ import type {
   ProfileSuggestion,
   ThreadMessage,
   ThreadMessageStreamEvent,
+  SkillOutcome,
   ThreadStatus,
   ThreadSummary,
   UploadedConversationFile,
@@ -187,6 +188,20 @@ export interface UpstreamMessageStreamEvent {
   attachments?: UpstreamMessageMedia[] | null;
   message?: string | null;
   code?: string | null;
+  skill_call_id?: string | null;
+  skillCallId?: string | null;
+  skill_name?: string | null;
+  skillName?: string | null;
+  outcome?: SkillOutcome | null;
+  summary?: string | null;
+  result?: unknown;
+  started_at?: string | number | Date | null;
+  startedAt?: string | number | Date | null;
+  completed_at?: string | number | Date | null;
+  completedAt?: string | number | Date | null;
+  duration_ms?: number | null;
+  durationMs?: number | null;
+  source?: 'agent' | 'harness' | null;
 }
 
 export interface UpstreamProfileSuggestion {
@@ -1221,6 +1236,35 @@ export function normalizeMessageStreamEvent(
       type,
       messageId,
       block: normalizedBlock,
+    };
+  }
+
+  if (type === 'skill.completed') {
+    const skillCallId = normalizeId(input.skillCallId ?? input.skill_call_id, '');
+    const skillName = normalizeId(input.skillName ?? input.skill_name, '');
+    const outcome = input.outcome;
+    const summary = typeof input.summary === 'string' ? input.summary.trim() : '';
+    if (
+      !messageId
+      || !skillCallId
+      || !skillName
+      || !summary
+      || (outcome !== 'success' && outcome !== 'insufficient_input' && outcome !== 'error')
+    ) {
+      return null;
+    }
+    return {
+      type: 'skill.completed',
+      messageId,
+      skillCallId,
+      skillName,
+      outcome,
+      summary,
+      ...(input.result !== undefined ? { result: input.result } : {}),
+      startedAt: normalizeTimestamp(input.startedAt ?? input.started_at),
+      completedAt: normalizeTimestamp(input.completedAt ?? input.completed_at),
+      durationMs: Math.max(0, Number(input.durationMs ?? input.duration_ms ?? 0)),
+      source: input.source === 'harness' ? 'harness' : 'agent',
     };
   }
 

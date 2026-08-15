@@ -6,7 +6,6 @@ import { parseFrontmatter } from '../../utils/frontmatterParser.js'
 import { substituteArguments } from '../../utils/argumentSubstitution.js'
 import { registerBundledSkill } from '../bundledSkills.js'
 import {
-  getGlobalSkillRoot,
   getGlobalSkillsRoot,
 } from '../globalSkillPaths.js'
 
@@ -18,7 +17,8 @@ export type GlobalDiskSkillCatalogEntry = {
   whenToUse: string
   argumentHint?: string
   argumentNames: string[]
-  category: 'analysis'
+  category: 'analysis' | 'generation' | 'utility' | 'search'
+  modelEntry: 'action-tool' | 'skill-catalog'
   resourceRoot: string
 }
 
@@ -37,9 +37,9 @@ function parseArgumentNames(frontmatter: FrontmatterData): string[] {
  * directory. These are global skills, not user-authored skills, so every user
  * sees the same catalog.
  *
- * The metadata.json requirement keeps this dynamic scan limited to packaged
- * app-owned skills and avoids double-registering the few legacy skills that
- * still have explicit wrappers below.
+ * Every direct child with a valid SKILL.md is application-owned and belongs to
+ * this global catalog. Runtime-only tools must not be represented here as
+ * synthetic skills.
  */
 export function getGlobalDiskSkillCatalog(): GlobalDiskSkillCatalogEntry[] {
   if (globalDiskSkillCatalogCache) return [...globalDiskSkillCatalogCache]
@@ -59,13 +59,6 @@ export function getGlobalDiskSkillCatalog(): GlobalDiskSkillCatalogEntry[] {
       if (!/^[a-z0-9][a-z0-9_-]*$/.test(entry.name)) return []
 
       const skillDir = join(GLOBAL_SKILLS_DIR, entry.name)
-      const metadataFile = join(skillDir, 'metadata.json')
-      try {
-        JSON.parse(readFileSync(metadataFile, 'utf8'))
-      } catch {
-        return []
-      }
-
       const skillFile = join(skillDir, 'SKILL.md')
       let source: string
       try {
@@ -100,6 +93,17 @@ export function getGlobalDiskSkillCatalog(): GlobalDiskSkillCatalogEntry[] {
         frontmatter.when_to_use.trim()
           ? frontmatter.when_to_use.trim()
           : description
+      const categoryValue = frontmatter.category
+      const category =
+        categoryValue === 'generation' ||
+        categoryValue === 'utility' ||
+        categoryValue === 'search'
+          ? categoryValue
+          : 'analysis'
+      const modelEntry =
+        frontmatter['model-entry'] === 'action-tool'
+          ? 'action-tool'
+          : 'skill-catalog'
 
       return [
         {
@@ -108,7 +112,8 @@ export function getGlobalDiskSkillCatalog(): GlobalDiskSkillCatalogEntry[] {
           whenToUse,
           argumentHint,
           argumentNames,
-          category: 'analysis' as const,
+          category,
+          modelEntry,
           resourceRoot: skillDir,
         },
       ]
@@ -133,52 +138,7 @@ async function loadDiskSkillPrompt(
   return `Base directory for this skill: ${skillDir}\n\n${expanded}`
 }
 
-async function loadGlobalSkillPrompt(
-  skillName: string,
-  args: string,
-): Promise<string> {
-  return loadDiskSkillPrompt(GLOBAL_SKILLS_DIR, skillName, args)
-}
-
 export function registerCareerAgentSkills(): void {
-  registerBundledSkill({
-    name: 'learning-plan',
-    description:
-      'Create structured long-term learning plans, curricula, interview preparation roadmaps, and interactive learning app specifications.',
-    whenToUse:
-      'Use for study plans, learning paths, interview or exam preparation, course planning, skill improvement, and structured knowledge learning.',
-    argumentHint: '[learning goal]',
-    userInvocable: true,
-    resourceRoot: getGlobalSkillRoot('learning-plan'),
-    async getPromptForCommand(args) {
-      return [
-        {
-          type: 'text',
-          text: await loadGlobalSkillPrompt('learning-plan', args),
-        },
-      ]
-    },
-  })
-
-  registerBundledSkill({
-    name: 'develop-web-game',
-    description:
-      'Build and validate interactive HTML applications, games, simulations, visual explanations, dashboards, animations, and algorithm demos.',
-    whenToUse:
-      'Use when interaction or visualization teaches better than plain text, especially for spatial, temporal, structural, quantitative, scientific, or process-oriented topics.',
-    argumentHint: '[application description]',
-    userInvocable: true,
-    resourceRoot: getGlobalSkillRoot('develop-web-game'),
-    async getPromptForCommand(args) {
-      return [
-        {
-          type: 'text',
-          text: await loadGlobalSkillPrompt('develop-web-game', args),
-        },
-      ]
-    },
-  })
-
   registerBundledSkill({
     name: 'code-analysis',
     description:
@@ -200,44 +160,6 @@ export function registerCareerAgentSkills(): void {
     },
   })
 
-  registerBundledSkill({
-    name: 'image-generation',
-    description: 'Generate or edit images from a user description.',
-    whenToUse:
-      'Use when the user asks to create, edit, transform, or generate an image.',
-    argumentHint: '[image description]',
-    userInvocable: true,
-    async getPromptForCommand(args) {
-      return [
-        {
-          type: 'text',
-          text:
-            'Use the ImageGenerate tool to complete the image request. Preserve the user intent and return the generated image result.' +
-            (args ? `\n\nImage request:\n${args}` : ''),
-        },
-      ]
-    },
-  })
-
-  registerBundledSkill({
-    name: 'video-generation',
-    description: 'Generate a video from a user description or source frame.',
-    whenToUse:
-      'Use when the user asks to create or generate a video, animation clip, or motion sequence.',
-    argumentHint: '[video description]',
-    userInvocable: true,
-    async getPromptForCommand(args) {
-      return [
-        {
-          type: 'text',
-          text:
-            'Use the VideoGenerate tool to complete the video request. Preserve requested duration, aspect ratio, audio, and source-frame constraints.' +
-            (args ? `\n\nVideo request:\n${args}` : ''),
-        },
-      ]
-    },
-  })
-
   for (const skill of getGlobalDiskSkillCatalog()) {
     registerBundledSkill({
       name: skill.name,
@@ -246,6 +168,7 @@ export function registerCareerAgentSkills(): void {
       argumentHint: skill.argumentHint,
       userInvocable: true,
       resourceRoot: skill.resourceRoot,
+      modelEntry: skill.modelEntry,
       async getPromptForCommand(args) {
         return [
           {

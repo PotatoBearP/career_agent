@@ -201,6 +201,7 @@ export function parseSkillFrontmatterFields(
   userInvocable: boolean
   hooks: HooksSettings | undefined
   executionContext: 'fork' | undefined
+  modelEntry: 'action-tool' | 'skill-catalog'
   agent: string | undefined
   effort: EffortValue | undefined
   shell: FrontmatterShell | undefined
@@ -258,6 +259,10 @@ export function parseSkillFrontmatterFields(
     userInvocable,
     hooks: parseHooksFromFrontmatter(frontmatter, resolvedName),
     executionContext: frontmatter.context === 'fork' ? 'fork' : undefined,
+    modelEntry:
+      frontmatter['model-entry'] === 'action-tool'
+        ? 'action-tool'
+        : 'skill-catalog',
     agent: frontmatter.agent as string | undefined,
     effort,
     shell: parseShellFrontmatter(frontmatter.shell, resolvedName),
@@ -286,6 +291,7 @@ export function createSkillCommand({
   loadedFrom,
   hooks,
   executionContext,
+  modelEntry,
   agent,
   paths,
   effort,
@@ -309,6 +315,7 @@ export function createSkillCommand({
   loadedFrom: LoadedFrom
   hooks: HooksSettings | undefined
   executionContext: 'inline' | 'fork' | undefined
+  modelEntry: 'action-tool' | 'skill-catalog'
   agent: string | undefined
   paths: string[] | undefined
   effort: EffortValue | undefined
@@ -328,6 +335,7 @@ export function createSkillCommand({
     disableModelInvocation,
     userInvocable,
     context: executionContext,
+    modelEntry,
     agent,
     effort,
     paths,

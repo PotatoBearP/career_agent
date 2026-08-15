@@ -29,6 +29,10 @@ import { getSessionContext } from '../server/SessionContext.js'
 type RegisteredHookMatcher = HookCallbackMatcher | PluginHookMatcher
 
 import type { SessionId } from 'src/types/ids.js'
+import type {
+  SkillCompletedEvent,
+  SkillInvocation,
+} from 'src/skills/skillLifecycleTypes.js'
 
 // DO NOT ADD MORE STATE HERE - BE JUDICIOUS WITH GLOBAL STATE
 
@@ -187,6 +191,12 @@ type State = {
       agentId: string | null
     }
   >
+  // Invocation-level Prompt Skill lifecycle. This is runtime-only state and
+  // is intentionally not restored when a process/session runtime is rebuilt.
+  skillInvocations: Map<string, SkillInvocation>
+  activeSkillCallStackByAgent: Map<string, string[]>
+  pendingSkillLifecycleEvents: SkillCompletedEvent[]
+  registeredSkillHookKeys: Set<string>
   // Track slow operations for dev bar display (ant-only)
   slowOperations: Array<{
     operation: string
@@ -465,6 +475,10 @@ function getInitialState(): State {
     teleportedSessionInfo: null,
     // Track invoked skills for preservation across compaction
     invokedSkills: new Map(),
+    skillInvocations: new Map(),
+    activeSkillCallStackByAgent: new Map(),
+    pendingSkillLifecycleEvents: [],
+    registeredSkillHookKeys: new Set(),
     // Track slow operations for dev bar display
     slowOperations: [],
     // SDK-provided betas
@@ -1764,6 +1778,13 @@ export function addInvokedSkill(
   })
 }
 
+export function removeInvokedSkill(
+  skillName: string,
+  agentId: string | null = null,
+): void {
+  getState().invokedSkills.delete(`${agentId ?? ''}:${skillName}`)
+}
+
 export function getInvokedSkills(): Map<string, InvokedSkillInfo> {
   return getState().invokedSkills
 }
@@ -2001,4 +2022,3 @@ export function getPromptId(): string | null {
 export function setPromptId(id: string | null): void {
   getState().promptId = id
 }
-

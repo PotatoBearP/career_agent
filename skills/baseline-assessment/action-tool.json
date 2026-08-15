@@ -1,0 +1,15 @@
+{
+  "tool_name": "BaselineAssessment",
+  "user_facing_name": "Baseline assessment",
+  "search_hint": "assess an existing evidence baseline for a role, domain, or task",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "input": {
+    "assessment_target": {
+      "type": "string",
+      "required": false,
+      "description": "Optional role, domain, or task capability to assess. Evidence comes from the forked context, not this parameter."
+    }
+  }
+}

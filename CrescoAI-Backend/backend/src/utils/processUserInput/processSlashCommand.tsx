@@ -45,10 +45,56 @@ import { buildPluginCommandTelemetryFields } from '../telemetry/pluginTelemetry.
 import { getAssistantMessageContentLength } from '../tokens.js';
 import { createAgentId } from '../uuid.js';
 import { getWorkload } from '../workloadContext.js';
+import {
+  beginSkillInvocation,
+  buildSkillInvocationEnvelope,
+  failSkillInvocationLoading,
+  finalizeActiveSkillInvocations,
+  isLifecycleManagedSkill,
+  markSkillInvocationRunning,
+} from '../../skills/skillLifecycle.js';
+import { executeBaselineAssessmentAction } from '../../skills/baselineAssessmentAction.js';
 import type { ProcessUserInputBaseResult, ProcessUserInputContext } from './processUserInput.js';
 type SlashCommandResult = ProcessUserInputBaseResult & {
   command: Command;
 };
+
+export async function executeBaselineAssessmentSlashCommand(
+  command: CommandBase & PromptCommand,
+  args: string,
+  context: ProcessUserInputContext,
+  precedingInputBlocks: ContentBlockParam[],
+  canUseTool: CanUseToolFn,
+  executeAction: typeof executeBaselineAssessmentAction = executeBaselineAssessmentAction,
+): Promise<SlashCommandResult> {
+  const result = await executeAction({
+    assessmentTarget: args,
+    context,
+    canUseTool,
+  });
+  const originalInput = createUserMessage({
+    content: prepareUserContent({
+      inputString: `/${getCommandName(command)} ${args}`.trim(),
+      precedingInputBlocks,
+    }),
+  });
+  const executedResult = createUserMessage({
+    isMeta: true,
+    toolUseResult: result,
+    content: [
+      '<skill-action-result skill="baseline-assessment" already_executed="true">',
+      JSON.stringify(result),
+      'This action has already executed. Do not call BaselineAssessment again for this slash invocation. Continue the original task using this result.',
+      '</skill-action-result>',
+    ].join('\n'),
+  });
+  return {
+    messages: [originalInput, executedResult],
+    shouldQuery: true,
+    command,
+    resultText: JSON.stringify(result),
+  };
+}
 
 // Poll interval and deadline for MCP settle before launching a background
 // forked subagent. MCP servers typically connect within 1-3s of startup;
@@ -73,12 +119,36 @@ async function executeForkedSlashCommand(command: CommandBase & PromptCommand, a
       ...buildPluginCommandTelemetryFields(command.pluginInfo)
     })
   });
-  const {
-    skillContent,
-    modifiedGetAppState,
-    baseAgent,
-    promptMessages
-  } = await prepareForkedCommandContext(command, args, context);
+  const lifecycleInvocation = isLifecycleManagedSkill(command)
+    ? beginSkillInvocation(
+        command.name,
+        agentId,
+        context.agentId ?? getAgentContext()?.agentId ?? null
+      )
+    : null;
+  let preparedContext: Awaited<ReturnType<typeof prepareForkedCommandContext>>;
+  try {
+    preparedContext = await prepareForkedCommandContext(command, args, context);
+  } catch (error) {
+    if (lifecycleInvocation) {
+      failSkillInvocationLoading(lifecycleInvocation.skillCallId, error);
+    }
+    throw error;
+  }
+  const skillContent = lifecycleInvocation
+    ? `${preparedContext.skillContent}${buildSkillInvocationEnvelope(lifecycleInvocation)}`
+    : preparedContext.skillContent;
+  const promptMessages = lifecycleInvocation
+    ? [createUserMessage({ content: skillContent })]
+    : preparedContext.promptMessages;
+  const { modifiedGetAppState, baseAgent } = preparedContext;
+  if (lifecycleInvocation) {
+    markSkillInvocationRunning({
+      skillCallId: lifecycleInvocation.skillCallId,
+      injectedContent: skillContent,
+      skillPath: command.source ? `${command.source}:${command.name}` : command.name,
+    });
+  }
 
   // Merge skill's effort into the agent definition so runAgent applies it
   const agentDefinition = command.effort !== undefined ? {
@@ -169,6 +239,10 @@ async function executeForkedSlashCommand(command: CommandBase & PromptCommand, a
       logForDebugging(`Background forked command /${commandName} completed (agent ${agentId})`);
       enqueueResult(`<scheduled-task-result command="/${commandName}">\n${resultText}\n</scheduled-task-result>`);
     })().catch(err => {
+      finalizeActiveSkillInvocations(
+        agentId,
+        bgAbortController.signal.aborted ? 'cancelled' : 'unreported'
+      );
       logError(err);
       enqueueResult(`<scheduled-task-result command="/${commandName}" status="failed">\n${err instanceof Error ? err.message : String(err)}\n</scheduled-task-result>`);
     });
@@ -237,7 +311,8 @@ async function executeForkedSlashCommand(command: CommandBase & PromptCommand, a
       isAsync: false,
       querySource: 'agent:custom',
       model: command.model as ModelAlias | undefined,
-      availableTools: context.options.tools
+      availableTools: context.options.tools,
+      override: { agentId }
     })) {
       agentMessages.push(message);
       const normalizedNew = normalizeMessages([message]);
@@ -266,6 +341,10 @@ async function executeForkedSlashCommand(command: CommandBase & PromptCommand, a
       }
     }
   } finally {
+    finalizeActiveSkillInvocations(
+      agentId,
+      context.abortController.signal.aborted ? 'cancelled' : 'unreported'
+    );
     // Clear the progress display
     setToolJSX(null);
   }
@@ -723,6 +802,18 @@ async function getMessagesForSlashCommand(commandName: string, args: string, set
       case 'prompt':
         {
           try {
+            if (
+              command.name === 'baseline-assessment' &&
+              command.modelEntry === 'action-tool'
+            ) {
+              return await executeBaselineAssessmentSlashCommand(
+                command,
+                args,
+                context,
+                precedingInputBlocks,
+                canUseTool ?? hasPermissionsToUseTool,
+              );
+            }
             // Check if command should run as forked sub-agent
             if (command.context === 'fork') {
               return await executeForkedSlashCommand(command, args, context, precedingInputBlocks, setToolJSX, canUseTool ?? hasPermissionsToUseTool);
@@ -866,7 +957,28 @@ async function getMessagesForPromptSlashCommand(command: CommandBase & PromptCom
       command
     };
   }
-  const result = await command.getPromptForCommand(args, context);
+  const lifecycleInvocation = isLifecycleManagedSkill(command)
+    ? beginSkillInvocation(command.name, context.agentId ?? null)
+    : null;
+  let result: ContentBlockParam[];
+  try {
+    result = await command.getPromptForCommand(args, context);
+  } catch (error) {
+    if (lifecycleInvocation) {
+      failSkillInvocationLoading(lifecycleInvocation.skillCallId, error);
+    }
+    throw error;
+  }
+
+  if (lifecycleInvocation) {
+    result = [
+      ...result,
+      {
+        type: 'text',
+        text: buildSkillInvocationEnvelope(lifecycleInvocation),
+      },
+    ];
+  }
 
   if (command.type === 'prompt' && command.skillRoot) {
     const { registerSessionSkillReadOnlyRoot } = await import('../../server/SessionContext.js');
@@ -887,7 +999,9 @@ async function getMessagesForPromptSlashCommand(command: CommandBase & PromptCom
   // agent are restored during compaction (preventing cross-agent leaks).
   const skillPath = command.source ? `${command.source}:${command.name}` : command.name;
   const skillContent = result.filter((b): b is TextBlockParam => b.type === 'text').map(b => b.text).join('\n\n');
-  addInvokedSkill(command.name, skillPath, skillContent, getAgentContext()?.agentId ?? null);
+  if (!lifecycleInvocation) {
+    addInvokedSkill(command.name, skillPath, skillContent, context.agentId ?? getAgentContext()?.agentId ?? null);
+  }
   const metadata = formatCommandLoadingMetadata(command, args);
   const additionalAllowedTools = parseToolListFromCLI(command.allowedTools ?? []);
 
@@ -899,11 +1013,26 @@ async function getMessagesForPromptSlashCommand(command: CommandBase & PromptCom
   // content itself from triggering discovery — it's meta-content, not user
   // intent, and a large SKILL.md (e.g. 110KB) would fire chunked AKI queries
   // adding seconds of latency to every skill invocation.
-  const attachmentMessages = await toArray(getAttachmentMessages(result.filter((block): block is TextBlockParam => block.type === 'text').map(block => block.text).join(' '), context, null, [],
+  let attachmentMessages: AttachmentMessage[];
+  try {
+    attachmentMessages = await toArray(getAttachmentMessages(result.filter((block): block is TextBlockParam => block.type === 'text').map(block => block.text).join(' '), context, null, [],
   // queuedCommands - handled by query.ts for mid-turn attachments
   context.messages, 'repl_main_thread', {
     skipSkillDiscovery: true
   }));
+    if (lifecycleInvocation) {
+      markSkillInvocationRunning({
+        skillCallId: lifecycleInvocation.skillCallId,
+        injectedContent: skillContent,
+        skillPath,
+      });
+    }
+  } catch (error) {
+    if (lifecycleInvocation) {
+      failSkillInvocationLoading(lifecycleInvocation.skillCallId, error);
+    }
+    throw error;
+  }
   const messages = [createUserMessage({
     content: metadata,
     uuid

@@ -38,6 +38,8 @@ export const CAREER_AGENT_API_ROUTE_PATTERNS = {
   settingsUsername: `${CAREER_AGENT_API_BASE_PATH}/settings/username`,
   settingsApi: `${CAREER_AGENT_API_BASE_PATH}/settings/api`,
   settingsApiTest: `${CAREER_AGENT_API_BASE_PATH}/settings/api/test`,
+  settingsMcpGithub: `${CAREER_AGENT_API_BASE_PATH}/settings/mcp/github`,
+  settingsMcpGithubTest: `${CAREER_AGENT_API_BASE_PATH}/settings/mcp/github/test`,
 } as const;
 
 export const CAREER_AGENT_API_ROUTE_DESCRIPTORS = [
@@ -155,6 +157,16 @@ export const CAREER_AGENT_API_ROUTE_DESCRIPTORS = [
     method: 'POST',
     path: CAREER_AGENT_API_ROUTE_PATTERNS.settingsApiTest,
     purpose: '测试当前或待保存的 API 配置连通性。',
+  },
+  {
+    method: 'GET/PUT/DELETE',
+    path: CAREER_AGENT_API_ROUTE_PATTERNS.settingsMcpGithub,
+    purpose: '读取、保存或删除当前用户的 GitHub MCP 配置。',
+  },
+  {
+    method: 'POST',
+    path: CAREER_AGENT_API_ROUTE_PATTERNS.settingsMcpGithubTest,
+    purpose: '测试已保存或待保存的 GitHub MCP PAT。',
   },
 ] as const;
 
@@ -274,5 +286,11 @@ export const CAREER_AGENT_API_ROUTES = {
   },
   settingsApiTest() {
     return CAREER_AGENT_API_ROUTE_PATTERNS.settingsApiTest;
+  },
+  settingsMcpGithub() {
+    return CAREER_AGENT_API_ROUTE_PATTERNS.settingsMcpGithub;
+  },
+  settingsMcpGithubTest() {
+    return CAREER_AGENT_API_ROUTE_PATTERNS.settingsMcpGithubTest;
   },
 } as const;

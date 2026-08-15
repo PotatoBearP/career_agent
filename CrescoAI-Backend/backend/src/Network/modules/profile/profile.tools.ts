@@ -167,6 +167,7 @@ export function createCompactProfileTools(runtime: ProfileToolRuntime): Tool[] {
     buildTool({
       ...common,
       name: 'profile_read',
+      schemaCacheNamespace: 'compact-profile-interactive',
       isReadOnly: () => true,
       searchHint: 'read authenticated user career profile or relevant career memory',
       async description() { return 'Read career-specific Profile data. Set source=basic for identity, education, location, and current employment facts; use source=memory for career goals, target roles, job preferences, and employment constraints. Do not use Profile for generic user preferences or project context.'; },
@@ -191,6 +192,7 @@ export function createCompactProfileTools(runtime: ProfileToolRuntime): Tool[] {
     buildTool({
       ...common,
       name: 'profile_update',
+      schemaCacheNamespace: 'compact-profile-interactive',
       searchHint: 'classify and update authenticated user career profile or career memory',
       async description() {
         return profileFeatureFlags.indexedMutations()
@@ -300,10 +302,11 @@ export function createProductProfileTools(runtime: ProfileToolRuntime): Tool[] {
     buildTool({
       ...common,
       name: 'profile_read',
+      schemaCacheNamespace: 'product-profile-interactive',
       isReadOnly: () => true,
-      searchHint: 'read the authenticated user product career profile',
+      searchHint: 'read the authenticated user product career and education profile',
       async description() {
-        return 'Read the current product career and learning Profile. Use source=product before Profile management; use source=relevant when the current career task only needs relevant Profile context.';
+        return 'Read the current product career, education, and learning Profile. Use source=product before Profile management; use source=relevant when the current career task only needs relevant Profile context.';
       },
       async prompt() {
         return `${PROFILE_MEMORY_SCOPE_PROMPT}\n\nThe product view uses stable fieldKey values and never exposes internal Profile levels, indexes, source ids, or storage paths. Read before changing an existing field when its current value matters.`;
@@ -326,12 +329,13 @@ export function createProductProfileTools(runtime: ProfileToolRuntime): Tool[] {
     buildTool({
       ...common,
       name: 'profile_update',
-      searchHint: 'automatically update one grounded product career profile field',
+      schemaCacheNamespace: 'product-profile-interactive',
+      searchHint: 'automatically update one grounded product career or education profile field',
       async description() {
-        return 'Automatically set or clear one stable product Profile field after the user explicitly provides a durable career or learning fact. The server owns internal levels, slots, versioning, and audit.';
+        return 'Automatically set or clear one stable product Profile field after the user explicitly provides a durable career, education, or learning fact. The server owns internal levels, slots, versioning, and audit.';
       },
       async prompt() {
-        return `${PROFILE_MEMORY_SCOPE_PROMPT}\n\nUpdate exactly one field per call. For list fields, prefer add/remove so an incremental fact cannot erase existing items; set replaces the full field and requires explicit complete replacement evidence. Use current_user_explicit only for facts stated in the current user turn, recalled_user_explicit only for a recalled attributable user statement, and grounded_summary only for a conservative synthesis supported by saved facts. Temporary task filters, assistant suggestions, questions asked, and content merely read are not Profile changes. Do not narrate the update after the tool returns.`;
+        return `${PROFILE_MEMORY_SCOPE_PROMPT}\n\nUpdate exactly one field per call. If the evidence contains multiple independently representable durable facts, make one call for every applicable field before answering; a no_change result covers only the requested field and does not save any other fact. Never choose an unrelated existing field as a substitute for the evidence. Use base.educationLevel and education.* fields for education facts; never put school, major, degree, or study year in base.currentRole, and never infer base.currentCity from a school's location. For list fields, prefer add/remove so an incremental fact cannot erase existing items; set replaces the full field and requires explicit complete replacement evidence. Use current_user_explicit only for facts stated in the current user turn, recalled_user_explicit only for a recalled attributable user statement, and grounded_summary only for a conservative synthesis supported by saved facts. Temporary task filters, assistant suggestions, questions asked, and content merely read are not Profile changes. Do not narrate the update after the tool returns.`;
       },
       get inputSchema() { return updateInput(); },
       get outputSchema() { return resultSchema(); },

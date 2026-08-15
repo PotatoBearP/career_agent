@@ -18,6 +18,19 @@ export type ArtifactViewMode = 'pane' | 'focus' | 'immersive';
 export type MessageActionKind = 'open-artifact';
 export type MessageMediaKind = 'image' | 'audio' | 'video' | 'html' | 'app' | 'file';
 export type DraftMessageAttachmentKind = 'image' | 'file';
+export type SkillOutcome = 'success' | 'insufficient_input' | 'error';
+
+export interface SkillResult {
+  skillCallId: string;
+  skillName: string;
+  outcome: SkillOutcome;
+  summary: string;
+  result?: unknown;
+  startedAt: string;
+  completedAt: string;
+  durationMs: number;
+  source: 'agent' | 'harness';
+}
 
 export interface AskQuestionOption {
   label: string;
@@ -161,6 +174,10 @@ export type ThreadMessageStreamEvent =
       messageId: string;
       block: MessageBlock;
     }
+  | ({
+      type: 'skill.completed';
+      messageId: string;
+    } & SkillResult)
   | {
       type: 'artifact.created';
       messageId: string;
@@ -458,4 +475,41 @@ export interface ConnectionTestResult {
   baseUrl: string;
   status: number | null;
   message: string;
+}
+
+export type GithubMcpRuntimeStatus = 'not_configured' | 'disabled' | 'disconnected' | 'connecting' | 'connected' | 'failed';
+
+export interface GithubMcpUser {
+  login: string | null;
+  name: string | null;
+  id: string | null;
+  htmlUrl: string | null;
+}
+
+export interface GithubMcpSetting {
+  provider: 'github';
+  endpoint: string;
+  enabled: boolean;
+  configured: boolean;
+  tokenHint: string | null;
+  status: GithubMcpRuntimeStatus;
+  toolCount: number;
+  toolNames: string[];
+  githubUser: GithubMcpUser | null;
+  lastError: string | null;
+  connectedAt: string | null;
+}
+
+export interface GithubMcpTestResult {
+  ok: boolean;
+  status: GithubMcpRuntimeStatus;
+  toolCount: number;
+  toolNames: string[];
+  githubUser: GithubMcpUser | null;
+  message: string;
+}
+
+export interface UpdateGithubMcpSettingInput {
+  enabled: boolean;
+  personalAccessToken?: string;
 }

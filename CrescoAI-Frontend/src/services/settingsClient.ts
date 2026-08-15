@@ -4,7 +4,11 @@ import type {
   AccountSetting,
   ApiSetting,
   ConnectionTestResult,
+  GithubMcpSetting,
+  GithubMcpTestResult,
+  GithubMcpUser,
   UpdateUsernameInput,
+  UpdateGithubMcpSettingInput,
   UpsertApiSettingInput,
   UserSettings,
 } from '../types/entities';
@@ -92,12 +96,46 @@ interface UpstreamConnectionTestResult {
   message?: string | null;
 }
 
+interface UpstreamGithubMcpUser {
+  login?: string | null;
+  name?: string | null;
+  id?: string | number | null;
+  html_url?: string | null;
+  htmlUrl?: string | null;
+}
+
+interface UpstreamGithubMcpResult {
+  provider?: string | null;
+  endpoint?: string | null;
+  enabled?: boolean | null;
+  configured?: boolean | null;
+  token_hint?: string | null;
+  tokenHint?: string | null;
+  status?: GithubMcpSetting['status'] | null;
+  tool_count?: number | null;
+  toolCount?: number | null;
+  tool_names?: string[] | null;
+  toolNames?: string[] | null;
+  github_user?: UpstreamGithubMcpUser | null;
+  githubUser?: UpstreamGithubMcpUser | null;
+  last_error?: string | null;
+  lastError?: string | null;
+  connected_at?: string | null;
+  connectedAt?: string | null;
+  ok?: boolean | null;
+  message?: string | null;
+}
+
 export interface SettingsClient {
   getSettings(): Promise<UserSettings>;
   updateUsername(input: UpdateUsernameInput): Promise<AccountSetting>;
   listApiSettings(): Promise<ApiSetting[]>;
   upsertApiSetting(input: UpsertApiSettingInput): Promise<ApiSetting>;
   testApiSetting(input: UpsertApiSettingInput): Promise<ConnectionTestResult>;
+  getGithubMcpSetting(): Promise<GithubMcpSetting>;
+  saveGithubMcpSetting(input: UpdateGithubMcpSettingInput): Promise<GithubMcpSetting>;
+  testGithubMcpSetting(personalAccessToken?: string): Promise<GithubMcpTestResult>;
+  deleteGithubMcpSetting(): Promise<GithubMcpSetting>;
 }
 
 function normalizeOptionalString(value: unknown) {
@@ -179,6 +217,44 @@ export function normalizeConnectionTestResult(input: UpstreamConnectionTestResul
   };
 }
 
+function normalizeGithubMcpUser(input: UpstreamGithubMcpUser | null | undefined): GithubMcpUser | null {
+  if (!input) return null;
+  return {
+    login: normalizeOptionalString(input.login),
+    name: normalizeOptionalString(input.name),
+    id: normalizeOptionalString(input.id),
+    htmlUrl: normalizeOptionalString(input.htmlUrl ?? input.html_url),
+  };
+}
+
+export function normalizeGithubMcpSetting(input: UpstreamGithubMcpResult): GithubMcpSetting {
+  const status = input.status ?? 'not_configured';
+  return {
+    provider: 'github',
+    endpoint: normalizeOptionalString(input.endpoint) ?? 'https://api.githubcopilot.com/mcp/',
+    enabled: Boolean(input.enabled),
+    configured: Boolean(input.configured),
+    tokenHint: normalizeOptionalString(input.tokenHint ?? input.token_hint),
+    status,
+    toolCount: Number(input.toolCount ?? input.tool_count ?? 0),
+    toolNames: input.toolNames ?? input.tool_names ?? [],
+    githubUser: normalizeGithubMcpUser(input.githubUser ?? input.github_user),
+    lastError: normalizeOptionalString(input.lastError ?? input.last_error),
+    connectedAt: normalizeDateString(input.connectedAt ?? input.connected_at),
+  };
+}
+
+export function normalizeGithubMcpTestResult(input: UpstreamGithubMcpResult): GithubMcpTestResult {
+  return {
+    ok: Boolean(input.ok),
+    status: input.status ?? (input.ok ? 'connected' : 'failed'),
+    toolCount: Number(input.toolCount ?? input.tool_count ?? 0),
+    toolNames: input.toolNames ?? input.tool_names ?? [],
+    githubUser: normalizeGithubMcpUser(input.githubUser ?? input.github_user),
+    message: normalizeOptionalString(input.message) ?? (input.ok ? '连接成功' : '连接失败'),
+  };
+}
+
 export function normalizeConnectionMessage(message: string | null) {
   if (!message) {
     return null;
@@ -251,6 +327,7 @@ function createMockSettingsClient(): SettingsClient {
     createdAt: null,
     updatedAt: null,
   };
+  let githubMcpSetting = normalizeGithubMcpSetting({});
 
   return {
     async getSettings() {
@@ -296,6 +373,35 @@ function createMockSettingsClient(): SettingsClient {
         message: input.apiKey || apiSetting?.hasApiKey ? '连接成功' : '请先填写或保存 API Key。',
       };
     },
+    async getGithubMcpSetting() {
+      return githubMcpSetting;
+    },
+    async saveGithubMcpSetting(input) {
+      const token = input.personalAccessToken?.trim();
+      githubMcpSetting = {
+        ...githubMcpSetting,
+        enabled: input.enabled,
+        configured: Boolean(token || githubMcpSetting.configured),
+        tokenHint: token ? `••••${token.slice(-4)}` : githubMcpSetting.tokenHint,
+        status: input.enabled ? 'disconnected' : 'disabled',
+      };
+      return githubMcpSetting;
+    },
+    async testGithubMcpSetting(personalAccessToken) {
+      const ok = Boolean(personalAccessToken?.trim() || githubMcpSetting.configured);
+      return {
+        ok,
+        status: ok ? 'connected' : 'failed',
+        toolCount: ok ? 2 : 0,
+        toolNames: ok ? ['mcp__github__get_me', 'mcp__github__get_file_contents'] : [],
+        githubUser: ok ? { login: 'mock-user', name: 'Mock User', id: null, htmlUrl: 'https://github.com/mock-user' } : null,
+        message: ok ? 'GitHub MCP connection and get_me call succeeded' : '请先填写或保存 GitHub PAT。',
+      };
+    },
+    async deleteGithubMcpSetting() {
+      githubMcpSetting = normalizeGithubMcpSetting({});
+      return githubMcpSetting;
+    },
   };
 }
 
@@ -311,6 +417,10 @@ function createUpstreamSettingsClient(config: RuntimeConfig, httpClient?: AxiosI
       listApiSettings: unavailable,
       upsertApiSetting: unavailable,
       testApiSetting: unavailable,
+      getGithubMcpSetting: unavailable,
+      saveGithubMcpSetting: unavailable,
+      testGithubMcpSetting: unavailable,
+      deleteGithubMcpSetting: unavailable,
     };
   }
 
@@ -376,6 +486,43 @@ function createUpstreamSettingsClient(config: RuntimeConfig, httpClient?: AxiosI
         return normalizeConnectionTestResult(response.data);
       } catch (error) {
         throw formatSettingsError(error, 'API 连接测试失败。');
+      }
+    },
+    async getGithubMcpSetting() {
+      try {
+        const response = await client.get<UpstreamGithubMcpResult>(CAREER_AGENT_API_ROUTES.settingsMcpGithub());
+        return normalizeGithubMcpSetting(response.data);
+      } catch (error) {
+        throw formatSettingsError(error, 'GitHub MCP 配置加载失败。');
+      }
+    },
+    async saveGithubMcpSetting(input) {
+      try {
+        const response = await client.put<UpstreamGithubMcpResult>(CAREER_AGENT_API_ROUTES.settingsMcpGithub(), {
+          enabled: input.enabled,
+          personalAccessToken: input.personalAccessToken || undefined,
+        });
+        return normalizeGithubMcpSetting(response.data);
+      } catch (error) {
+        throw formatSettingsError(error, 'GitHub MCP 配置保存失败。');
+      }
+    },
+    async testGithubMcpSetting(personalAccessToken) {
+      try {
+        const response = await client.post<UpstreamGithubMcpResult>(CAREER_AGENT_API_ROUTES.settingsMcpGithubTest(), {
+          personalAccessToken: personalAccessToken?.trim() || undefined,
+        });
+        return normalizeGithubMcpTestResult(response.data);
+      } catch (error) {
+        throw formatSettingsError(error, 'GitHub MCP 连接测试失败。');
+      }
+    },
+    async deleteGithubMcpSetting() {
+      try {
+        const response = await client.delete<UpstreamGithubMcpResult>(CAREER_AGENT_API_ROUTES.settingsMcpGithub());
+        return normalizeGithubMcpSetting(response.data);
+      } catch (error) {
+        throw formatSettingsError(error, 'GitHub MCP 配置删除失败。');
       }
     },
   };

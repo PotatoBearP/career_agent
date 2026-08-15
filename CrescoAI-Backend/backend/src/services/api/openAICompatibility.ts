@@ -52,16 +52,53 @@ function buildChatCompletionsUrl(baseUrl: string): string {
 function textFromContent(value: unknown): string {
   if (typeof value === 'string') return value
   if (!Array.isArray(value)) return ''
-  return value
+  const toolReferences: string[] = []
+  const text = value
     .map(item => {
       if (typeof item === 'string') return item
       if (!isRecord(item)) return ''
       if (typeof item.text === 'string') return item.text
       if (typeof item.content === 'string') return item.content
+      if (item.type === 'tool_reference' && typeof item.tool_name === 'string') {
+        toolReferences.push(item.tool_name)
+      }
       return ''
     })
     .filter(Boolean)
     .join('\n')
+
+  if (!toolReferences.length) return text
+
+  const loadedTools = [...new Set(toolReferences)]
+  const toolReferenceText =
+    `Loaded tools are now available for direct function calls: ${loadedTools.join(', ')}. ` +
+    'Call the appropriate loaded tool directly; do not search for these same tools again.'
+  return [text, toolReferenceText].filter(Boolean).join('\n')
+}
+
+function getImmediateToolReferences(messages: unknown): Set<string> {
+  if (!Array.isArray(messages) || messages.length === 0) return new Set()
+  const latestMessage = messages[messages.length - 1]
+  if (!isRecord(latestMessage) || !Array.isArray(latestMessage.content)) {
+    return new Set()
+  }
+
+  const references = new Set<string>()
+  for (const block of latestMessage.content) {
+    if (!isRecord(block) || block.type !== 'tool_result' || !Array.isArray(block.content)) {
+      continue
+    }
+    for (const item of block.content) {
+      if (
+        isRecord(item) &&
+        item.type === 'tool_reference' &&
+        typeof item.tool_name === 'string'
+      ) {
+        references.add(item.tool_name)
+      }
+    }
+  }
+  return references
 }
 
 function translateUserContent(content: unknown): UnknownRecord[] {
@@ -147,7 +184,7 @@ export function translateAnthropicRequestToOpenAI(input: UnknownRecord): Unknown
     }
   }
 
-  const tools = (Array.isArray(input.tools) ? input.tools : [])
+  const allTools = (Array.isArray(input.tools) ? input.tools : [])
     .filter(isRecord)
     .map(tool => ({
       type: 'function',
@@ -158,15 +195,33 @@ export function translateAnthropicRequestToOpenAI(input: UnknownRecord): Unknown
       },
     }))
 
-  const toolChoice = isRecord(input.tool_choice)
-    ? input.tool_choice.type === 'tool'
-      ? { type: 'function', function: { name: String(input.tool_choice.name ?? '') } }
-      : input.tool_choice.type === 'any'
-        ? 'required'
-        : input.tool_choice.type === 'auto'
-          ? 'auto'
-          : undefined
-    : undefined
+  // Anthropic expands tool_reference blocks server-side and expects the model
+  // to call one of those tools next. OpenAI-compatible APIs have no equivalent
+  // protocol, so emulate that transition for exactly the immediate follow-up:
+  // expose only the referenced schemas and require one function call. Once the
+  // real tool returns, the latest message no longer contains tool_reference and
+  // the normal tool pool is restored.
+  const immediateToolReferences = getImmediateToolReferences(input.messages)
+  const referencedTools = immediateToolReferences.size
+    ? allTools.filter(tool => {
+        const fn = isRecord(tool.function) ? tool.function : undefined
+        return typeof fn?.name === 'string' && immediateToolReferences.has(fn.name)
+      })
+    : []
+  const isToolReferenceFollowUp = referencedTools.length > 0
+  const tools = isToolReferenceFollowUp ? referencedTools : allTools
+
+  const toolChoice = isToolReferenceFollowUp
+    ? 'required'
+    : isRecord(input.tool_choice)
+      ? input.tool_choice.type === 'tool'
+        ? { type: 'function', function: { name: String(input.tool_choice.name ?? '') } }
+        : input.tool_choice.type === 'any'
+          ? 'required'
+          : input.tool_choice.type === 'auto'
+            ? 'auto'
+            : undefined
+      : undefined
 
   return {
     model: input.model,

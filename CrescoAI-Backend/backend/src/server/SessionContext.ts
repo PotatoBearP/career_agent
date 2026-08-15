@@ -17,6 +17,7 @@ import {
   isPathWithinRoot,
 } from './workspaceSecurity.js'
 import type { ConversationMemoryTurnState } from '../Network/memory/conversationMemoryTypes.js'
+import type { MCPServerConnection } from '../services/mcp/types.js'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -67,7 +68,11 @@ export type SessionContext = {
   config: SessionConfig
   anthropicClient: any | null
   queryEngine: any | null
-  mcpClients: Array<{ close: () => Promise<void> }>
+  mcpClients: MCPServerConnection[]
+  /** Runtime generation used to rebuild the QueryEngine when MCP configuration changes. */
+  mcpRuntimeVersion?: number
+  /** Only session-owned clients are closed when a conversation is disposed. */
+  ownsMcpClients?: boolean
   wsConnections: Set<any>
   abortController: AbortController
   createdAt: number

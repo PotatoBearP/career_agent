@@ -26,6 +26,7 @@ import type {
   MessageMedia,
   ProfileRecord,
   ProfileSuggestion,
+  SkillResult,
   ThreadMessageStreamEvent,
   ThreadMessage,
   ThreadSummary,
@@ -231,6 +232,36 @@ function truncateText(value: string, maxLength: number) {
   }
 
   return `${value.slice(0, maxLength - 3)}...`;
+}
+
+function readSkillResults(raw: Record<string, unknown> | null | undefined): SkillResult[] {
+  return Array.isArray(raw?.skillResults)
+    ? raw.skillResults.filter((value): value is SkillResult => (
+      typeof value === 'object'
+      && value !== null
+      && typeof (value as SkillResult).skillCallId === 'string'
+    ))
+    : [];
+}
+
+export function mergeMessageRaw(
+  current: Record<string, unknown> | null | undefined,
+  incoming: Record<string, unknown> | null,
+): Record<string, unknown> | null {
+  const currentResults = readSkillResults(current);
+  const incomingResults = readSkillResults(incoming);
+  if (!currentResults.length && !incomingResults.length) {
+    return incoming;
+  }
+  const resultsByCallId = new Map<string, SkillResult>();
+  for (const result of [...currentResults, ...incomingResults]) {
+    resultsByCallId.set(result.skillCallId, result);
+  }
+  return {
+    ...(current ?? {}),
+    ...(incoming ?? {}),
+    skillResults: Array.from(resultsByCallId.values()),
+  };
 }
 
 function deriveThreadSeed(submission: DraftMessageSubmission) {
@@ -1093,7 +1124,9 @@ export const useWorkspaceStore = defineStore('workspace', {
           blocks: payload.blocks !== undefined
             ? normalizeMessageBlocks(payload.blocks)
             : normalizeMessageBlocks(existingMessage.blocks),
-          raw: payload.raw !== undefined ? payload.raw : existingMessage.raw,
+          raw: payload.raw !== undefined
+            ? mergeMessageRaw(existingMessage.raw, payload.raw)
+            : existingMessage.raw,
           streaming: payload.streaming !== undefined ? payload.streaming : existingMessage.streaming,
         };
       };
@@ -1263,6 +1296,27 @@ export const useWorkspaceStore = defineStore('workspace', {
             ...this.messages[index],
             blocks,
             content: deriveMessageContentFromBlocks(blocks, this.messages[index].content),
+          };
+          return;
+        }
+
+        if (event.type === 'skill.completed') {
+          const index = ensureAssistantMessage(event.messageId);
+          const currentRaw = this.messages[index].raw;
+          const skillResult: SkillResult = {
+            skillCallId: event.skillCallId,
+            skillName: event.skillName,
+            outcome: event.outcome,
+            summary: event.summary,
+            ...(event.result !== undefined ? { result: event.result } : {}),
+            startedAt: event.startedAt,
+            completedAt: event.completedAt,
+            durationMs: event.durationMs,
+            source: event.source,
+          };
+          this.messages[index] = {
+            ...this.messages[index],
+            raw: mergeMessageRaw(currentRaw, { skillResults: [skillResult] }),
           };
           return;
         }

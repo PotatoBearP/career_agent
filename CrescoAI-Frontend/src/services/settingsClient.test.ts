@@ -4,6 +4,8 @@ import {
   normalizeApiSetting,
   normalizeConnectionMessage,
   normalizeConnectionTestResult,
+  normalizeGithubMcpSetting,
+  normalizeGithubMcpTestResult,
   normalizeUserSettings,
 } from './settingsClient';
 
@@ -104,5 +106,41 @@ describe('settingsClient normalizers', () => {
       ok: false,
       status: 0,
     }).message).toBe('连接失败');
+  });
+
+  it('normalizes GitHub MCP status without exposing credential fields', () => {
+    const setting = normalizeGithubMcpSetting({
+      enabled: true,
+      configured: true,
+      token_hint: '••••1234',
+      status: 'connected',
+      tool_count: 2,
+      tool_names: ['get_me', 'get_file_contents'],
+      github_user: {
+        login: 'octocat',
+        name: 'The Octocat',
+        html_url: 'https://github.com/octocat',
+      },
+    });
+
+    expect(setting).toMatchObject({
+      provider: 'github',
+      enabled: true,
+      configured: true,
+      tokenHint: '••••1234',
+      status: 'connected',
+      toolCount: 2,
+      githubUser: {
+        login: 'octocat',
+        htmlUrl: 'https://github.com/octocat',
+      },
+    });
+    expect(Object.keys(setting)).not.toContain('personalAccessToken');
+
+    expect(normalizeGithubMcpTestResult({ ok: true, status: 'connected' })).toMatchObject({
+      ok: true,
+      status: 'connected',
+      message: '连接成功',
+    });
   });
 });

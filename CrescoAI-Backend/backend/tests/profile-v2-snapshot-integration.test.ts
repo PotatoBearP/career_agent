@@ -13,6 +13,12 @@ import { ProfileSuggestionEntity } from '../src/Network/modules/profile/entities
 import { ProfileExternalSnapshotService } from '../src/Network/modules/profile/profile-external-snapshot.service.js';
 import { ProfileLegacyAdapterService } from '../src/Network/modules/profile/profile-legacy-adapter.service.js';
 import { ProfileMemoryService } from '../src/Network/modules/profile/profile-memory.service.js';
+import type { ProfileEvidenceService } from '../src/Network/modules/profile/profile-evidence.service.js';
+import { ProfileProductMutationService } from '../src/Network/modules/profile/profile-product-mutation.service.js';
+import { ProfileProductProjectionService } from '../src/Network/modules/profile/profile-product-projection.service.js';
+import { ProfileRecallService } from '../src/Network/modules/profile/profile-recall.service.js';
+import { createProfileRefreshTools } from '../src/Network/modules/profile/profile-refresh.tools.js';
+import { createProductProfileTools } from '../src/Network/modules/profile/profile.tools.js';
 import type { ProfileProjectionService } from '../src/Network/modules/profile/profile-projection.service.js';
 import { createDefaultProfile } from '../src/Network/modules/profile/profile.types.js';
 import { ProfileV2Service } from '../src/Network/modules/profile/profile-v2.service.js';
@@ -83,6 +89,18 @@ function profileV2Service(
     dataSource.getRepository(BaseProfileEntity),
     dataSource.getRepository(ProfileStateEntity),
   );
+}
+
+function productProjectionService(
+  dataSource: DataSource,
+  profileV2: ProfileV2Service,
+) {
+  const evidence = {
+    getActiveLinks: async () => [],
+    valueKey: () => null,
+    itemKey: (_fieldKey: string, value: string) => `item-${value}`,
+  } as unknown as ProfileEvidenceService;
+  return new ProfileProductProjectionService(dataSource, profileV2, evidence);
 }
 
 async function createUser(dataSource: DataSource, displayName = 'Before') {
@@ -282,6 +300,163 @@ describe('Profile V2 snapshot integration', () => {
     expect(await dataSource.getRepository(ProfileProjectionJobEntity).countBy({
       userId: user.id,
     })).toBe(1);
+  });
+
+  test('concurrent base and state reads share one SQLite initialization transaction', async () => {
+    const dataSource = await createTestDataSource();
+    const user = await createUser(dataSource, 'Concurrent reads');
+    const service = profileV2Service(dataSource);
+
+    const [base, state] = await Promise.all([
+      service.getBaseProfile(user.id),
+      service.getState(user.id),
+    ]);
+
+    expect(base).toMatchObject({
+      userId: user.id,
+      name: 'Concurrent reads',
+      version: 1,
+    });
+    expect(state).toMatchObject({
+      userId: user.id,
+      aggregateVersion: 1,
+    });
+    expect(await dataSource.getRepository(ProfileRevisionEntity).countBy({
+      userId: user.id,
+    })).toBe(1);
+    expect(await dataSource.getRepository(ProfileProjectionJobEntity).countBy({
+      userId: user.id,
+    })).toBe(1);
+  });
+
+  test('Profile recall does not open nested SQLite initialization transactions', async () => {
+    const dataSource = await createTestDataSource();
+    const user = await createUser(dataSource, 'Recall user');
+    const service = profileV2Service(dataSource);
+    const recall = new ProfileRecallService(service, {
+      list: async () => [],
+    } as unknown as ProfileMemoryService);
+
+    await expect(recall.buildContext(user.id, '帮我做职业规划')).resolves.toMatchObject({
+      version: 1,
+      queryIntent: 'career_planning',
+    });
+  });
+
+  test('Product Profile education fields update the existing education JSON', async () => {
+    const dataSource = await createTestDataSource();
+    const user = await createUser(dataSource, 'Education user');
+    const profileV2 = profileV2Service(dataSource);
+    const projection = productProjectionService(dataSource, profileV2);
+    const mutations = new ProfileProductMutationService(
+      profileV2,
+      {} as ProfileMemoryService,
+      projection,
+    );
+    const actor = {
+      actorType: 'agent' as const,
+      sourceType: 'user_explicit' as const,
+      sourceConversationId: 'education-conversation',
+      sourceMessageId: 'education-message',
+    };
+
+    let product = await projection.getProductProfile(user.id);
+    expect(product.education).toMatchObject({
+      level: { value: '' },
+      school: { value: '' },
+      major: { value: '' },
+      graduationDate: { value: null },
+    });
+
+    product = await mutations.mutate(user.id, {
+      expectedVersion: product.version,
+      fieldKey: 'education.school',
+      operation: 'set',
+      value: '北京理工大学',
+    }, actor);
+    product = await mutations.mutate(user.id, {
+      expectedVersion: product.version,
+      fieldKey: 'education.major',
+      operation: 'set',
+      value: '计算机技术',
+    }, actor);
+    product = await mutations.mutate(user.id, {
+      expectedVersion: product.version,
+      fieldKey: 'base.educationLevel',
+      operation: 'set',
+      value: '硕士研究生',
+    }, actor);
+    product = await mutations.mutate(user.id, {
+      expectedVersion: product.version,
+      fieldKey: 'education.graduationDate',
+      operation: 'set',
+      value: '2029-06-30',
+    }, actor);
+
+    expect(product.version).toBe(5);
+    expect(product.education).toMatchObject({
+      level: { value: '硕士研究生' },
+      school: { value: '北京理工大学' },
+      major: { value: '计算机技术' },
+      graduationDate: { value: '2029-06-30' },
+    });
+    expect((await profileV2.getBaseProfile(user.id)).educationBackground).toEqual([{
+      school: '北京理工大学',
+      major: '计算机技术',
+      degree: '',
+      graduationDate: '2029-06-30',
+      description: '',
+    }]);
+    expect(await dataSource.getRepository(ProfileRevisionEntity).countBy({
+      userId: user.id,
+    })).toBe(5);
+
+    await expect(mutations.mutate(user.id, {
+      expectedVersion: product.version,
+      fieldKey: 'education.graduationDate',
+      operation: 'set',
+      value: '2029-02-30',
+    }, actor)).rejects.toThrow('must be a valid date');
+    expect((await profileV2.getState(user.id)).aggregateVersion).toBe(5);
+
+    product = await mutations.mutate(user.id, {
+      expectedVersion: product.version,
+      fieldKey: 'education.major',
+      operation: 'clear',
+    }, actor);
+    expect(product.education.school.value).toBe('北京理工大学');
+    expect(product.education.major.value).toBe('');
+    expect((await profileV2.getBaseProfile(user.id)).educationBackground[0]).toMatchObject({
+      school: '北京理工大学',
+      major: '',
+      graduationDate: '2029-06-30',
+    });
+  });
+
+  test('interactive and refresh Profile tools use isolated schema caches', () => {
+    const interactive = createProductProfileTools({
+      userId: 1,
+      conversationId: 'conversation',
+      baseService: {} as ProfileV2Service,
+      memoryService: {} as ProfileMemoryService,
+      proposalService: {} as never,
+      productProjectionService: {} as ProfileProductProjectionService,
+      productMutationService: {} as ProfileProductMutationService,
+    });
+    const refresh = createProfileRefreshTools({
+      snapshot: {} as never,
+      allowedEvidenceRefs: new Set(),
+      staged: [],
+    });
+
+    expect(interactive.find((tool) => tool.name === 'profile_read')?.schemaCacheNamespace)
+      .toBe('product-profile-interactive');
+    expect(interactive.find((tool) => tool.name === 'profile_update')?.schemaCacheNamespace)
+      .toBe('product-profile-interactive');
+    expect(refresh.find((tool) => tool.name === 'profile_read')?.schemaCacheNamespace)
+      .toBe('product-profile-refresh');
+    expect(refresh.find((tool) => tool.name === 'profile_update')?.schemaCacheNamespace)
+      .toBe('product-profile-refresh');
   });
 
   test('two concurrent first snapshots both succeed', async () => {

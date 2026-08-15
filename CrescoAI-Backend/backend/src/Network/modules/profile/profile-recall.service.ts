@@ -121,14 +121,18 @@ export class ProfileRecallService {
       ['currentIndustry', base.currentIndustry],
       ['currentCity', base.currentCity],
       ['educationLevel', base.educationLevel],
+      ['educationSchool', base.educationBackground[0]?.school ?? ''],
+      ['educationMajor', base.educationBackground[0]?.major ?? ''],
+      ['educationDegree', base.educationBackground[0]?.degree ?? ''],
+      ['educationGraduationDate', base.educationBackground[0]?.graduationDate ?? null],
       ['yearsOfExperience', base.yearsOfExperience],
       ['contactLanguage', base.contactLanguage],
     ];
     const allowed = intent === 'resume_editing'
-      ? new Set(['name', 'currentStatus', 'currentRole', 'currentIndustry', 'currentCity', 'educationLevel', 'yearsOfExperience'])
+      ? new Set(['name', 'currentStatus', 'currentRole', 'currentIndustry', 'currentCity', 'educationLevel', 'educationSchool', 'educationMajor', 'educationDegree', 'educationGraduationDate', 'yearsOfExperience'])
       : intent === 'job_recommendation'
-        ? new Set(['currentStatus', 'currentRole', 'currentIndustry', 'currentCity', 'educationLevel', 'yearsOfExperience'])
-        : new Set(['currentStatus', 'currentRole', 'currentIndustry', 'educationLevel']);
+        ? new Set(['currentStatus', 'currentRole', 'currentIndustry', 'currentCity', 'educationLevel', 'educationSchool', 'educationMajor', 'educationDegree', 'educationGraduationDate', 'yearsOfExperience'])
+        : new Set(['currentStatus', 'currentRole', 'currentIndustry', 'educationLevel', 'educationSchool', 'educationMajor', 'educationDegree']);
     return entries
       .filter(([key, value]) => allowed.has(key) && value !== '' && value !== null)
       .map(([key, value]) => ({ key, value: String(value) }));

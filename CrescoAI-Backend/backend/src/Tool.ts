@@ -365,6 +365,11 @@ export type Tool<
   P extends ToolProgressData = ToolProgressData,
 > = {
   /**
+   * Distinguishes tools that intentionally share a public name but expose
+   * different descriptions or input schemas in different runtimes.
+   */
+  readonly schemaCacheNamespace?: string
+  /**
    * Optional aliases for backwards compatibility when a tool is renamed.
    * The tool can be looked up by any of these names in addition to its primary name.
    */

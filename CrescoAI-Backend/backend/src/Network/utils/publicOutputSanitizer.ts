@@ -1,7 +1,9 @@
 import { basename } from 'node:path';
 
-const WINDOWS_FILE_PATH_PATTERN = /(?:[A-Za-z]:|\\\\[^\\/\s]+[\\/]+[^\\/\s]+)[\\/]+(?:[^\\/\r\n"'`<>|?*]+[\\/]+)+[^\\/\r\n"'`<>|?*]*?\.[A-Za-z0-9]{1,12}/g;
-const WINDOWS_PATH_TOKEN_PATTERN = /(?:[A-Za-z]:|\\\\[^\\/\s]+[\\/]+[^\\/\s]+)[\\/]+(?:[^\s"'`<>|?*,;:()\[\]{}]+[\\/]+)*[^\s"'`<>|?*,;:()\[\]{}]*/g;
+// A drive letter must not be embedded in another word. Without this guard, the
+// trailing `s:/` in `https://...` is mistaken for a Windows path and sanitized.
+const WINDOWS_FILE_PATH_PATTERN = /(?<![A-Za-z0-9_])(?:[A-Za-z]:|\\\\[^\\/\s]+[\\/]+[^\\/\s]+)[\\/]+(?:[^\\/\r\n"'`<>|?*]+[\\/]+)+[^\\/\r\n"'`<>|?*]*?\.[A-Za-z0-9]{1,12}/g;
+const WINDOWS_PATH_TOKEN_PATTERN = /(?<![A-Za-z0-9_])(?:[A-Za-z]:|\\\\[^\\/\s]+[\\/]+[^\\/\s]+)[\\/]+(?:[^\s"'`<>|?*,;:()\[\]{}]+[\\/]+)*[^\s"'`<>|?*,;:()\[\]{}]*/g;
 const UNIX_FILE_PATH_PATTERN = /\/(?:home|Users|var|tmp|opt|srv|root|workspace|mnt|git)(?:\/[^/\r\n"'`<>|?*]+)+?\/[^/\r\n"'`<>|?*]*?\.[A-Za-z0-9]{1,12}/g;
 const UNIX_PATH_TOKEN_PATTERN = /\/(?:home|Users|var|tmp|opt|srv|root|workspace|mnt|git)(?:\/[^\s"'`<>|?*,;:()\[\]{}]+)+/g;
 const NETWORK_RELATIVE_PATH_PATTERN = /(?:\.\.?[\\/]+)?(?:(?:CrescoAI-Backend|backend)[\\/]+)?src[\\/]+Network[\\/]+(?:user|files)(?:[\\/]+[^\s"'`<>|?*,;:()\[\]{}]+)+/gi;

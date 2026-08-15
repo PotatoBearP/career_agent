@@ -1,0 +1,72 @@
+{
+  "original_metadata": {
+    "skill_id": "baseline-assessment",
+    "name": "基线评估",
+    "type": "career_assessment",
+    "kag_role": "skill_action",
+    "description": "仅根据调用前上下文中已有的证据，评估用户相对于明确目标的当前能力基线。",
+    "inputs": [
+      "assessment_target",
+      "available_context_evidence"
+    ],
+    "outputs": [
+      "baseline_assessment"
+    ],
+    "preconditions": [
+      "用户或上游流程需要基于已有证据判断相对于某一目标的当前起点"
+    ],
+    "postconditions": [
+      "通过 ReturnSkillResult 报告 success、insufficient_input 或 error"
+    ],
+    "possible_next_skills": [],
+    "required_context_types": [],
+    "allowed_tools": [
+      "ReturnSkillResult"
+    ],
+    "recommended_verifiers": [
+      "evidence_traceability_check",
+      "confidence_calibration_check",
+      "boundary_compliance_check"
+    ]
+  },
+  "compiled_metadata": {
+    "skill_id": "baseline-assessment",
+    "claude_skill_name": "baseline-assessment",
+    "display_name": "基线评估",
+    "type": "career_assessment",
+    "kag_role": "skill_action",
+    "summary": "Assesses a target-relative capability baseline using only evidence already present at invocation time.",
+    "minimum_required_inputs": [
+      "assessment_target",
+      "available_context_evidence"
+    ],
+    "optional_inputs": [
+      "provided_assessment_framework"
+    ],
+    "required_context_types": [],
+    "allowed_tools": [
+      "ReturnSkillResult"
+    ],
+    "recommended_verifiers": [
+      "evidence_traceability_check",
+      "confidence_calibration_check",
+      "boundary_compliance_check"
+    ],
+    "trigger_examples": [
+      "Assess my current baseline for becoming a backend engineer using what you already know about me.",
+      "Based on the profile and prior tool results in this conversation, assess my current product management baseline.",
+      "Evaluate my present SQL capability for this analytics role from the evidence already available."
+    ],
+    "negative_trigger_examples": [
+      "Interview me to find out my current level.",
+      "Find my profile and collect evidence about my skills.",
+      "Create a learning plan for backend engineering."
+    ],
+    "handoff_conditions": {},
+    "output_artifact_type": "baseline_assessment",
+    "risk_level": "medium",
+    "requires_current_information": false,
+    "requires_user_profile": false,
+    "requires_external_evidence": false
+  }
+}

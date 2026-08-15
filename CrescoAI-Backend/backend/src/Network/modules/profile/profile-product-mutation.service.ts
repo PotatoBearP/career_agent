@@ -47,7 +47,7 @@ export class ProfileProductMutationService {
       throw profileVersionConflict(input.expectedVersion, state.aggregateVersion);
     }
 
-    if (definition.storage === 'base') {
+    if (definition.storage === 'base' || definition.storage === 'education') {
       if (input.operation === 'add' || input.operation === 'remove') {
         throw profileValidationError(`${input.operation} is only valid for list fields`);
       }
@@ -55,13 +55,23 @@ export class ProfileProductMutationService {
         definition,
         input.operation === 'clear' ? this.emptyValue(definition.codec) : input.value,
       );
-      await this.mutateBase(
-        userId,
-        definition.baseProperty!,
-        normalized,
-        input.expectedVersion,
-        actor,
-      );
+      if (definition.storage === 'base') {
+        await this.mutateBase(
+          userId,
+          definition.baseProperty!,
+          normalized,
+          input.expectedVersion,
+          actor,
+        );
+      } else {
+        await this.mutateEducation(
+          userId,
+          definition.educationProperty!,
+          normalized,
+          input.expectedVersion,
+          actor,
+        );
+      }
     } else {
       await this.mutateMemory(userId, input, definition, actor);
     }
@@ -202,9 +212,60 @@ export class ProfileProductMutationService {
     }, meta);
   }
 
+  private async mutateEducation(
+    userId: number,
+    property: NonNullable<ProfileProductFieldDefinition['educationProperty']>,
+    value: ProfileProductValue,
+    expectedAggregateVersion: number,
+    actor: ProfileProductMutationActor,
+  ) {
+    const base = await this.profileV2Service.getBaseProfile(userId);
+    const current = base.educationBackground[0] ?? {
+      school: '',
+      major: '',
+      degree: '',
+      graduationDate: null,
+      description: '',
+    };
+    const normalized = property === 'graduationDate'
+      ? (typeof value === 'string' ? value : null)
+      : String(value ?? '');
+    if (current[property] === normalized) return;
+    if (
+      actor.actorType === 'agent'
+      && actor.sourceType !== 'user_explicit'
+      && !this.isEmptyValue(current[property])
+    ) {
+      return;
+    }
+
+    const primary = { ...current, [property]: normalized };
+    const educationBackground = base.educationBackground.map((item) => ({ ...item }));
+    const hasContent = Object.values(primary).some((item) => item !== null && item !== '');
+    if (hasContent) {
+      if (educationBackground.length) educationBackground[0] = primary;
+      else educationBackground.push(primary);
+    } else if (educationBackground.length) {
+      educationBackground.shift();
+    }
+
+    await this.profileV2Service.updateBaseProfile(userId, {
+      educationBackground,
+    }, {
+      sourceType: actor.sourceType,
+      sourceConversationId: actor.sourceConversationId,
+      sourceMessageId: actor.sourceMessageId,
+      actorType: actor.actorType,
+      userConfirmed: actor.actorType === 'user',
+      updateLevel: 'L3',
+      expectedVersion: base.version,
+      expectedAggregateVersion,
+    });
+  }
+
   private emptyValue(codec: ProfileProductFieldDefinition['codec']): ProfileProductValue {
     if (isListProfileProductCodec(codec)) return [];
-    if (codec === 'number') return null;
+    if (codec === 'number' || codec === 'date') return null;
     return '';
   }
 

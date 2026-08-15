@@ -55,6 +55,10 @@ import {
   markConversationMemorySessionDeleting,
   unmarkConversationMemorySessionDeleting,
 } from '../../memory/conversationMemoryLock.js';
+import type {
+  JsonValue,
+  SkillOutcome,
+} from '../../../skills/skillLifecycleTypes.js';
 
 declare global {
   namespace Express {
@@ -215,6 +219,25 @@ export type ConversationStreamEvent =
       message_id: string;
       messageId: string;
       block: MessageBlock;
+    }
+  | {
+      type: 'skill.completed';
+      message_id: string;
+      messageId: string;
+      skill_call_id: string;
+      skillCallId: string;
+      skill_name: string;
+      skillName: string;
+      outcome: SkillOutcome;
+      summary: string;
+      result?: JsonValue;
+      started_at: string;
+      startedAt: string;
+      completed_at: string;
+      completedAt: string;
+      duration_ms: number;
+      durationMs: number;
+      source: 'agent' | 'harness';
     }
   | {
       type: 'artifact.created';
@@ -1009,6 +1032,29 @@ export class ConversationService implements OnModuleInit {
           message_id: event.messageId,
           messageId: event.messageId,
           block: sanitizeServerPhysicalPathsInValue(event.block) as MessageBlock,
+        };
+        continue;
+      }
+
+      if (event.type === 'skill.completed') {
+        yield {
+          type: 'skill.completed',
+          message_id: event.messageId,
+          messageId: event.messageId,
+          skill_call_id: event.skillCallId,
+          skillCallId: event.skillCallId,
+          skill_name: event.skillName,
+          skillName: event.skillName,
+          outcome: event.outcome,
+          summary: sanitizeServerPhysicalPaths(event.summary),
+          result: sanitizeServerPhysicalPathsInValue(event.result) as JsonValue | undefined,
+          started_at: event.startedAt,
+          startedAt: event.startedAt,
+          completed_at: event.completedAt,
+          completedAt: event.completedAt,
+          duration_ms: event.durationMs,
+          durationMs: event.durationMs,
+          source: event.source,
         };
         continue;
       }

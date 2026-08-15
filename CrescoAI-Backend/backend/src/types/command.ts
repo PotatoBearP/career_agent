@@ -43,6 +43,10 @@ export type PromptCommand = {
   // 'inline' = skill content expands into the current conversation
   // 'fork' = skill runs in a sub-agent with separate context and token budget
   context?: 'inline' | 'fork'
+  // Controls how the model starts this prompt skill. Skills default to the
+  // generic Skill catalog; action-tool skills have a dedicated Tool entry and
+  // must not be exposed through SkillTool.
+  modelEntry?: 'action-tool' | 'skill-catalog'
   // Agent type to use when forked (e.g., 'Bash', 'general-purpose')
   // Only applicable when context is 'fork'
   agent?: string

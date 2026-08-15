@@ -24,6 +24,7 @@ import { normalizeProfileRecord, type ProfileRecord } from './profile.types';
 import { ProfileEvidenceService } from './profile-evidence.service';
 import type { ProfileEvidenceLinkEntity } from './entities/profile-evidence-link.entity';
 import type { ProfileProductListField } from './profile-product.types';
+import type { EducationBackgroundItem } from './profile-v2.types';
 
 @Injectable()
 export class ProfileProductProjectionService {
@@ -64,10 +65,19 @@ export class ProfileProductProjectionService {
     const now = Date.now();
     const visibleMemories = memories.filter((memory) =>
       !memory.expiresAt || memory.expiresAt.getTime() > now);
+    const education = this.parseEducation(base.educationBackgroundJson)[0]
+      ?? this.emptyEducation();
     const values = new Map<ProfileProductFieldKey, ProfileProductValue>();
     for (const definition of listProfileProductFieldDefinitions()) {
       if (definition.storage === 'base' && definition.baseProperty) {
         values.set(definition.fieldKey, base[definition.baseProperty] as ProfileProductValue);
+        continue;
+      }
+      if (definition.storage === 'education' && definition.educationProperty) {
+        values.set(
+          definition.fieldKey,
+          education[definition.educationProperty] as ProfileProductValue,
+        );
         continue;
       }
       const candidate = this.selectMemory(
@@ -125,6 +135,14 @@ export class ProfileProductProjectionService {
         currentStatus: field<string>('base.currentStatus'),
         currentIndustry: field<string>('base.currentIndustry'),
         yearsOfExperience: field<number | null>('base.yearsOfExperience'),
+      },
+      education: {
+        level: field<string>('base.educationLevel'),
+        school: field<string>('education.school'),
+        major: field<string>('education.major'),
+        degree: field<string>('education.degree'),
+        graduationDate: field<string | null>('education.graduationDate'),
+        description: field<string>('education.description'),
       },
       summary: field<string>('profile.summary'),
       skills: listField('career.skills'),
@@ -217,5 +235,24 @@ export class ProfileProductProjectionService {
     } catch {
       return {};
     }
+  }
+
+  private parseEducation(raw: string): EducationBackgroundItem[] {
+    try {
+      const value = JSON.parse(raw) as unknown;
+      return Array.isArray(value) ? value as EducationBackgroundItem[] : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private emptyEducation(): EducationBackgroundItem {
+    return {
+      school: '',
+      major: '',
+      degree: '',
+      graduationDate: null,
+      description: '',
+    };
   }
 }

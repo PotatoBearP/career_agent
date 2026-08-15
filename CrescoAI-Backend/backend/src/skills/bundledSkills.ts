@@ -25,6 +25,7 @@ export type BundledSkillDefinition = {
   isEnabled?: () => boolean
   hooks?: HooksSettings
   context?: 'inline' | 'fork'
+  modelEntry?: 'action-tool' | 'skill-catalog'
   agent?: string
   /** Existing application-owned directory containing this skill's resources. */
   resourceRoot?: string
@@ -92,6 +93,7 @@ export function registerBundledSkill(definition: BundledSkillDefinition): void {
     hooks: definition.hooks,
     skillRoot,
     context: definition.context,
+    modelEntry: definition.modelEntry,
     agent: definition.agent,
     isEnabled: definition.isEnabled,
     isHidden: !(definition.userInvocable ?? true),

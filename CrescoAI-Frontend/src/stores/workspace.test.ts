@@ -2,6 +2,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   hasCompletedInteractiveToolReply,
+  mergeMessageRaw,
   preserveCompletedLiveReplies,
   useWorkspaceStore,
 } from './workspace';
@@ -9,6 +10,25 @@ import {
 describe('useWorkspaceStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+  });
+
+  it('deduplicates skill results by runtime call id when raw payloads merge', () => {
+    const first = {
+      skillCallId: 'call-1',
+      skillName: 'learning-plan',
+      outcome: 'success',
+      summary: 'first',
+      startedAt: '2026-08-13T10:00:00.000Z',
+      completedAt: '2026-08-13T10:00:01.000Z',
+      durationMs: 1000,
+      source: 'agent',
+    } as const;
+    const merged = mergeMessageRaw(
+      { skillResults: [first] },
+      { skillResults: [{ ...first, summary: 'latest' }] },
+    );
+
+    expect(merged?.skillResults).toEqual([{ ...first, summary: 'latest' }]);
   });
 
   it('closes the active artifact when switching threads', async () => {

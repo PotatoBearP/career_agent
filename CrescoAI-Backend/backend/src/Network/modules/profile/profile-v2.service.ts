@@ -22,6 +22,11 @@ import {
 
 @Injectable()
 export class ProfileV2Service {
+  private readonly initializationByUser = new Map<
+    number,
+    Promise<{ base: BaseProfileEntity; state: ProfileStateEntity }>
+  >();
+
   constructor(
     @InjectDataSource() private readonly dataSource: DataSource,
     @InjectRepository(UserEntity)
@@ -151,6 +156,21 @@ export class ProfileV2Service {
   }
 
   private async ensureProfileInitialized(userId: number) {
+    const existing = this.initializationByUser.get(userId);
+    if (existing) return existing;
+
+    const initialization = this.initializeProfile(userId);
+    this.initializationByUser.set(userId, initialization);
+    const clear = () => {
+      if (this.initializationByUser.get(userId) === initialization) {
+        this.initializationByUser.delete(userId);
+      }
+    };
+    initialization.then(clear, clear);
+    return initialization;
+  }
+
+  private async initializeProfile(userId: number) {
     let lastError: unknown;
     for (let attempt = 0; attempt < 4; attempt += 1) {
       try {

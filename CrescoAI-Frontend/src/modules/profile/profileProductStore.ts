@@ -36,6 +36,14 @@ function legacyProductView(profile: ProfileRecord): CareerProfileProductView {
       currentIndustry: field('base.currentIndustry', ''),
       yearsOfExperience: field('base.yearsOfExperience', null),
     },
+    education: {
+      level: field('base.educationLevel', ''),
+      school: field('education.school', ''),
+      major: field('education.major', ''),
+      degree: field('education.degree', ''),
+      graduationDate: field('education.graduationDate', null),
+      description: field('education.description', profile.careerProfile.educationBackground),
+    },
     summary: field('profile.summary', profile.artifacts.resumeSummary),
     skills: field('career.skills', profile.careerProfile.skills),
     career: {

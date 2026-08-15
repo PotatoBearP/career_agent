@@ -654,6 +654,36 @@ describe('normalizeThreadMessage', () => {
     });
   });
 
+  it('normalizes skill completion events', () => {
+    const event = normalizeMessageStreamEvent({
+      type: 'skill.completed',
+      message_id: 'msg-assistant-1',
+      skill_call_id: 'call-1',
+      skill_name: 'learning-plan',
+      outcome: 'insufficient_input',
+      summary: '缺少当前技能水平。',
+      result: { missing: ['skill_level'] },
+      started_at: '2026-08-13T10:00:00.000Z',
+      completed_at: '2026-08-13T10:00:01.000Z',
+      duration_ms: 1000,
+      source: 'agent',
+    }, 'session-1');
+
+    expect(event).toEqual({
+      type: 'skill.completed',
+      messageId: 'msg-assistant-1',
+      skillCallId: 'call-1',
+      skillName: 'learning-plan',
+      outcome: 'insufficient_input',
+      summary: '缺少当前技能水平。',
+      result: { missing: ['skill_level'] },
+      startedAt: '2026-08-13T10:00:00.000Z',
+      completedAt: '2026-08-13T10:00:01.000Z',
+      durationMs: 1000,
+      source: 'agent',
+    });
+  });
+
   it('normalizes AskUserQuestion blocks into a safe interactive question payload', () => {
     const event = normalizeMessageStreamEvent({
       type: 'message.block.completed',

@@ -32,6 +32,7 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+  app.enableShutdownHooks();
 
   app.useGlobalPipes(
     new ValidationPipe({

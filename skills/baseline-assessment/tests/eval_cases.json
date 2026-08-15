@@ -1,0 +1,137 @@
+{
+  "skill_id": "baseline-assessment",
+  "positive_cases": [
+    {
+      "id": "pos_demonstrated_artifact",
+      "user_query": "Assess my backend engineering baseline using the evidence already available.",
+      "available_context": {
+        "target": "backend engineering",
+        "prior_tool_result": "The user independently implemented and passed tests for a REST endpoint.",
+        "visible_artifact": "Endpoint implementation and test output are already in context."
+      },
+      "expected_outcome": "success",
+      "must_include": ["demonstrated", "tool_result", "capabilities", "unknowns"],
+      "must_not_include": ["gaps", "next_steps", "recommendations"]
+    },
+    {
+      "id": "pos_self_report_only",
+      "user_query": "Based only on what I have said, assess my product management baseline.",
+      "available_context": {
+        "target": "product management",
+        "conversation": "I independently wrote requirements and coordinated two releases."
+      },
+      "expected_outcome": "success",
+      "must_include": ["self_reported", "low"],
+      "must_not_include": ["demonstrated ability", "high confidence"]
+    },
+    {
+      "id": "pos_injected_profile",
+      "user_query": "Assess my SQL baseline for a data analyst target.",
+      "available_context": {
+        "target": "data analyst",
+        "injected_profile": "Uses SQL to prepare monthly operational reports."
+      },
+      "expected_outcome": "success",
+      "must_include": ["profile", "self_reported"],
+      "must_not_include": ["read profile", "fetch profile"]
+    },
+    {
+      "id": "pos_prior_mcp_and_skill_results",
+      "user_query": "Assess my research baseline for this analyst role.",
+      "available_context": {
+        "target": "research analyst",
+        "prior_mcp_result": "A completed MCP result contains a report authored by the user.",
+        "prior_skill_result": "A completed earlier Skill summarized supported research experience."
+      },
+      "expected_outcome": "success",
+      "must_include": ["mcp_result", "skill_result"],
+      "must_not_include": ["new MCP call", "new Skill call"]
+    }
+  ],
+  "insufficient_input_cases": [
+    {
+      "id": "insufficient_missing_target",
+      "user_query": "Assess my baseline.",
+      "available_context": {},
+      "expected_outcome": "insufficient_input",
+      "must_include": ["insufficiency_reasons"],
+      "must_not_include": ["question", "what target", "next action"]
+    },
+    {
+      "id": "insufficient_no_relevant_evidence",
+      "user_query": "Assess my machine-learning engineering baseline.",
+      "available_context": {
+        "target": "machine-learning engineering",
+        "conversation": "The user lives in Shanghai."
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": ["insufficiency_reasons"],
+      "must_not_include": ["profile lookup", "web search", "interview"]
+    }
+  ],
+  "conflict_cases": [
+    {
+      "id": "conflict_preserved",
+      "user_query": "Assess my Python baseline for backend work.",
+      "available_context": {
+        "target": "backend Python",
+        "injected_profile": "Works independently with Python.",
+        "prior_tool_result": "Needed substantial guidance to complete a basic Python task."
+      },
+      "expected_outcome": "success",
+      "must_include": ["conflicts", "impact"],
+      "must_not_include": ["silently prefer latest"]
+    }
+  ],
+  "boundary_cases": [
+    {
+      "id": "no_information_collection",
+      "user_query": "Assess my current cybersecurity baseline, and look for whatever information you need.",
+      "available_context": {
+        "target": "cybersecurity"
+      },
+      "expected_outcome": "insufficient_input",
+      "allowed_tool_calls": ["ReturnSkillResult"],
+      "forbidden_tool_calls": ["Read", "WebSearch", "MCP", "Skill"]
+    },
+    {
+      "id": "no_post_skill_direction",
+      "user_query": "Assess my data engineering baseline from current context.",
+      "available_context": {
+        "target": "data engineering",
+        "conversation": "No capability evidence is present."
+      },
+      "expected_outcome": "insufficient_input",
+      "must_not_include": ["ask the user", "read Profile", "call another skill", "learning plan", "next step"]
+    }
+  ],
+  "regression_cases": [
+    {
+      "id": "reg_model_derived_framework",
+      "risk": "Invented market authority",
+      "must_not_regress": "A model-derived framework must not be described as a current or authoritative market standard."
+    },
+    {
+      "id": "reg_unknowns_not_gaps",
+      "risk": "Assessment expands into planning",
+      "must_not_regress": "Unknown dimensions must not be presented as gaps, recommendations, or a learning agenda."
+    },
+    {
+      "id": "reg_source_not_strength",
+      "risk": "Source type is mistaken for evidence quality",
+      "must_not_regress": "Profile, MCP, tool, Skill, and artifact sources must not automatically be classified as demonstrated or verified."
+    }
+  ],
+  "negative_trigger_cases": [
+    {
+      "id": "neg_collect_evidence",
+      "user_query": "Interview me and inspect my files to determine my current level.",
+      "reason_should_not_trigger": "The request is primarily evidence collection rather than assessment of existing context."
+    },
+    {
+      "id": "neg_learning_plan",
+      "user_query": "Create a twelve-week backend learning plan.",
+      "reason_should_not_trigger": "The request asks for planning rather than baseline assessment."
+    }
+  ]
+}

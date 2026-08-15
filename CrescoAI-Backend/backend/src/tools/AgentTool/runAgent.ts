@@ -26,6 +26,7 @@ import type {
   ScopedMcpServerConfig,
 } from '../../services/mcp/types.js'
 import type { Tool, Tools, ToolUseContext } from '../../Tool.js'
+import { RETURN_SKILL_RESULT_TOOL_NAME } from '../../skills/skillLifecycle.js'
 import { killShellTasksForAgent } from '../../tasks/LocalShellTask/killShellTasks.js'
 import type { Command } from '../../types/command.js'
 import type { AgentId } from '../../types/ids.js'
@@ -497,9 +498,16 @@ export async function* runAgent({
     }
   }
 
-  const resolvedTools = useExactTools
+  const agentResolvedTools = useExactTools
     ? availableTools
     : resolveAgentTools(agentDefinition, availableTools, isAsync).resolvedTools
+  const returnSkillResultTool = availableTools.find(
+    tool => tool.name === RETURN_SKILL_RESULT_TOOL_NAME,
+  )
+  const resolvedTools =
+    returnSkillResultTool && !agentResolvedTools.includes(returnSkillResultTool)
+      ? [...agentResolvedTools, returnSkillResultTool]
+      : agentResolvedTools
 
   const additionalWorkingDirectories = Array.from(
     appState.toolPermissionContext.additionalWorkingDirectories.keys(),

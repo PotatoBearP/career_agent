@@ -206,6 +206,18 @@ function hasContent(values: string[]) {
         </section>
 
         <section class="profile-card span-2">
+          <div class="card-heading"><p class="eyebrow">教育背景</p><h2>主教育经历</h2></div>
+          <div class="form-grid">
+            <label>学历层次<input v-model="draft.education.level.value" placeholder="例如：硕士研究生" /></label>
+            <label>学校<input v-model="draft.education.school.value" /></label>
+            <label>专业<input v-model="draft.education.major.value" /></label>
+            <label>学位<input v-model="draft.education.degree.value" placeholder="例如：工学硕士" /></label>
+            <label>预计毕业日期<input v-model="draft.education.graduationDate.value" type="date" /></label>
+            <label>补充说明<input v-model="draft.education.description.value" placeholder="例如：研一在读" /></label>
+          </div>
+        </section>
+
+        <section class="profile-card span-2">
           <div class="card-heading"><p class="eyebrow">职业概述</p><h2>用几句话介绍现在的你</h2></div>
           <textarea v-model="draft.summary.value" rows="5" placeholder="例如：具备 Java 后端和微服务经验，希望转向 AI Infra 方向。" />
         </section>
@@ -254,6 +266,18 @@ function hasContent(values: string[]) {
       </div>
 
       <div v-else class="profile-grid">
+        <section class="profile-card span-2">
+          <div class="card-heading"><p class="eyebrow">教育背景</p><h2>主教育经历</h2></div>
+          <dl class="intent-grid">
+            <div><dt>学历层次</dt><dd>{{ profile.education.level.value || '待补充' }}</dd><ProfileRelatedConversations v-if="evidenceUiEnabled" :field="profile.education.level" @open="showEvidence" /></div>
+            <div><dt>学校</dt><dd>{{ profile.education.school.value || '待补充' }}</dd><ProfileRelatedConversations v-if="evidenceUiEnabled" :field="profile.education.school" @open="showEvidence" /></div>
+            <div><dt>专业</dt><dd>{{ profile.education.major.value || '待补充' }}</dd><ProfileRelatedConversations v-if="evidenceUiEnabled" :field="profile.education.major" @open="showEvidence" /></div>
+            <div><dt>学位</dt><dd>{{ profile.education.degree.value || '待补充' }}</dd><ProfileRelatedConversations v-if="evidenceUiEnabled" :field="profile.education.degree" @open="showEvidence" /></div>
+            <div><dt>预计毕业日期</dt><dd>{{ profile.education.graduationDate.value || '待补充' }}</dd><ProfileRelatedConversations v-if="evidenceUiEnabled" :field="profile.education.graduationDate" @open="showEvidence" /></div>
+            <div><dt>补充说明</dt><dd>{{ profile.education.description.value || '暂无' }}</dd><ProfileRelatedConversations v-if="evidenceUiEnabled" :field="profile.education.description" @open="showEvidence" /></div>
+          </dl>
+        </section>
+
         <section class="profile-card span-2 summary-card">
           <div class="card-heading"><p class="eyebrow">职业概述</p><h2>现在的我</h2></div>
           <p v-if="profile.summary.value" class="summary-copy">{{ profile.summary.value }}</p>

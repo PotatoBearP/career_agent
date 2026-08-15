@@ -5,7 +5,15 @@ import MobileRailTrigger from '../modules/navigation/MobileRailTrigger.vue';
 import { runtimeConfig } from '../config/runtime';
 import { createSettingsClient } from '../services/settingsClient';
 import { useAuthStore } from '../stores/auth';
-import type { AccountSetting, ApiSetting, ConnectionTestResult, LoadState, UserSettings } from '../types/entities';
+import type {
+  AccountSetting,
+  ApiSetting,
+  ConnectionTestResult,
+  GithubMcpSetting,
+  GithubMcpTestResult,
+  LoadState,
+  UserSettings,
+} from '../types/entities';
 
 const settingsClient = createSettingsClient();
 const authStore = useAuthStore();
@@ -19,6 +27,11 @@ const apiTestStatus = ref<LoadState>('idle');
 const errorMessage = ref<string | null>(null);
 const successMessage = ref<string | null>(null);
 const testResult = ref<ConnectionTestResult | null>(null);
+const githubMcpSetting = ref<GithubMcpSetting | null>(null);
+const githubMcpTestResult = ref<GithubMcpTestResult | null>(null);
+const githubMcpSaveStatus = ref<LoadState>('idle');
+const githubMcpTestStatus = ref<LoadState>('idle');
+const githubMcpDeleteStatus = ref<LoadState>('idle');
 
 const accountForm = reactive({
   username: '',
@@ -49,10 +62,18 @@ const videoForm = reactive({
   videoModels: '',
 });
 
+const githubMcpForm = reactive({
+  enabled: false,
+  personalAccessToken: '',
+});
+
 const isLoading = computed(() => loadStatus.value === 'loading');
 const isSavingAccount = computed(() => accountSaveStatus.value === 'loading');
 const isSavingApi = computed(() => apiSaveStatus.value === 'loading');
 const isTestingApi = computed(() => apiTestStatus.value === 'loading');
+const isSavingGithubMcp = computed(() => githubMcpSaveStatus.value === 'loading');
+const isTestingGithubMcp = computed(() => githubMcpTestStatus.value === 'loading');
+const isDeletingGithubMcp = computed(() => githubMcpDeleteStatus.value === 'loading');
 const primaryApiSetting = computed(() => settings.value?.apiSettings[0] ?? null);
 
 const accountMeta = computed(() => {
@@ -91,6 +112,12 @@ function syncForms(nextSettings: UserSettings) {
   applyApiForm(nextSettings.apiSettings[0] ?? null);
 }
 
+function applyGithubMcpForm(setting: GithubMcpSetting) {
+  githubMcpSetting.value = setting;
+  githubMcpForm.enabled = setting.enabled;
+  githubMcpForm.personalAccessToken = '';
+}
+
 function formatDate(value: string | null) {
   if (!value) {
     return '未记录';
@@ -115,9 +142,13 @@ async function loadSettings() {
   errorMessage.value = null;
 
   try {
-    const nextSettings = await settingsClient.getSettings();
+    const [nextSettings, nextGithubMcpSetting] = await Promise.all([
+      settingsClient.getSettings(),
+      settingsClient.getGithubMcpSetting(),
+    ]);
     settings.value = nextSettings;
     syncForms(nextSettings);
+    applyGithubMcpForm(nextGithubMcpSetting);
     loadStatus.value = 'ready';
   } catch (error) {
     loadStatus.value = 'error';
@@ -266,6 +297,58 @@ async function saveMultimodalSetting() {
   } catch (error) {
     multimodalSaveStatus.value = 'error';
     setFailure(error, '多模态配置保存失败。');
+  }
+}
+
+async function saveGithubMcpSetting() {
+  githubMcpSaveStatus.value = 'loading';
+  try {
+    const setting = await settingsClient.saveGithubMcpSetting({
+      enabled: githubMcpForm.enabled,
+      personalAccessToken: githubMcpForm.personalAccessToken.trim() || undefined,
+    });
+    applyGithubMcpForm(setting);
+    githubMcpTestResult.value = null;
+    githubMcpSaveStatus.value = 'ready';
+    setSuccess('GitHub MCP 配置已保存；会在首次测试或对话时连接。');
+  } catch (error) {
+    githubMcpSaveStatus.value = 'error';
+    setFailure(error, 'GitHub MCP 配置保存失败。');
+  }
+}
+
+async function testGithubMcpSetting() {
+  githubMcpTestStatus.value = 'loading';
+  githubMcpTestResult.value = null;
+  try {
+    const result = await settingsClient.testGithubMcpSetting(
+      githubMcpForm.personalAccessToken.trim() || undefined,
+    );
+    githubMcpTestResult.value = result;
+    githubMcpTestStatus.value = result.ok ? 'ready' : 'error';
+    if (result.ok) {
+      setSuccess('GitHub MCP 握手、工具发现和 get_me 调用均已通过。');
+    } else {
+      errorMessage.value = result.message;
+      successMessage.value = null;
+    }
+  } catch (error) {
+    githubMcpTestStatus.value = 'error';
+    setFailure(error, 'GitHub MCP 连接测试失败。');
+  }
+}
+
+async function deleteGithubMcpSetting() {
+  githubMcpDeleteStatus.value = 'loading';
+  try {
+    const setting = await settingsClient.deleteGithubMcpSetting();
+    applyGithubMcpForm(setting);
+    githubMcpTestResult.value = null;
+    githubMcpDeleteStatus.value = 'ready';
+    setSuccess('GitHub MCP 配置已删除，运行时连接已释放。');
+  } catch (error) {
+    githubMcpDeleteStatus.value = 'error';
+    setFailure(error, 'GitHub MCP 配置删除失败。');
   }
 }
 
@@ -508,6 +591,82 @@ onMounted(() => {
         </form>
       </section>
 
+      <section class="settings-card mcp-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">MCP</p>
+            <h2>GitHub MCP</h2>
+          </div>
+          <div class="multimodal-key-badges">
+            <span class="api-key-badge" :class="{ configured: githubMcpSetting?.configured }">
+              {{ githubMcpSetting?.configured ? `PAT 已保存 ${githubMcpSetting.tokenHint ?? ''}` : '未保存 PAT' }}
+            </span>
+            <span class="api-key-badge" :class="{ configured: githubMcpSetting?.status === 'connected' }">
+              {{ githubMcpSetting?.status ?? 'not_configured' }}
+            </span>
+          </div>
+        </div>
+
+        <form class="settings-form mcp-form" @submit.prevent="saveGithubMcpSetting">
+          <p class="mcp-hint">
+            固定连接 GitHub 官方远程 MCP，仅启用 context、repos 工具集并强制只读。
+            配置按当前用户持久化；PAT 留空表示保留已保存值。
+          </p>
+          <label class="toggle-field">
+            <input v-model="githubMcpForm.enabled" type="checkbox" />
+            <span>允许对话和 Skill 使用 GitHub MCP</span>
+          </label>
+          <label class="field-block wide-field">
+            <span>GitHub Personal Access Token</span>
+            <input
+              v-model="githubMcpForm.personalAccessToken"
+              type="password"
+              autocomplete="off"
+              placeholder="github_pat_...（留空保留已保存 PAT）"
+            />
+          </label>
+          <div class="mcp-endpoint wide-field">
+            <span>官方端点</span>
+            <code>{{ githubMcpSetting?.endpoint ?? 'https://api.githubcopilot.com/mcp/' }}</code>
+          </div>
+          <div class="button-row wide-field mcp-button-row">
+            <button
+              v-if="githubMcpSetting?.configured"
+              type="button"
+              class="danger-button"
+              :disabled="isDeletingGithubMcp"
+              @click="deleteGithubMcpSetting"
+            >
+              {{ isDeletingGithubMcp ? '删除中...' : '删除配置' }}
+            </button>
+            <span class="button-spacer" />
+            <button type="button" class="ghost-button" :disabled="isTestingGithubMcp" @click="testGithubMcpSetting">
+              {{ isTestingGithubMcp ? '测试中...' : '测试连接' }}
+            </button>
+            <button type="submit" class="primary-button" :disabled="isSavingGithubMcp">
+              {{ isSavingGithubMcp ? '保存中...' : '保存 GitHub MCP' }}
+            </button>
+          </div>
+        </form>
+
+        <div v-if="githubMcpTestResult" class="test-result" :class="{ ok: githubMcpTestResult.ok }">
+          <strong>{{ githubMcpTestResult.ok ? '独立测试通过' : '独立测试失败' }}</strong>
+          <span>{{ githubMcpTestResult.message }}</span>
+          <code v-if="githubMcpTestResult.githubUser?.login">
+            GitHub 用户：{{ githubMcpTestResult.githubUser.login }}<template v-if="githubMcpTestResult.githubUser.name">（{{ githubMcpTestResult.githubUser.name }}）</template>
+          </code>
+          <span>发现 {{ githubMcpTestResult.toolCount }} 个只读工具</span>
+          <details v-if="githubMcpTestResult.toolNames.length" class="mcp-tool-list">
+            <summary>查看工具名称</summary>
+            <code v-for="toolName in githubMcpTestResult.toolNames" :key="toolName">{{ toolName }}</code>
+          </details>
+        </div>
+
+        <p v-else-if="githubMcpSetting?.lastError" class="mcp-runtime-error">
+          上次连接错误：{{ githubMcpSetting.lastError }}
+        </p>
+      </section>
+
       <section class="settings-card runtime-card">
         <div class="section-heading">
           <div>
@@ -546,7 +705,8 @@ onMounted(() => {
 }
 
 .ghost-button,
-.primary-button {
+.primary-button,
+.danger-button {
   min-height: 40px;
   border-radius: 10px;
   padding: 0 14px;
@@ -566,8 +726,15 @@ onMounted(() => {
   color: var(--color-on-primary);
 }
 
+.danger-button {
+  border: 1px solid color-mix(in srgb, var(--color-danger) 36%, var(--color-border));
+  background: var(--color-surface-strong);
+  color: var(--color-danger);
+}
+
 .ghost-button:disabled,
-.primary-button:disabled {
+.primary-button:disabled,
+.danger-button:disabled {
   cursor: wait;
   opacity: 0.64;
 }
@@ -776,10 +943,85 @@ h2 {
   flex-wrap: wrap;
 }
 
+.mcp-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mcp-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.toggle-field {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text);
+  font-weight: 750;
+}
+
+.toggle-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+.mcp-endpoint {
+  display: grid;
+  gap: 5px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--color-bg-subtle);
+}
+
+.mcp-endpoint span {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.mcp-endpoint code,
+.mcp-tool-list code {
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+}
+
+.mcp-button-row .button-spacer {
+  flex: 1;
+}
+
+.mcp-tool-list {
+  display: grid;
+  gap: 7px;
+}
+
+.mcp-tool-list summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.mcp-tool-list code {
+  display: block;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: var(--color-surface-strong);
+}
+
+.mcp-runtime-error {
+  margin: 14px 0 0;
+  color: var(--color-danger);
+  font-size: 0.84rem;
+}
+
 @media (max-width: 960px) {
   .settings-grid,
   .api-form,
   .multimodal-form,
+  .mcp-form,
   .runtime-grid {
     grid-template-columns: 1fr;
   }

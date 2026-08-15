@@ -2,7 +2,6 @@ import { feature } from 'bun:bundle'
 import type { UUID } from 'crypto'
 import { relative } from 'path'
 import { getCwd } from 'src/utils/cwd.js'
-import { addInvokedSkill } from '../bootstrap/state.js'
 import { asSessionId } from '../types/ids.js'
 import type {
   AttributionSnapshotMessage,
@@ -373,24 +372,15 @@ function isTerminalToolResult(
 }
 
 /**
- * Restores skill state from invoked_skills attachments in messages.
- * This ensures that skills are preserved across resume after compaction.
- * Without this, if another compaction happens after resume, the skills would be lost
- * because STATE.invokedSkills would be empty.
+ * Active Skill invocations are runtime-only. On process restart or explicit
+ * resume, do not repopulate invokedSkills from old compact attachments: their
+ * call IDs are expired and must not be injected by a later compact.
  * @internal Exported for testing - use loadConversationForResume instead
  */
 export function restoreSkillStateFromMessages(messages: Message[]): void {
   for (const message of messages) {
     if (message.type !== 'attachment') {
       continue
-    }
-    if (message.attachment.type === 'invoked_skills') {
-      for (const skill of message.attachment.skills) {
-        if (skill.name && skill.path && skill.content) {
-          // Resume only happens for the main session, so agentId is null
-          addInvokedSkill(skill.name, skill.path, skill.content, null)
-        }
-      }
     }
     // A prior process already injected the skills-available reminder — it's
     // in the transcript the model is about to see. sentSkillNames is
