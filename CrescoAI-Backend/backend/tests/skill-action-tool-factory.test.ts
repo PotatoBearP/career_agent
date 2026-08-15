@@ -73,6 +73,7 @@ describe('offline Skill Action Tool factory', () => {
       config: {
         tool_name: 'DomainMap',
         user_facing_name: 'Domain map',
+        child_tools: ['WebSearch'],
         input: {
           domain: {
             type: 'string',
@@ -101,7 +102,8 @@ describe('offline Skill Action Tool factory', () => {
     expect(source).toContain(GENERATED_FILE_MARKER)
     expect(source).toContain("const SKILL_NAME = \"domain-map\" as const")
     expect(source).toContain('domain: z.string().trim().min(1)')
-    expect(source).toContain('executeSkillAction({')
+    expect(source).toContain('createSkillActionTool({')
+    expect(source).toContain('childToolNames: ["WebSearch"]')
     expect(source).not.toContain('legacy-skill')
     expect(() => new Bun.Transpiler({ loader: 'ts' }).transformSync(source)).not.toThrow()
   })

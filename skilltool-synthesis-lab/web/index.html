@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillTool 合成</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div><h1>SkillTool 合成</h1><p>画像与场景独立输入，普通工具按需选择</p></div>
+      <div class="top-actions">
+        <span id="serviceStatus" class="status">连接中</span>
+        <button id="downloadButton" class="button" disabled>导出结果</button>
+        <button id="runButton" class="button primary">开始合成</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="sidebar">
+        <section class="block">
+          <div class="section-title"><h2>运行配置</h2><button id="resetButton" class="link-button">恢复样例</button></div>
+          <div class="segmented"><button class="mode active" data-mode="mock">离线样例</button><button class="mode" data-mode="api">模型 API</button></div>
+          <div id="apiFields" class="form-grid disabled">
+            <label>Base URL<input id="baseUrl" /></label>
+            <label>Model<input id="modelName" /></label>
+            <label>API Key<input id="apiKey" type="password" autocomplete="off" placeholder="仅用于本次请求" /></label>
+            <div class="row"><label>Temperature<input id="temperature" type="number" min="0" max="2" step="0.1" /></label><label>Max tokens<input id="maxTokens" type="number" min="1000" step="500" /></label></div>
+          </div>
+          <label class="checkbox"><input id="persistRun" type="checkbox" checked />保存生成产物</label>
+        </section>
+
+        <section class="block">
+          <div class="section-title"><div><h2>输入 JSON</h2><p>画像提供事实；场景独立定义问题空间</p></div></div>
+          <div class="tabs"><button class="editor-tab active" data-editor="profile">画像</button><button class="editor-tab" data-editor="state">状态</button><button class="editor-tab" data-editor="scenario">场景</button></div>
+          <div class="editor-meta"><span id="editorLabel">复杂用户画像 JSON</span><span id="jsonValidity" class="valid">JSON 有效</span></div>
+          <textarea id="jsonEditor" spellcheck="false"></textarea>
+        </section>
+      </aside>
+
+      <section class="content">
+        <section class="block summary">
+          <div><h2>合成流程</h2><p>画像 / 状态 / 场景 → 需求 → 任务 → 候选 → 降重 → 质量门</p></div>
+          <div id="summaryMetrics" class="metrics"><span><strong>—</strong> 需求</span><span><strong>—</strong> 任务</span><span><strong>—</strong> SkillTools</span><span><strong>—</strong> 质量分</span></div>
+        </section>
+
+        <section class="block">
+          <div class="section-title"><h2>合成轨迹</h2><span id="runMeta" class="muted">尚未运行</span></div>
+          <div id="pipelineFlow" class="pipeline-flow"></div><div id="stageStrip" class="stage-strip"></div>
+        </section>
+
+        <section class="reference-grid">
+          <details class="block reference" open>
+            <summary>SkillTool 模板</summary>
+            <p>模型必须按此结构输出，每个候选也会在右侧按同一模板展示。</p>
+            <pre id="templateView"></pre>
+          </details>
+          <details class="block reference" open>
+            <summary>可用普通工具 <span id="toolCount" class="muted"></span></summary>
+            <p>已排除 Skill 及递归入口。存在不代表必须使用；默认不选。</p>
+            <div id="toolCatalog" class="tool-catalog"></div>
+          </details>
+        </section>
+
+        <section class="result-grid">
+          <section class="block">
+            <div class="section-title"><h2>SkillTool 候选</h2><span class="muted">点击查看契约</span></div>
+            <div id="candidateList" class="candidate-list empty"><p>等待合成。</p></div>
+          </section>
+          <section class="block inspector">
+            <div class="section-title"><h2 id="inspectorTitle">输入 / 输出 / 工具</h2><span id="qualityBadge" class="badge">—</span></div>
+            <div id="ioGraph" class="empty"><p>选择一个 SkillTool。</p></div>
+            <div id="toolPolicy"></div>
+            <div id="skillDetails" class="skill-details"></div>
+            <details id="candidateTemplatePanel" class="candidate-json"><summary>查看完整 SkillTool 模板实例</summary><pre id="candidateTemplate"></pre></details>
+          </section>
+        </section>
+
+        <section class="block">
+          <div class="section-title"><h2>任务覆盖</h2><span id="coverageBadge" class="muted">0 / 0</span></div>
+          <div id="taskGrid" class="task-grid empty"><p>等待合成。</p></div>
+        </section>
+      </section>
+    </main>
+    <div id="toast" class="toast"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

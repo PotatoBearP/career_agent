@@ -11,6 +11,7 @@ import {
   returnSkillResult,
 } from '../src/skills/skillLifecycle.js'
 import type { ToolUseContext } from '../src/Tool.js'
+import type { Tool } from '../src/Tool.js'
 import type { PromptCommand } from '../src/types/command.js'
 import { createUserMessage } from '../src/utils/messages.js'
 import type { runAgent } from '../src/tools/AgentTool/runAgent.js'
@@ -166,5 +167,48 @@ describe('forked Skill executor', () => {
 
     expect(execution.completion?.outcome).toBe('success')
     expect(continuedAfterReturn).toBe(false)
+  })
+
+  test('runs Action Skills with the declared exact child tools plus ReturnSkillResult', async () => {
+    let captured: Parameters<typeof runAgent>[0] | undefined
+    const returnTool = { name: 'ReturnSkillResult' } as Tool
+    const webTool = { name: 'WebSearch' } as Tool
+    const unrelatedTool = { name: 'Bash' } as Tool
+    const exactContext = context()
+    exactContext.options.tools = [returnTool, webTool, unrelatedTool]
+    const fakeRunAgent = (async function* (input: Parameters<typeof runAgent>[0]) {
+      captured = input
+    }) as typeof runAgent
+
+    await executeForkedPromptSkill({
+      command: command(),
+      commandName: 'baseline-assessment',
+      contextMode: 'fork',
+      exactToolNames: ['WebSearch'],
+      context: exactContext,
+      canUseTool: async () => ({ behavior: 'allow', updatedInput: {} }),
+      runAgentImpl: fakeRunAgent,
+    })
+
+    expect(captured?.availableTools).toEqual([returnTool, webTool])
+    expect(captured?.allowedTools).toEqual(['WebSearch', 'ReturnSkillResult'])
+    expect(captured?.useExactTools).toBe(true)
+  })
+
+  test('fails before the API loop when a declared child tool is unavailable', async () => {
+    const exactContext = context()
+    exactContext.options.tools = [{ name: 'ReturnSkillResult' } as Tool]
+
+    await expect(
+      executeForkedPromptSkill({
+        command: command(),
+        commandName: 'baseline-assessment',
+        contextMode: 'fork',
+        exactToolNames: ['WebSearch'],
+        context: exactContext,
+        canUseTool: async () => ({ behavior: 'allow', updatedInput: {} }),
+        runAgentImpl: (async function* () {}) as typeof runAgent,
+      }),
+    ).rejects.toThrow('Action Skill child tools are unavailable: WebSearch')
   })
 })

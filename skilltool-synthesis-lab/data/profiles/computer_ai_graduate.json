@@ -1,0 +1,40 @@
+{
+  "profile_id": "profile-computer-graduate-001",
+  "profile_version": "2.0",
+  "identity": {"persona": "计算机专业硕士研究生", "location": "中国", "languages": ["中文", "英文技术阅读"], "graduation_window": "12-18个月"},
+  "education": {"degree": "硕士在读", "major": "计算机科学与技术", "coursework": ["机器学习", "数据结构", "软件工程", "自然语言处理"], "research_mode": "应用研究为主", "evidence_confidence": "medium"},
+  "capability_evidence": [
+    {"capability": "Python", "level": "applied", "evidence": ["课程项目", "研究代码"], "confidence": "medium"},
+    {"capability": "PyTorch", "level": "applied", "evidence": ["模型训练实验"], "confidence": "medium"},
+    {"capability": "软件开发", "level": "foundational", "evidence": ["问答原型"], "confidence": "low"},
+    {"capability": "研究与分析", "level": "applied", "evidence": ["论文检索", "实验设计", "技术报告"], "confidence": "medium"},
+    {"capability": "商业问题理解", "level": "unknown", "evidence": [], "confidence": "low"}
+  ],
+  "experience": {
+    "internships": [],
+    "projects": [
+      {"name": "图像分类课程项目", "role": "独立完成", "outcome_evidence": "课程验收", "transferability": "unvalidated"},
+      {"name": "校园知识库问答原型", "role": "方案与实现", "outcome_evidence": "可运行原型", "transferability": "unvalidated"}
+    ],
+    "public_outputs": [], "collaboration_exposure": "limited"
+  },
+  "motivations_and_values": {
+    "motivators": ["解决复杂问题", "持续学习", "工作成果可见"],
+    "values": ["成长反馈", "工作自主性", "有意义的产品或研究影响"],
+    "anti_preferences": ["长期重复性工作", "完全缺少反馈的环境"], "confidence": "medium"
+  },
+  "work_preferences": {
+    "locations": ["上海", "杭州", "深圳"], "organization_types": ["成长型公司", "成熟科技公司", "研究型组织"],
+    "work_modes": ["需要一定技术深度", "允许跨职能协作"], "risk_tolerance": "medium", "compensation_priority": "important_but_not_primary"
+  },
+  "learning_and_decision_style": {
+    "learning_style": ["通过项目学习", "先建立框架再深入"], "decision_style": "先发散收集证据，再用小实验收敛",
+    "common_biases": ["容易把专业背景当成唯一方向", "可能高估课程项目的岗位迁移性"], "feedback_preference": "具体、基于证据、可以转化为行动"
+  },
+  "life_context_and_constraints": {
+    "time_budget_per_week": "8-12小时用于职业探索", "financial_runway": "未提供", "mobility": "可考虑异地，但优先目标城市",
+    "hard_constraints": ["需要在毕业前获得真实工作场景证据"], "soft_constraints": ["缺少正式实习", "行业信息来源零散"]
+  },
+  "unknowns": ["希望服务的业务问题与人群", "研究、工程、产品、咨询等工作形态的真实偏好", "能力在不同产业中的可迁移性", "压力、协作和模糊环境下的表现", "薪酬、稳定性、成长性之间的真实权重"],
+  "profile_boundaries": {"facts_only": true, "must_not_infer": ["目标行业", "目标岗位", "目标赛道"], "note": "专业和已有项目只是个人证据，不等于场景方向。"}
+}

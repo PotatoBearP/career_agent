@@ -1,0 +1,18 @@
+{
+  "state_id": "state-open-career-exploration-001",
+  "timestamp": "2026-08-15T00:00:00+08:00",
+  "career_stage": "graduate_exploration",
+  "decision_phase": "divergent",
+  "current_goal": "形成跨行业、跨岗位族的可比较机会地图，并确定下一轮验证范围",
+  "target_domain_status": "open",
+  "explicit_target_domains": [],
+  "available_evidence": ["教育与项目经历", "初步地点和组织偏好", "能力自评及部分项目证据"],
+  "missing_evidence": ["不同工作形态的体验证据", "跨行业岗位样本", "目标组织的一手信息", "能力迁移性验证", "个人决策权重"],
+  "active_hypotheses": [
+    {"hypothesis": "技术背景可以迁移到多个产业和职能", "status": "untested"},
+    {"hypothesis": "比起具体技术标签，工作内容和成长环境可能更影响长期匹配", "status": "untested"}
+  ],
+  "completed_tasks": [],
+  "decision_horizon": "8周内形成2-3个需要深入验证的机会方向",
+  "state_boundaries": {"do_not_default_to_major": true, "domain_requires_explicit_scenario_input": true}
+}

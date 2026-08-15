@@ -24,6 +24,7 @@ const actionToolConfigSchema = z.strictObject({
   preserve_existing: z.boolean().optional().default(false),
   always_load: z.boolean().optional().default(false),
   read_only: z.boolean().optional().default(true),
+  child_tools: z.array(z.string().trim().min(1)).optional().default([]),
   input: z.record(z.string(), inputFieldSchema).optional(),
 })
 
@@ -40,6 +41,7 @@ export type SkillActionToolSpec = {
   preserveExisting: boolean
   alwaysLoad: boolean
   readOnly: boolean
+  childToolNames: string[]
   input: Record<string, ActionToolInputField>
   skillDir: string
   outputFile: string
@@ -185,6 +187,7 @@ export async function discoverSkillActionTools(
       preserveExisting: config.preserve_existing,
       alwaysLoad: config.always_load,
       readOnly: config.read_only,
+      childToolNames: config.child_tools,
       input,
       skillDir,
       outputFile: join(options.toolsDir, exportName, `${exportName}.ts`),
@@ -229,19 +232,12 @@ export function renderSkillActionTool(spec: SkillActionToolSpec): string {
     : ''
   const userFacingName = JSON.stringify(spec.userFacingName)
   const useMessage = JSON.stringify(`Run ${spec.userFacingName}`)
-  const rejectedMessage = JSON.stringify(`${spec.userFacingName} rejected`)
-  const failedMessage = JSON.stringify(`${spec.userFacingName} failed`)
-  const progressMessage = JSON.stringify(`Running ${spec.userFacingName}`)
+  const childToolNames = JSON.stringify(spec.childToolNames)
 
   return `${GENERATED_FILE_MARKER}
-import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
 import { z } from 'zod/v4'
-import { buildTool, type ToolDef } from '../../Tool.js'
-import {
-  executeSkillAction,
-  getSkillActionCommand,
-} from '../../skills/skillAction.js'
 import { lazySchema } from '../../utils/lazySchema.js'
+import { createSkillActionTool } from '../SkillActionTool/createSkillActionTool.js'
 
 const SKILL_NAME = ${JSON.stringify(spec.skillName)} as const
 
@@ -250,96 +246,19 @@ const inputSchema = lazySchema(() =>
 ${inputFields}
   }),
 )
-type InputSchema = ReturnType<typeof inputSchema>
 
-const outputSchema = lazySchema(() =>
-  z.strictObject({
-    skill_call_id: z.string(),
-    skill_name: z.literal(SKILL_NAME),
-    agent_id: z.string(),
-    execution_status: z.literal('completed'),
-    outcome: z.enum(['success', 'insufficient_input', 'error']),
-    summary: z.string(),
-    result: z.json().optional(),
-    completed_at: z.string(),
-    duration_ms: z.number(),
-  }),
-)
-type OutputSchema = ReturnType<typeof outputSchema>
-type Output = z.infer<OutputSchema>
-
-export const ${spec.exportName} = buildTool({
-  name: ${JSON.stringify(spec.toolName)},${searchHint}
-  maxResultSizeChars: 100_000,
-  strict: true,
+export const ${spec.exportName} = createSkillActionTool({
+  skillName: SKILL_NAME,
+  toolName: ${JSON.stringify(spec.toolName)},${searchHint}
+  inputSchema,
+  userFacingName: ${userFacingName},
   alwaysLoad: ${spec.alwaysLoad},
-  async description() {
-    return (await getSkillActionCommand(SKILL_NAME)).description
-  },
-  async prompt() {
-    return (await getSkillActionCommand(SKILL_NAME)).description
-  },
-  get inputSchema(): InputSchema {
-    return inputSchema()
-  },
-  get outputSchema(): OutputSchema {
-    return outputSchema()
-  },
-  userFacingName() {
-    return ${userFacingName}
-  },
-  isEnabled() {
-    return true
-  },
-  isConcurrencySafe() {
-    return false
-  },
-  isReadOnly() {
-    return ${spec.readOnly}
-  },
-  toAutoClassifierInput(input) {
-    return JSON.stringify(input)
-  },
-  async checkPermissions(input) {
-    return { behavior: 'allow', updatedInput: input }
-  },
-  renderToolUseMessage() {
+  readOnly: ${spec.readOnly},
+  childToolNames: ${childToolNames},
+  renderInvocation() {
     return ${useMessage}
   },
-  renderToolUseRejectedMessage() {
-    return ${rejectedMessage}
-  },
-  renderToolUseErrorMessage() {
-    return ${failedMessage}
-  },
-  renderToolUseProgressMessage() {
-    return ${progressMessage}
-  },
-  renderToolResultMessage(output) {
-    return output.summary
-  },
-  async call(input, context, canUseTool) {
-    const actionInput = Object.keys(input).length > 0 ? input : undefined
-    return {
-      data: await executeSkillAction({
-        skillName: SKILL_NAME,
-        actionInput,
-        context,
-        canUseTool,
-      }),
-    }
-  },
-  mapToolResultToToolResultBlockParam(
-    content: Output,
-    toolUseID: string,
-  ): ToolResultBlockParam {
-    return {
-      type: 'tool_result',
-      tool_use_id: toolUseID,
-      content: JSON.stringify(content),
-    }
-  },
-} satisfies ToolDef<InputSchema, Output>)
+})
 `
 }
 

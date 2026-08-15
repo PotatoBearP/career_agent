@@ -26,6 +26,8 @@ export async function getSkillActionCommand(
 export async function executeSkillAction(input: {
   skillName: string
   actionInput?: JsonValue
+  /** Exact child tools, excluding ReturnSkillResult, which is always injected. */
+  childToolNames?: readonly string[]
   context: ToolUseContext
   canUseTool: CanUseToolFn
 }): Promise<CompletedSkillAction> {
@@ -36,6 +38,7 @@ export async function executeSkillAction(input: {
     actionInput: input.actionInput,
     contextMode: 'fork',
     requireCompletion: true,
+    exactToolNames: input.childToolNames,
     context: input.context,
     canUseTool: input.canUseTool,
   })

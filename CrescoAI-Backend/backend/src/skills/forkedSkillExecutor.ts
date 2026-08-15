@@ -6,6 +6,7 @@ import { getAgentContext } from '../utils/agentContext.js'
 import { extractResultText, prepareForkedCommandContext } from '../utils/forkedAgent.js'
 import { createUserMessage } from '../utils/messages.js'
 import type { ModelAlias } from '../utils/model/aliases.js'
+import type { AgentId } from '../types/ids.js'
 import { createAgentId } from '../utils/uuid.js'
 import { clearInvokedSkillsForAgent } from '../bootstrap/state.js'
 import { runAgent } from '../tools/AgentTool/runAgent.js'
@@ -17,6 +18,7 @@ import {
   getSkillInvocation,
   isLifecycleManagedSkill,
   markSkillInvocationRunning,
+  RETURN_SKILL_RESULT_TOOL_NAME,
 } from './skillLifecycle.js'
 import type { JsonValue, SkillOutcome } from './skillLifecycleTypes.js'
 
@@ -52,6 +54,23 @@ export class UnreportedSkillInvocationError extends Error {
   }
 }
 
+function resolveExactSkillTools(
+  availableTools: ToolUseContext['options']['tools'],
+  requestedNames: readonly string[],
+) {
+  const names = new Set([
+    ...requestedNames,
+    RETURN_SKILL_RESULT_TOOL_NAME,
+  ])
+  const resolved = availableTools.filter(tool => names.has(tool.name))
+  const resolvedNames = new Set(resolved.map(tool => tool.name))
+  const missing = Array.from(names).filter(name => !resolvedNames.has(name))
+  if (missing.length > 0) {
+    throw new Error(`Action Skill child tools are unavailable: ${missing.join(', ')}`)
+  }
+  return { tools: resolved, names: Array.from(names) }
+}
+
 function actionInputBlock(input: JsonValue | undefined): string {
   if (input === undefined) return ''
   return [
@@ -71,15 +90,22 @@ export async function executeForkedPromptSkill(input: {
   commandName: string
   args?: string
   actionInput?: JsonValue
-  agentId?: string
+  agentId?: AgentId
   contextMode: ForkedSkillContextMode
   requireCompletion?: boolean
+  /** When provided, run the child with exactly these tools plus ReturnSkillResult. */
+  exactToolNames?: readonly string[]
   context: ToolUseContext
   canUseTool: CanUseToolFn
   onMessage?: (message: Message, details: { agentId: string; skillContent: string }) => void
   runAgentImpl?: typeof runAgent
 }): Promise<ForkedSkillExecution> {
   const agentId = input.agentId ?? createAgentId()
+  // Resolve policy before creating lifecycle state so invalid configurations
+  // cannot leave a loading/running invocation behind.
+  const exactTools = input.exactToolNames
+    ? resolveExactSkillTools(input.context.options.tools, input.exactToolNames)
+    : null
   const lifecycleInvocation = isLifecycleManagedSkill(input.command)
     ? beginSkillInvocation(
         input.commandName,
@@ -141,7 +167,13 @@ export async function executeForkedPromptSkill(input: {
       forkContextMessages,
       querySource: 'agent:custom',
       model: input.command.model as ModelAlias | undefined,
-      availableTools: input.context.options.tools,
+      availableTools: exactTools?.tools ?? input.context.options.tools,
+      ...(exactTools
+        ? {
+            allowedTools: exactTools.names,
+            useExactTools: true,
+          }
+        : {}),
       override: { agentId },
     })) {
       agentMessages.push(message)

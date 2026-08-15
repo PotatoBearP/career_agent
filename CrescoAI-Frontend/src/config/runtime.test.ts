@@ -61,6 +61,16 @@ describe('resolveRuntimeConfig', () => {
     expect(config.userId).toBe('1');
   });
 
+  it('preserves the same-origin API base used by a reverse proxy', () => {
+    const config = resolveRuntimeConfig({
+      VITE_CAREER_AGENT_CLIENT_MODE: 'upstream',
+      VITE_CAREER_AGENT_API_BASE_URL: '/',
+    });
+
+    expect(config.apiBaseUrl).toBe('/');
+    expect(config.upstreamConfigured).toBe(true);
+  });
+
   it('falls back to polling for invalid upstream transport values', () => {
     const config = resolveRuntimeConfig({
       VITE_CAREER_AGENT_CLIENT_MODE: 'upstream',

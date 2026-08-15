@@ -1,0 +1,24 @@
+{
+  "skill_id": "snake_case_unique_id",
+  "skill_name": "kebab-case-runtime-name",
+  "tool_name": "PascalCaseCallableName",
+  "title": "面向用户的名称",
+  "business_goal": "一个有意义、可验证、边界明确的业务结果",
+  "when_to_use": "触发条件，以及不应使用的边界",
+  "task_ids": ["covered_task_id"],
+  "scenario_binding": {"domain_source": "scenario_only", "domain_mode": "open|explicit", "explicit_domains": [], "profile_role": "evidence_only"},
+  "scope": {"includes": ["负责内容"], "excludes": ["明确不负责的内容"]},
+  "input_schema": {
+    "field_name": {"type": "object", "required": true, "description": "字段语义", "source": "profile|state|scenario|user_input|external_data|prior_skill_output", "available": true}
+  },
+  "output_schema": {"result_field": {"type": "object", "description": "可被直接消费的结构化结果"}},
+  "output_consumers": ["user_decision|another-skilltool|external_system"],
+  "tool_selection": [
+    {"tool_name": "WebSearch", "usage_mode": "conditional", "reason": "只有需要补齐最新公开证据时才搜索", "condition": "输入未提供足够且新鲜的外部证据", "fallback": "返回 insufficient_input，并列出缺失证据"}
+  ],
+  "child_tools": ["WebSearch"],
+  "fresh_data_policy": "none|optional|required",
+  "complexity": {"level": "bounded", "estimated_steps": 4, "rationale": "为什么不是简单包装，也不应继续拆分"},
+  "independence": {"portable": true, "assumptions": ["仅依赖输入契约、外部模型 API 和已选普通工具"]},
+  "evaluation_cases": [{"case": "输入完整", "expected_outcome": "success"}]
+}

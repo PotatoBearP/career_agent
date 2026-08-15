@@ -43,6 +43,10 @@ function normalizeBaseUrl(value: string | undefined): string | null {
     return null;
   }
 
+  if (nextValue === '/') {
+    return '/';
+  }
+
   return nextValue.replace(/\/+$/, '');
 }
 

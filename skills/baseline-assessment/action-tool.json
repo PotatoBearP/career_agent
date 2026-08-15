@@ -5,6 +5,7 @@
   "preserve_existing": true,
   "always_load": true,
   "read_only": true,
+  "child_tools": [],
   "input": {
     "assessment_target": {
       "type": "string",

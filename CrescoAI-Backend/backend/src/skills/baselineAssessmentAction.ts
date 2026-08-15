@@ -24,6 +24,7 @@ export async function executeBaselineAssessmentAction(input: {
     actionInput: assessmentTarget
       ? { assessment_target: assessmentTarget }
       : undefined,
+    childToolNames: [],
     context: input.context,
     canUseTool: input.canUseTool,
   })

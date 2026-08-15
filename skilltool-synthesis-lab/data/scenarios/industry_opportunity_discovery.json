@@ -1,0 +1,19 @@
+{
+  "scenario_id": "scenario-industry-opportunity-discovery",
+  "scenario_version": "2.0",
+  "name": "行业探索与机会发现",
+  "objective": "在不预设用户专业对应行业的前提下，构建跨行业、岗位族、组织和具体机会的可比较探索空间，并形成下一轮验证组合。",
+  "trigger": "用户处于方向发散或重新定位阶段，尚未通过明确证据锁定目标领域。",
+  "target_domain": {
+    "mode": "open", "explicit_domains": [],
+    "selection_rule": "仅当场景显式提供领域时才限定领域；否则保持跨领域探索，禁止从画像专业、项目或技能推断目标行业。",
+    "breadth": "先比较产业问题、工作形态和岗位族，再选择需要深入的领域"
+  },
+  "scene_dimensions": ["职业阶段与决策成熟度", "个人价值、动机、约束和证据", "产业问题与价值链位置", "工作形态与岗位族", "组织类型与团队环境", "地域、薪酬、成长性和风险", "真实机会与进入窗口", "能力迁移性与证据缺口", "信息访谈、项目、实习等验证实验"],
+  "scope": {
+    "include": ["识别职业阶段、决策约束和信息缺口", "形成跨行业、跨职能的探索假设", "比较产业问题、价值链和组织生态", "比较岗位族、工作内容和进入路径", "发现雇主、团队、项目、实习和岗位信号", "映射能力证据及跨领域迁移性", "按个人权重、证据质量和可逆性进行机会组合排序", "设计低成本验证实验和停止规则"],
+    "exclude": ["根据专业自动限定行业或岗位", "代替用户做最终职业决定", "无数据依据地预测录用概率或行业增长", "把一次探索直接扩张为长期学习计划", "直接修改主应用状态"]
+  },
+  "required_outputs": ["职业阶段、约束与未知项摘要", "跨领域探索假设集合", "产业问题与价值链机会地图", "岗位族、工作形态与要求矩阵", "组织生态与具体机会清单", "能力迁移性和证据缺口矩阵", "带来源、置信度和敏感性的机会组合", "下一轮验证实验及更新决策的规则"],
+  "quality_preferences": {"coverage": "high", "cross_domain_comparison": "required_when_target_open", "evidence_grounding": "required", "uncertainty_visible": true, "profile_scenario_leakage": "reject", "max_skill_candidates": 12, "target_skill_candidates": 8}
+}
