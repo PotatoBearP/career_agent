@@ -25,6 +25,12 @@
 - 是否把专业、项目或技能错误推断为场景目标领域；
 - 辅助工具是否来自非 Skill 工具目录、确有必要并说明使用模式与降级路径。
 
+合成管线文件按执行步骤命名：
+
+- `pipeline/step1_synthesis_prompts.py`：定义需求、任务、候选与去重合并提示词；
+- `pipeline/step2_quality_gate.py`：执行候选合并和确定性质量检查；
+- `pipeline/step3_artifact_generation.py`：渲染并保存最终 SkillTool 产物。
+
 ## 快速开始
 
 无需安装第三方依赖，需要 Python 3.10+。
@@ -88,6 +94,9 @@ Web UI 可直接编辑三类 JSON。每次 run 会保存完整输入、各阶段
 
 ```text
 runs/<run-id>/
+  step1_demand_analysis/
+    request.json
+    demand_analysis.json
   run.json
   generated-skills/
     <skill-name>/
@@ -97,6 +106,8 @@ runs/<run-id>/
       tests/eval_cases.json
 ```
 
+需求分析完成后会立即保存 Step 1 的请求上下文和结果，因此即使后续步骤失败，仍可复现第一次需求分析，并为后续规模化合成提供参考样本。`request.json` 包含三类输入和实际提示词；`demand_analysis.json` 包含结构化需求结果。
+
 生成的 `action-tool.json` 参考当前抽象的 Action Skill Tool 模板，并增加 `child_tools` 精确子 Agent 工具声明。`tool_selection` 同时记录每个工具是 `required`、`optional` 还是 `conditional`，以及选择理由、触发条件和降级路径。运行时应由 Harness 自动补入 `ReturnSkillResult`，它不在可选工具目录内。
 
 工具目录默认一个都不选。只有完成具体业务目标需要时，模型才可以从目录中选择普通工具；Skill、Skill 发现工具、生成的 SkillActionTool 和 ReturnSkillResult 均被排除，避免嵌套 Skill。
@@ -104,8 +115,8 @@ runs/<run-id>/
 ## 扩展新场景
 
 1. 增加 profile/state/scenario JSON，或通过 Web UI 粘贴。
-2. 在 `pipeline/prompts.py` 调整合成约束或输出契约。
-3. 在 `pipeline/quality.py` 增加业务专属质量门。
+2. 在 `pipeline/step1_synthesis_prompts.py` 调整合成约束或输出契约。
+3. 在 `pipeline/step2_quality_gate.py` 增加业务专属质量门。
 4. 使用模型 API 运行，复核 `dedupe_decisions` 与质量报告。
 5. 将通过质量门的 generated-skills 接入目标 SkillTool runtime。
 

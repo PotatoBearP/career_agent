@@ -11,8 +11,8 @@ sys.path.insert(0, str(ROOT))
 
 from pipeline.mock_model import MockSynthesisModel
 from pipeline.model_api import ModelConfig, OpenAICompatibleModel, chat_completions_url, extract_json
-from pipeline.quality import evaluate_portfolio
-from pipeline.synthesis import SynthesisPipeline
+from pipeline.step2_quality_gate import evaluate_portfolio
+from pipeline.synthesis import PipelineError, SynthesisPipeline
 
 
 def load(relative: str):
@@ -90,11 +90,41 @@ class PipelineTest(unittest.TestCase):
             )
             run_dir = Path(result["run_directory"])
             self.assertTrue((run_dir / "run.json").is_file())
+            step1 = run_dir / "step1_demand_analysis"
+            request = json.loads((step1 / "request.json").read_text(encoding="utf-8"))
+            demand = json.loads((step1 / "demand_analysis.json").read_text(encoding="utf-8"))
+            self.assertEqual(request["inputs"]["scenario"], self.scenario)
+            self.assertIn("Analyze the user's needs", request["user_prompt"])
+            self.assertEqual(demand, result["demand_analysis"])
             skill_dir = run_dir / "generated-skills/career-stage-assessment"
             self.assertIn("model-entry: action-tool", (skill_dir / "SKILL.md").read_text(encoding="utf-8"))
             action = json.loads((skill_dir / "action-tool.json").read_text(encoding="utf-8"))
             self.assertEqual(action["tool_name"], "CareerStageAssessment")
             self.assertEqual(action["child_tools"], [])
+
+    def test_preserves_step1_demand_when_a_later_step_fails(self):
+        class FailAfterDemandModel(MockSynthesisModel):
+            def complete_json(self, *, system, user):
+                if user.startswith("Convert the analyzed needs"):
+                    raise RuntimeError("task synthesis failed")
+                return super().complete_json(system=system, user=user)
+
+        with tempfile.TemporaryDirectory(dir=ROOT / "runs") as directory:
+            with self.assertRaises(PipelineError):
+                SynthesisPipeline(FailAfterDemandModel(), runs_root=Path(directory)).run(
+                    profile=self.profile,
+                    state=self.state,
+                    scenario=self.scenario,
+                    persist=True,
+                    model_mode="mock",
+                )
+            run_dirs = [path for path in Path(directory).iterdir() if path.is_dir()]
+            self.assertEqual(len(run_dirs), 1)
+            step1 = run_dirs[0] / "step1_demand_analysis"
+            self.assertTrue((step1 / "request.json").is_file())
+            demand = json.loads((step1 / "demand_analysis.json").read_text(encoding="utf-8"))
+            self.assertEqual(demand["needs"][0]["need_id"], "career_stage_clarity")
+            self.assertFalse((run_dirs[0] / "run.json").exists())
 
     def test_catalog_excludes_recursive_skill_tools(self):
         catalog = load("data/tools/project_tools.json")

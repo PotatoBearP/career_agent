@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#081225"/><stop offset="1" stop-color="#172554"/></linearGradient><filter id="shadow"><feDropShadow dy="7" stdDeviation="7" flood-opacity=".3"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/></marker></defs>
+<rect width="1600" height="1040" fill="url(#bg)"/>
+<text x="80" y="64" fill="#f8fafc" font-family="Arial,sans-serif" font-size="34" font-weight="700">Scenario × Profile SkillTool I/O Map</text>
+<text x="80" y="102" fill="#94a3b8" font-family="Arial,sans-serif" font-size="17">run-20260815-111828-a791494a · gpt-5.6-sol-offline-simulation</text>
+<text x="80" y="140" fill="#7dd3fc" font-family="Arial,sans-serif" font-size="18">Needs 8 · Tasks 9 · All SkillTools 9 · Quality 100.0</text>
+<text x="80" y="180" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="14">Every SkillTool in this scenario-profile unit · IN = input_schema · OUT = output_schema · arrows = output consumers</text>
+<line x1="520" y1="335" x2="573" y2="335" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1025" y1="335" x2="1078" y2="335" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1025" y1="335" x2="68" y2="585" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1530" y1="335" x2="573" y2="585" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1530" y1="335" x2="573" y2="835" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="520" y1="585" x2="68" y2="835" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="520" y1="585" x2="1078" y2="585" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1025" y1="585" x2="1078" y2="585" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1530" y1="585" x2="68" y2="835" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1530" y1="585" x2="573" y2="835" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="520" y1="835" x2="573" y2="835" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="520" y1="835" x2="1078" y2="835" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="1025" y1="835" x2="1078" y2="835" stroke="#38bdf8" stroke-opacity=".3" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="80" y="240" width="440" height="205" rx="16" fill="#111c30" stroke="#475569" filter="url(#shadow)"/>
+<text x="100" y="271" fill="#7dd3fc" font-family="monospace" font-size="13">career_stage_assessment</text>
+<text x="100" y="301" fill="#f8fafc" font-family="Arial,sans-serif" font-size="18" font-weight="700">职业阶段识别</text>
+<text x="100" y="330" fill="#a7f3d0" font-family="monospace" font-size="12">IN  profile, state</text>
+<text x="100" y="348" fill="#fde68a" font-family="monospace" font-size="12">OUT stage_assessment</text>
+<text x="100" y="414" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="12">Tool: CareerStageAssessment</text>
+<text x="100" y="434" fill="#94a3b8" font-family="Arial,sans-serif" font-size="12">Child tools: none</text>
+<rect x="585" y="240" width="440" height="205" rx="16" fill="#111c30" stroke="#475569" filter="url(#shadow)"/>
+<text x="605" y="271" fill="#7dd3fc" font-family="monospace" font-size="13">career_direction_hypothesis</text>
+<text x="605" y="301" fill="#f8fafc" font-family="Arial,sans-serif" font-size="18" font-weight="700">跨领域职业假设</text>
+<text x="605" y="330" fill="#a7f3d0" font-family="monospace" font-size="12">IN  profile, scenario, stage_assessment</text>
+<text x="605" y="348" fill="#fde68a" font-family="monospace" font-size="12">OUT direction_hypotheses</text>
+<text x="605" y="414" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="12">Tool: CareerDirectionHypothesis</text>
+<text x="605" y="434" fill="#94a3b8" font-family="Arial,sans-serif" font-size="12">Child tools: none</text>
+<rect x="1090" y="240" width="440" height="205" rx="16" fill="#111c30" stroke="#475569" filter="url(#shadow)"/>
+<text x="1110" y="271" fill="#7dd3fc" font-family="monospace" font-size="13">industry_problem_landscape</text>
+<text x="1110" y="301" fill="#f8fafc" font-family="Arial,sans-serif" font-size="18" font-weight="700">产业问题与价值链地图</text>
+<text x="1110" y="330" fill="#a7f3d0" font-family="monospace" font-size="12">IN  direction_hypotheses, market_evidence</text>
+<text x="1110" y="348" fill="#fde68a" font-family="monospace" font-size="12">OUT industry_landscape</text>
+<text x="1110" y="414" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="12">Tool: IndustryProblemLandscape</text>
+<text x="1110" y="434" fill="#94a3b8" font-family="Arial,sans-serif" font-size="12">Child tools: WebSearch, WebFetch</text>
+<rect x="80" y="490" width="440" height="205" rx="16" fill="#111c30" stroke="#475569" filter="url(#shadow)"/>
+<text x="100" y="521" fill="#7dd3fc" font-family="monospace" font-size="13">role_family_positioning</text>
+<text x="100" y="551" fill="#f8fafc" font-family="Arial,sans-serif" font-size="18" font-weight="700">岗位族与工作形态定位</text>
+<text x="100" y="580" fill="#a7f3d0" font-family="monospace" font-size="12">IN  profile, direction_hypotheses, job_evidence</text>
+<text x="100" y="598" fill="#fde68a" font-family="monospace" font-size="12">OUT role_family_matrix</text>
+<text x="100" y="664" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="12">Tool: RoleFamilyPositioning</text>
+<text x="100" y="684" fill="#94a3b8" font-family="Arial,sans-serif" font-size="12">Child tools: WebSearch, WebFetch</text>
+<rect x="585" y="490" width="440" height="205" rx="16" fill="#111c30" stroke="#475569" filter="url(#shadow)"/>
+<text x="605" y="521" fill="#7dd3fc" font-family="monospace" font-size="13">employer_target_mapping</text>
+<text x="605" y="551" fill="#f8fafc" font-family="Arial,sans-serif" font-size="18" font-weight="700">组织生态地图</text>
+<text x="605" y="580" fill="#a7f3d0" font-family="monospace" font-size="12">IN  profile, industry_landscape</text>
+<text x="605" y="598" fill="#a7f3d0" font-family="monospace" font-size="12">    organization_evidence</text>
+<text x="605" y="616" fill="#fde68a" font-family="monospace" font-size="12">OUT employer_segments</text>
+<text x="605" y="664" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="12">Tool: EmployerTargetMapping</text>
+<text x="605" y="684" fill="#94a3b8" font-family="Arial,sans-serif" font-size="12">Child tools: WebSearch, WebFetch</text>
+<rect x="1090" y="490" width="440" height="205" rx="16" fill="#111c30" stroke="#475569" filter="url(#shadow)"/>
+<text x="1110" y="521" fill="#7dd3fc" font-family="monospace" font-size="13">live_opportunity_discovery</text>
+<text x="1110" y="551" fill="#f8fafc" font-family="Arial,sans-serif" font-size="18" font-weight="700">实时机会发现</text>
+<text x="1110" y="580" fill="#a7f3d0" font-family="monospace" font-size="12">IN  role_family_matrix, employer_segments</text>
+<text x="1110" y="598" fill="#a7f3d0" font-family="monospace" font-size="12">    search_constraints</text>
+<text x="1110" y="616" fill="#fde68a" font-family="monospace" font-size="12">OUT opportunity_inventory</text>
+<text x="1110" y="664" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="12">Tool: LiveOpportunityDiscovery</text>
+<text x="1110" y="684" fill="#94a3b8" font-family="Arial,sans-serif" font-size="12">Child tools: WebSearch, WebFetch</text>
+<rect x="80" y="740" width="440" height="205" rx="16" fill="#111c30" stroke="#475569" filter="url(#shadow)"/>
+<text x="100" y="771" fill="#7dd3fc" font-family="monospace" font-size="13">capability_evidence_assessment</text>
+<text x="100" y="801" fill="#f8fafc" font-family="Arial,sans-serif" font-size="18" font-weight="700">能力证据评估</text>
+<text x="100" y="830" fill="#a7f3d0" font-family="monospace" font-size="12">IN  profile, role_family_matrix</text>
+<text x="100" y="848" fill="#a7f3d0" font-family="monospace" font-size="12">    opportunity_inventory</text>
+<text x="100" y="866" fill="#fde68a" font-family="monospace" font-size="12">OUT evidence_matrix</text>
+<text x="100" y="914" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="12">Tool: CapabilityEvidenceAssessment</text>
+<text x="100" y="934" fill="#94a3b8" font-family="Arial,sans-serif" font-size="12">Child tools: none</text>
+<rect x="585" y="740" width="440" height="205" rx="16" fill="#111c30" stroke="#475569" filter="url(#shadow)"/>
+<text x="605" y="771" fill="#7dd3fc" font-family="monospace" font-size="13">opportunity_portfolio_prioritization</text>
+<text x="605" y="801" fill="#f8fafc" font-family="Arial,sans-serif" font-size="18" font-weight="700">机会组合优先级</text>
+<text x="605" y="830" fill="#a7f3d0" font-family="monospace" font-size="12">IN  profile, industry_landscape</text>
+<text x="605" y="848" fill="#a7f3d0" font-family="monospace" font-size="12">    role_family_matrix, opportunity_inventory</text>
+<text x="605" y="866" fill="#a7f3d0" font-family="monospace" font-size="12">    evidence_matrix</text>
+<text x="605" y="884" fill="#fde68a" font-family="monospace" font-size="12">OUT ranked_portfolio</text>
+<text x="605" y="914" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="12">Tool: OpportunityPortfolioPrioritization</text>
+<text x="605" y="934" fill="#94a3b8" font-family="Arial,sans-serif" font-size="12">Child tools: none</text>
+<rect x="1090" y="740" width="440" height="205" rx="16" fill="#111c30" stroke="#475569" filter="url(#shadow)"/>
+<text x="1110" y="771" fill="#7dd3fc" font-family="monospace" font-size="13">exploration_experiment_design</text>
+<text x="1110" y="801" fill="#f8fafc" font-family="Arial,sans-serif" font-size="18" font-weight="700">探索实验设计</text>
+<text x="1110" y="830" fill="#a7f3d0" font-family="monospace" font-size="12">IN  ranked_portfolio, evidence_matrix, time_budget</text>
+<text x="1110" y="848" fill="#fde68a" font-family="monospace" font-size="12">OUT validation_experiments</text>
+<text x="1110" y="914" fill="#cbd5e1" font-family="Arial,sans-serif" font-size="12">Tool: ExplorationExperimentDesign</text>
+<text x="1110" y="934" fill="#94a3b8" font-family="Arial,sans-serif" font-size="12">Child tools: none</text>
+</svg>
