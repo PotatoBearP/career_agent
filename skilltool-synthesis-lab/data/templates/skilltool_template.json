@@ -4,12 +4,15 @@
   "tool_name": "PascalCaseCallableName",
   "title": "面向用户的名称",
   "business_goal": "一个有意义、可验证、边界明确的业务结果",
+  "invocation_mode": "standalone|aggregate",
+  "composition": {"required_prior_outputs": [], "optional_prior_outputs": []},
   "when_to_use": "触发条件，以及不应使用的边界",
+  "reference_pattern": "采用了哪个 reference skill 的哪些结构性做法，禁止照搬其业务内容",
   "task_ids": ["covered_task_id"],
   "scenario_binding": {"domain_source": "scenario_only", "domain_mode": "open|explicit", "explicit_domains": [], "profile_role": "evidence_only"},
   "scope": {"includes": ["负责内容"], "excludes": ["明确不负责的内容"]},
   "input_schema": {
-    "field_name": {"type": "object", "required": true, "description": "字段语义", "source": "profile|state|scenario|user_input|external_data|prior_skill_output", "available": true}
+    "field_name": {"type": "object", "required": true, "description": "字段语义", "source": "profile|scenario|upstream_artifact|invocation_input|user_input|ordinary_tool_output|external_data|prior_skill_output", "source_ref": "input_inventory_asset_id_or_semantic_output_field_or_null", "available": true, "acquisition": {"mode": "provided|request_user|ordinary_tool|external_connector|prior_skill", "provider": null, "fallback": null}}
   },
   "output_schema": {"result_field": {"type": "object", "description": "可被直接消费的结构化结果"}},
   "output_consumers": ["user_decision|another-skilltool|external_system"],
@@ -18,7 +21,17 @@
   ],
   "child_tools": ["WebSearch"],
   "fresh_data_policy": "none|optional|required",
+  "action_tool": {"search_hint": "简短且具体的检索提示", "preserve_existing": true, "always_load": true, "read_only": false},
+  "operating_model": {
+    "role": "子模型在本 Skill 中承担的具体业务角色",
+    "hard_boundaries": ["与本能力直接相关、可检查的禁止事项"],
+    "workflow": [{"step": 1, "name": "具体步骤", "instructions": ["针对明确输入、字段、工具或判断规则的操作"], "success_criteria": ["本步骤可观察的完成标准"]}],
+    "decision_rules": ["排序、分级、计算、证据冲突或新鲜度的确定性规则"],
+    "outcome_rules": {"success": ["成功条件"], "insufficient_input": ["输入不足条件"], "error": ["执行或序列化失败条件"]},
+    "artifact_contract": {"mode": "none|write_file", "artifact_type": null, "file_name_pattern": null, "format": null, "verification_steps": []},
+    "final_checks": ["调用 ReturnSkillResult 前必须成立的断言"]
+  },
   "complexity": {"level": "bounded", "estimated_steps": 4, "rationale": "为什么不是简单包装，也不应继续拆分"},
   "independence": {"portable": true, "assumptions": ["仅依赖输入契约、外部模型 API 和已选普通工具"]},
-  "evaluation_cases": [{"case": "输入完整", "expected_outcome": "success"}]
+  "evaluation_cases": [{"id": "success_complete_input", "user_query": "真实调用语句", "available_context": {"输入": "代表性条件"}, "expected_outcome": "success", "must_include": ["可观察结果"], "must_not_include": ["越界行为"]}]
 }

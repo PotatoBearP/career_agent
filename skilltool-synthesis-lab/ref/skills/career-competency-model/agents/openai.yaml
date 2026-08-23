@@ -1,0 +1,4 @@
+interface:
+  display_name: "Career Competency Model"
+  short_description: "Research an evidence-backed role competency model"
+  default_prompt: "Use $career-competency-model to research current external competency requirements for a clearly scoped career target."

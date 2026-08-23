@@ -1,0 +1,30 @@
+{
+  "tool_name": "LearningPlan",
+  "user_facing_name": "Learning plan",
+  "search_hint": "build a staged learning path from a competency model and a baseline assessment",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "input": {
+    "model_ref": {
+      "type": "string",
+      "required": false,
+      "description": "Opaque artifact:// reference for a CareerCompetencyModel. Omit to resolve the most recent matching Action result in context."
+    },
+    "baseline_ref": {
+      "type": "string",
+      "required": false,
+      "description": "Opaque artifact:// reference for a BaselineAssessment. Omit to resolve the most recent matching Action result in context."
+    },
+    "goal_level": {
+      "type": "string",
+      "required": false,
+      "description": "User's personal goal on the depth ladder: working, independent, or advanced. Omit or pass null for market-aligned (the model's expected_depth per competency). Only pass a value the user actually stated; ask via AskUserQuestion before calling when it is unknown and would materially change the plan's scope."
+    },
+    "constraints": {
+      "type": "json",
+      "required": true,
+      "description": "User-stated planning constraints: available_time_per_week (required string) and deadline (required string or null; null only when the user explicitly said they have no deadline), plus optional resource_constraints, explicit_goals, and notes. Before calling, ask the user via AskUserQuestion for any missing required values or for other missing inputs that would materially change the plan; batch missing questions into one call. Never invent constraints."
+    }
+  }
+}

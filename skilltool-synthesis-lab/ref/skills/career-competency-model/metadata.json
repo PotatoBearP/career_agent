@@ -1,0 +1,83 @@
+{
+  "original_metadata": {
+    "skill_id": "career-competency-model",
+    "name": "CareerCompetencyModel",
+    "type": "career_world_model",
+    "kag_role": "skill_action",
+    "description": "研究当前外部世界对明确职业目标的能力要求，并生成带来源依据的结构化职业能力模型。",
+    "inputs": [
+      "career_target"
+    ],
+    "outputs": [
+      "CareerCompetencyModel artifact"
+    ],
+    "preconditions": [
+      "职业或岗位目标足够明确，可以开展外部资料研究"
+    ],
+    "postconditions": [
+      "独立 JSON artifact 已写入工作区并通过 ReturnSkillResult 返回引用"
+    ],
+    "possible_next_skills": [],
+    "required_context_types": [],
+    "allowed_tools": [
+      "WebSearch",
+      "WebFetch",
+      "Write",
+      "Read",
+      "ReturnSkillResult"
+    ],
+    "recommended_verifiers": [
+      "source_diversity_check",
+      "requirement_traceability_check",
+      "scope_boundary_check",
+      "artifact_integrity_check"
+    ]
+  },
+  "compiled_metadata": {
+    "skill_id": "career-competency-model",
+    "claude_skill_name": "career-competency-model",
+    "display_name": "CareerCompetencyModel",
+    "type": "career_world_model",
+    "kag_role": "skill_action",
+    "summary": "Researches current external occupational requirements and writes a source-backed CareerCompetencyModel artifact.",
+    "minimum_required_inputs": [
+      "career_target"
+    ],
+    "optional_inputs": [
+      "industry",
+      "region",
+      "seniority",
+      "specialization"
+    ],
+    "required_context_types": [],
+    "allowed_tools": [
+      "WebSearch",
+      "WebFetch",
+      "Write",
+      "Read",
+      "ReturnSkillResult"
+    ],
+    "recommended_verifiers": [
+      "source_diversity_check",
+      "requirement_traceability_check",
+      "scope_boundary_check",
+      "artifact_integrity_check"
+    ],
+    "trigger_examples": [
+      "Research the competency model for a senior LLM agent engineer in China.",
+      "What capabilities does the market currently expect from a healthcare product manager in the US?",
+      "Build a source-backed occupational competency model for an entry-level robotics perception engineer."
+    ],
+    "negative_trigger_examples": [
+      "Assess whether I already have the abilities required for an LLM engineer.",
+      "Compare my résumé with this role and identify my gaps.",
+      "Create a six-month course and learning plan for becoming a product manager."
+    ],
+    "handoff_conditions": {},
+    "output_artifact_type": "CareerCompetencyModel",
+    "risk_level": "medium",
+    "requires_current_information": true,
+    "requires_user_profile": false,
+    "requires_external_evidence": true
+  }
+}

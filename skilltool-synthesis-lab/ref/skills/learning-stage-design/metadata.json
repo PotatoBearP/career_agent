@@ -1,0 +1,31 @@
+{
+  "original_metadata": {
+    "skill_id": "learning-stage-design",
+    "name": "LearningStageDesign",
+    "type": "learning_stage_package",
+    "kag_role": "skill_action",
+    "description": "将已激活学习计划的当前阶段展开为可执行、可学习、可验收的阶段方案。",
+    "inputs": ["plan_id", "constraints", "harness_stage_snapshot"],
+    "outputs": ["LearningStagePackage artifact"],
+    "allowed_tools": ["WebSearch", "WebFetch", "Write", "Read", "Edit", "ReturnSkillResult"]
+  },
+  "compiled_metadata": {
+    "skill_id": "learning-stage-design",
+    "claude_skill_name": "learning-stage-design",
+    "display_name": "LearningStageDesign",
+    "type": "learning_stage_package",
+    "kag_role": "skill_action",
+    "summary": "Expands the current activated plan stage into an executable and assessable package.",
+    "minimum_required_inputs": [],
+    "optional_inputs": ["plan_id", "constraints"],
+    "allowed_tools": ["WebSearch", "WebFetch", "Write", "Read", "Edit", "ReturnSkillResult"],
+    "trigger_examples": ["把我当前学习计划的这一阶段展开成可以开始执行的方案。"],
+    "negative_trigger_examples": ["重新做整个学习计划。", "评估我是否已经通过当前阶段。"],
+    "handoff_conditions": {},
+    "output_artifact_type": "LearningStagePackage",
+    "risk_level": "medium",
+    "requires_current_information": true,
+    "requires_user_profile": false,
+    "requires_external_evidence": true
+  }
+}

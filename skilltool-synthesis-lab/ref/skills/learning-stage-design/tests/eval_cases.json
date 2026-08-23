@@ -1,0 +1,6 @@
+[
+  {"id":"focus-stage-success","expected_outcome":"success","invariants":["uses frozen current stage","includes sourced resources","does not modify state"]},
+  {"id":"explicit-plan-success","expected_outcome":"success","invariants":["expands only selected current stage","returns one artifact"]},
+  {"id":"missing-focus","expected_outcome":"tool_error","invariants":["fork is not started"]},
+  {"id":"invalid-stage-snapshot","expected_outcome":"insufficient_input","invariants":["does not ask questions","does not revise plan"]}
+]

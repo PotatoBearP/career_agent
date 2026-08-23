@@ -1,0 +1,26 @@
+{
+  "scenario_id": "scenario-job-application-material-preparation",
+  "scenario_version": "1.0",
+  "name": "岗位材料准备",
+  "objective": "基于用户真实经历与目标岗位要求，形成可复用的基础材料和针对具体岗位的投递版本，并明确仍需用户补充的事实。",
+  "trigger": "用户已确认优先申请的真实岗位，准备整理或调整简历、项目表述、求职信及补充材料。",
+  "upstream_stage": {
+    "stage_id": "career_direction_and_role_matching",
+    "name": "职业方向探索与岗位匹配",
+    "description": "上一场景已完成真实岗位采集、用户经历与岗位要求对照及投递优先级判断。",
+    "artifacts": [
+      {"asset_id":"user_profile","name":"用户画像","type":"object","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"UserProfileAnalysis","stage":"用户画像分析"},"derived_from":[],"description":"由用户确认的事实、经历证据、偏好和现实约束。"},
+      {"asset_id":"verified_opportunity_list","name":"真实岗位机会清单","type":"array","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"IndustryOpportunityDiscovery","stage":"职业方向探索与岗位匹配"},"derived_from":[],"description":"保留来源、时间、组织和岗位要求的真实机会。"},
+      {"asset_id":"opportunity_pursuit_ranking","name":"岗位投递优先顺序","type":"array","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"OpportunityRanking","stage":"职业方向探索与岗位匹配"},"derived_from":["verified_opportunity_list"],"description":"用户确认的优先申请岗位及排序理由。"},
+      {"asset_id":"application_focus_brief","name":"投递材料准备要点","type":"object","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"ApplicationFocusBrief","stage":"职业方向探索与岗位匹配"},"derived_from":["opportunity_pursuit_ranking"],"description":"不同岗位应突出、弱化和补充的材料重点。"},
+      {"asset_id":"evidence_gap_analysis","name":"经历与要求对照结果","type":"object","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"EvidenceGapAnalysis","stage":"职业方向探索与岗位匹配"},"derived_from":["user_profile","verified_opportunity_list"],"description":"用户已有证据、待补充事实与岗位要求的对应关系。"}
+    ]
+  },
+  "task_io_policy": {"allowed_input_origins":["user_provided","tool_generated","existing_artifact","prior_task_output"],"prior_task_output_available_from_iteration":2,"required_value_types":["object","array","string","number","boolean"],"existing_artifact_ids":["user_profile","verified_opportunity_list","opportunity_pursuit_ranking","application_focus_brief","evidence_gap_analysis"]},
+  "target_domain": {"mode":"selected_opportunities","explicit_domains":[],"selection_rule":"仅围绕用户在调用时选择的真实岗位准备材料，不依据画像自行扩大岗位范围。","breadth":"先形成可复用基础材料，再按具体岗位要求生成针对性版本。"},
+  "scene_dimensions": ["目标岗位与投递截止时间","现有简历、项目材料和作品链接","岗位要求与经历证据的对应关系","基础简历的信息结构和篇幅","针对不同岗位的重点调整","求职信及补充材料要求","材料缺口、事实确认和最终检查"],
+  "scope": {"include":["复用用户确认的画像和岗位信息","整理可复用的基础简历与经历素材","按具体岗位调整内容顺序和表述重点","准备求职信、项目摘要或补充材料草稿","检查真实性、完整性、格式和岗位针对性"],"exclude":["重新生成或修改用户画像","编造经历、数字、职责、成果或技能","把岗位要求表述成用户已经具备的事实","未经用户确认向外部岗位发送材料"]},
+  "required_outputs": ["结构清楚且事实有来源的基础简历内容","按用户选定岗位准备的针对性投递材料","可复用的项目经历与成果表述素材库","材料缺口和待用户确认事实清单","提交前的内容、格式与岗位对应检查结果"],
+  "quality_preferences": {"coverage":"high","evidence_grounding":"required","truthfulness":"strict","user_confirmation_before_external_action":true,"profile_scenario_leakage":"reject","max_skill_candidates":10,"target_skill_candidates":6},
+  "composition_preferences": {"topology":"parallel_first","min_standalone_ratio":0.6,"min_root_ratio":0.5,"max_required_dependency_depth":3}
+}

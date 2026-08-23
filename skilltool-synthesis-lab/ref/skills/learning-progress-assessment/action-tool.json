@@ -1,0 +1,12 @@
+{
+  "tool_name": "LearningProgressAssessment",
+  "user_facing_name": "Learning progress assessment",
+  "search_hint": "assess already-visible work against the current learning stage rubric",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "input": {
+    "plan_id": {"type":"string","required":false,"description":"Optional logical plan ID. Omit to use the focus plan."},
+    "evidence": {"type":"json","required":true,"description":"Non-empty array identifying evidence already visible in the conversation: source_type, optional source_ref, and summary. This tool does not fetch evidence."}
+  }
+}

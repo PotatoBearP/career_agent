@@ -8,16 +8,20 @@
   </head>
   <body>
     <header class="topbar">
-      <div><h1>SkillTool 合成</h1><p>画像与场景独立输入，普通工具按需选择</p></div>
+      <div><h1>SkillTool 合成</h1><p>固定画像、按需切换场景，普通工具按需选择</p></div>
       <div class="top-actions">
         <span id="serviceStatus" class="status">连接中</span>
         <button id="downloadButton" class="button" disabled>导出结果</button>
-        <button id="runButton" class="button primary">开始合成</button>
       </div>
     </header>
 
     <main class="workspace">
       <aside class="sidebar">
+        <section class="block">
+          <div class="section-title"><div><h2>历史合成</h2><p>加载、检查并继续修改过去的结果</p></div><button id="refreshRunsButton" class="link-button">刷新</button></div>
+          <div id="runList" class="run-list empty"><p>正在加载历史记录…</p></div>
+        </section>
+
         <section class="block">
           <div class="section-title"><h2>运行配置</h2><button id="resetButton" class="link-button">恢复样例</button></div>
           <div class="segmented"><button class="mode active" data-mode="mock">离线样例</button><button class="mode" data-mode="api">模型 API</button></div>
@@ -31,55 +35,97 @@
         </section>
 
         <section class="block">
-          <div class="section-title"><div><h2>输入 JSON</h2><p>画像提供事实；场景独立定义问题空间</p></div></div>
-          <div class="tabs"><button class="editor-tab active" data-editor="profile">画像</button><button class="editor-tab" data-editor="state">状态</button><button class="editor-tab" data-editor="scenario">场景</button></div>
-          <div class="editor-meta"><span id="editorLabel">复杂用户画像 JSON</span><span id="jsonValidity" class="valid">JSON 有效</span></div>
+          <div class="section-title"><div><h2>合成参考</h2><p>画像保持不变；选择不同场景限定本轮任务范围</p></div></div>
+          <div class="tabs"><button class="editor-tab active" data-editor="profile">画像</button><button class="editor-tab" data-editor="scenario">场景</button></div>
+          <label id="scenarioSelectorWrap" class="scenario-selector hidden">选择场景
+            <select id="scenarioSelect"></select>
+            <small id="scenarioDescription">切换后仍可在下方继续编辑场景内容。</small>
+          </label>
+          <div class="editor-meta"><span id="editorLabel">用户画像（自然语言）</span><span id="jsonValidity" class="valid">内容已填写</span></div>
           <textarea id="jsonEditor" spellcheck="false"></textarea>
         </section>
       </aside>
 
       <section class="content">
-        <section class="block summary">
-          <div><h2>合成流程</h2><p>画像 / 状态 / 场景 → 需求 → 任务 → 候选 → 降重 → 质量门</p></div>
-          <div id="summaryMetrics" class="metrics"><span><strong>—</strong> 需求</span><span><strong>—</strong> 任务</span><span><strong>—</strong> SkillTools</span><span><strong>—</strong> 质量分</span></div>
-        </section>
-
         <section class="block">
-          <div class="section-title"><h2>合成轨迹</h2><span id="runMeta" class="muted">尚未运行</span></div>
-          <div id="pipelineFlow" class="pipeline-flow"></div><div id="stageStrip" class="stage-strip"></div>
+          <div class="section-title"><div><h2>当前合成工序</h2><p>任务确认后直接组合必要工具，按 ref 生成并校验；不再经过候选降重和质量门。</p></div><span id="runMeta" class="muted">尚未运行</span></div>
+          <div id="pipelineFlow" class="pipeline-flow"></div>
+          <div id="stageStrip" class="stage-strip"></div>
         </section>
 
-        <section class="reference-grid">
-          <details class="block reference" open>
-            <summary>SkillTool 模板</summary>
-            <p>模型必须按此结构输出，每个候选也会在右侧按同一模板展示。</p>
-            <pre id="templateView"></pre>
-          </details>
-          <details class="block reference" open>
-            <summary>可用普通工具 <span id="toolCount" class="muted"></span></summary>
-            <p>已排除 Skill 及递归入口。存在不代表必须使用；默认不选。</p>
-            <div id="toolCatalog" class="tool-catalog"></div>
-          </details>
+        <section class="block run-monitor-panel">
+          <div class="section-title"><div><h2>运行时间</h2><p>实时显示当前耗时；运行完成后保留总耗时和每道工序耗时。</p></div><span id="monitorStatus" class="monitor-status">待运行</span></div>
+          <div class="monitor-summary">
+            <strong id="monitorMessage">尚未开始新的运行</strong>
+            <span id="monitorStage">等待请求</span>
+            <span>已用时 <b id="monitorElapsed">00:00</b></span>
+            <span id="monitorHealth">服务状态：未检查</span>
+          </div>
+          <div class="monitor-progress"><div id="monitorProgressBar"></div></div>
+          <div class="monitor-progress-meta"><span id="monitorProgressText">0 / 0 stages</span><span>时间会随 run 一起保存</span></div>
+          <div id="monitorLog" class="monitor-log"><p>运行事件会实时显示在这里。</p></div>
+        </section>
+
+        <section class="block task-workspace-panel">
+          <div class="section-title"><div><h2>任务合成</h2><p id="taskIterationSummary">先初始化任务池，再自由选择下一轮迭代方式。</p></div><div class="panel-actions"><span id="taskCount" class="badge">0 个任务</span><button id="taskSynthesisButton" class="button primary">初始化任务池</button></div></div>
+          <div class="task-iteration-actions">
+            <div><strong>下一步迭代</strong><p>可按任意顺序重复执行；开始生成 SkillTool 后任务池将锁定。</p></div>
+            <button class="button task-iteration-button" data-direction="extension" disabled>自然延伸</button>
+            <button class="button task-iteration-button" data-direction="decomposition" disabled>任务拆解</button>
+            <button class="button task-iteration-button" data-direction="deduplication" disabled>语义去重</button>
+          </div>
+          <div id="taskIterationTabs" class="task-iteration-tabs"></div>
+          <div id="taskIterationView" class="task-iteration-view empty"><p>每轮任务将在合成后单独显示。</p></div>
+          <section class="task-flow-panel">
+            <div class="section-title"><div><h3>任务 Flow</h3><p>按输入 → 任务 → 输出的数据依赖排列；任务输出被消费后继续连接下游任务。</p></div><div id="taskFlowStats" class="task-flow-stats"></div></div>
+            <div class="task-flow-viewport"><svg id="taskFlowGraph" role="img" aria-label="任务输入输出衔接图"></svg></div>
+          </section>
+          <div id="taskIoPools" class="task-io-pools empty"><p>任务生成后将在这里汇总输入池和输出池。</p></div>
+          <div id="taskGrid" class="task-grid empty"><p>尚未合成任务。</p></div>
+        </section>
+
+        <section class="block existing-tools-panel">
+          <div class="section-title"><div><h2>现有工具</h2><p>任务的 tool_generated 输入只能由此目录中的普通工具产生。</p></div><span id="toolCount" class="badge">0 个</span></div>
+          <div id="toolCatalog" class="tool-catalog empty"><p>正在加载工具目录…</p></div>
         </section>
 
         <section class="result-grid">
           <section class="block">
-            <div class="section-title"><h2>SkillTool 候选</h2><span class="muted">点击查看契约</span></div>
+            <div class="section-title"><div><h2>SkillTool 合成</h2><span class="muted">严格根据上方最终任务集生成</span></div><button id="skilltoolSynthesisButton" class="button primary" disabled>根据任务集生成 SkillTool</button></div>
             <div id="candidateList" class="candidate-list empty"><p>等待合成。</p></div>
           </section>
           <section class="block inspector">
             <div class="section-title"><h2 id="inspectorTitle">输入 / 输出 / 工具</h2><span id="qualityBadge" class="badge">—</span></div>
             <div id="ioGraph" class="empty"><p>选择一个 SkillTool。</p></div>
             <div id="toolPolicy"></div>
+            <div id="harnessToolPolicy"></div>
             <div id="skillDetails" class="skill-details"></div>
             <details id="candidateTemplatePanel" class="candidate-json"><summary>查看完整 SkillTool 模板实例</summary><pre id="candidateTemplate"></pre></details>
           </section>
         </section>
 
-        <section class="block">
-          <div class="section-title"><h2>任务覆盖</h2><span id="coverageBadge" class="muted">0 / 0</span></div>
-          <div id="taskGrid" class="task-grid empty"><p>等待合成。</p></div>
+        <section class="block quality-rubric-panel">
+          <div class="section-title"><div><h2>直接合成与产物校验</h2><p>展示任务—工具组合、ref 样式生成和最终结构校验。</p></div><span id="qualityGateBadge" class="rubric-status pending">待校验</span></div>
+          <div id="qualityRubrics" class="rubric-grid empty"><p>尚未生成 SkillTool。</p></div>
         </section>
+
+        <section class="block">
+          <div class="section-title"><div><h2>合并后的 SkillTool 数据 Flow</h2><p>同一语义输入或输出只显示一个节点，并连接所有生产者与消费者。</p></div><div class="panel-actions"><button id="ioZoomOut" class="button">−</button><button id="ioZoomReset" class="button">100%</button><button id="ioZoomIn" class="button">＋</button><button id="ioGraphDownload" class="button">导出 SVG</button></div></div>
+          <div id="ioOverviewStats" class="task-flow-stats"></div>
+          <div class="io-overview-viewport"><svg id="ioOverviewGraph" role="img" aria-label="合并后的 SkillTool 输入输出图"></svg></div>
+        </section>
+
+        <section class="block">
+          <div class="section-title"><div><h2>生成产物</h2><p id="artifactLocation">通过直接产物校验的 SkillTool 与 Harness Tool 文件</p></div><span id="artifactCount" class="muted">0 个</span></div>
+          <div class="artifact-workspace">
+            <div id="artifactList" class="artifact-list empty"><p>等待生成产物。</p></div>
+            <div class="artifact-inspector">
+              <div id="artifactFileTabs" class="artifact-file-tabs"></div>
+              <pre id="artifactFileContent">选择一个产物文件。</pre>
+            </div>
+          </div>
+        </section>
+
       </section>
     </main>
     <div id="toast" class="toast"></div>

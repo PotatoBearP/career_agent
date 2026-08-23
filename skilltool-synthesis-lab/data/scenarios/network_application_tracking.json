@@ -1,0 +1,26 @@
+{
+  "scenario_id": "scenario-network-application-tracking",
+  "scenario_version": "1.0",
+  "name": "人脉申请追踪",
+  "objective": "帮助用户寻找合适的公开联系和内推入口，准备真实自然的沟通草稿，并持续整理岗位申请状态与下一步跟进。",
+  "trigger": "用户已有目标岗位和投递材料，准备寻找内推、开始投递或整理正在推进的申请。",
+  "upstream_stage": {
+    "stage_id": "job_application_material_preparation",
+    "name": "岗位材料准备",
+    "description": "上一场景已形成针对目标岗位的投递材料及提交前检查结果。",
+    "artifacts": [
+      {"asset_id":"user_profile","name":"用户画像","type":"object","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"UserProfileAnalysis","stage":"用户画像分析"},"derived_from":[],"description":"由用户确认的事实、经历证据、偏好和现实约束。"},
+      {"asset_id":"verified_opportunity_list","name":"真实岗位机会清单","type":"array","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"IndustryOpportunityDiscovery","stage":"职业方向探索与岗位匹配"},"derived_from":[],"description":"保留来源、时间、组织和岗位要求的真实机会。"},
+      {"asset_id":"opportunity_pursuit_ranking","name":"岗位投递优先顺序","type":"array","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"OpportunityRanking","stage":"职业方向探索与岗位匹配"},"derived_from":["verified_opportunity_list"],"description":"用户确认的优先申请岗位及排序理由。"},
+      {"asset_id":"tailored_application_packages","name":"针对岗位准备的投递材料","type":"array","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"JobApplicationMaterialPreparation","stage":"岗位材料准备"},"derived_from":["user_profile","opportunity_pursuit_ranking"],"description":"用户检查过的岗位定制简历、求职信或补充材料。"},
+      {"asset_id":"material_quality_report","name":"投递材料检查结果","type":"object","artifact_class":"existing_artifact","source":"upstream_artifact","availability":"available","producer":{"kind":"previous_scenario","name":"MaterialQualityCheck","stage":"岗位材料准备"},"derived_from":["tailored_application_packages"],"description":"提交前仍需确认或修正的内容与格式问题。"}
+    ]
+  },
+  "task_io_policy": {"allowed_input_origins":["user_provided","tool_generated","existing_artifact","prior_task_output"],"prior_task_output_available_from_iteration":2,"required_value_types":["object","array","string","number","boolean"],"existing_artifact_ids":["user_profile","verified_opportunity_list","opportunity_pursuit_ranking","tailored_application_packages","material_quality_report"]},
+  "target_domain": {"mode":"selected_opportunities","explicit_domains":[],"selection_rule":"仅围绕用户选择或已经申请的岗位寻找联系入口和维护状态，不依据画像擅自扩大范围。","breadth":"同时覆盖公开人脉入口、内推准备、投递记录、回复状态和下一步跟进。"},
+  "scene_dimensions": ["用户选择的目标岗位与申请渠道","用户已有联系人和关系背景","公开可核验的团队或招聘入口","自然真实的联系与内推请求话术","投递时间、材料版本和申请状态","回复、面试、拒绝和关闭记录","跟进时间、下一步动作和优先级"],
+  "scope": {"include":["寻找公开可核验的人脉和内推入口","根据真实关系准备联系与跟进草稿","整理岗位投递、回复和面试状态","提醒需要跟进或补充材料的申请","汇总近期申请进展和下一步动作"],"exclude":["猜测或收集私人联系方式","虚构共同经历、熟人背书或推荐关系","绕过平台权限或批量发送骚扰信息","未经用户确认执行实际发送、投递、撤回或状态修改"]},
+  "required_outputs": ["带来源和适用理由的公开联系或内推入口清单","针对不同关系和渠道的联系消息草稿","包含岗位、材料版本、渠道、时间和状态的申请追踪表","需要跟进的申请及建议时间清单","近期进展、阻塞项和下一步动作汇总"],
+  "quality_preferences": {"coverage":"high","source_traceability":"required","privacy":"strict","user_confirmation_before_external_action":true,"profile_scenario_leakage":"reject","max_skill_candidates":10,"target_skill_candidates":6},
+  "composition_preferences": {"topology":"parallel_first","min_standalone_ratio":0.6,"min_root_ratio":0.5,"max_required_dependency_depth":3}
+}

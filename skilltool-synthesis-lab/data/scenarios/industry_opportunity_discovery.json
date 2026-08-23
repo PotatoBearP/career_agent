@@ -1,19 +1,89 @@
 {
   "scenario_id": "scenario-industry-opportunity-discovery",
-  "scenario_version": "2.0",
-  "name": "行业探索与机会发现",
-  "objective": "在不预设用户专业对应行业的前提下，构建跨行业、岗位族、组织和具体机会的可比较探索空间，并形成下一轮验证组合。",
-  "trigger": "用户处于方向发散或重新定位阶段，尚未通过明确证据锁定目标领域。",
+  "scenario_version": "3.0",
+  "name": "毕业前职业方向探索与真实机会验证",
+  "objective": "在4周内结合上海、杭州和深圳的真实实习及应届岗位，比较不同工作内容和组织环境，筛选3个值得继续验证的职业方向，并形成可立即执行的信息访谈、岗位申请或工作样本计划。",
+  "trigger": "用户已完成画像分析，准备通过真实岗位和低成本实践缩小职业方向。",
+  "upstream_stage": {
+    "stage_id": "user_profile_analysis",
+    "name": "用户画像分析",
+    "description": "上一场景收集用户事实与证据，并生成经过用户确认的结构化用户画像。",
+    "artifacts": [
+      {
+        "asset_id": "user_profile",
+        "name": "用户画像",
+        "type": "object",
+        "artifact_class": "existing_artifact",
+        "source": "upstream_artifact",
+        "availability": "available",
+        "producer": {
+          "kind": "previous_scenario",
+          "name": "UserProfileAnalysis",
+          "stage": "用户画像分析"
+        },
+        "derived_from": [],
+        "description": "上一场景生成并由用户确认的结构化画像，包含教育经历、项目证据、能力证据、工作偏好、目标城市、时间投入和现实约束。"
+      }
+    ]
+  },
+  "task_io_policy": {
+    "allowed_input_origins": ["user_provided", "tool_generated", "existing_artifact", "prior_task_output"],
+    "prior_task_output_available_from_iteration": 2,
+    "required_value_types": ["object", "array", "string", "number", "boolean"],
+    "existing_artifact_ids": ["user_profile"]
+  },
   "target_domain": {
-    "mode": "open", "explicit_domains": [],
-    "selection_rule": "仅当场景显式提供领域时才限定领域；否则保持跨领域探索，禁止从画像专业、项目或技能推断目标行业。",
-    "breadth": "先比较产业问题、工作形态和岗位族，再选择需要深入的领域"
+    "mode": "open",
+    "explicit_domains": [],
+    "selection_rule": "仅当用户明确指定行业时才限定搜索范围；否则从实际工作活动出发形成跨行业候选方向，禁止依据专业或技术经历默认选择人工智能或互联网。",
+    "breadth": "先比较岗位每天处理的问题、交付成果、协作对象和进入门槛，再比较行业、公司和团队。"
   },
-  "scene_dimensions": ["职业阶段与决策成熟度", "个人价值、动机、约束和证据", "产业问题与价值链位置", "工作形态与岗位族", "组织类型与团队环境", "地域、薪酬、成长性和风险", "真实机会与进入窗口", "能力迁移性与证据缺口", "信息访谈、项目、实习等验证实验"],
+  "scene_dimensions": [
+    "毕业时间、校招节点与每周可投入时间",
+    "用户愿意尝试和明确排斥的日常工作活动",
+    "上海、杭州和深圳的真实实习及应届岗位供给",
+    "岗位日常任务、交付物、协作对象和考核方式",
+    "组织类型、团队环境和招聘入口",
+    "已有项目及能力证据与岗位要求的对应关系",
+    "信息访谈、工作样本和岗位申请等验证行动"
+  ],
   "scope": {
-    "include": ["识别职业阶段、决策约束和信息缺口", "形成跨行业、跨职能的探索假设", "比较产业问题、价值链和组织生态", "比较岗位族、工作内容和进入路径", "发现雇主、团队、项目、实习和岗位信号", "映射能力证据及跨领域迁移性", "按个人权重、证据质量和可逆性进行机会组合排序", "设计低成本验证实验和停止规则"],
-    "exclude": ["根据专业自动限定行业或岗位", "代替用户做最终职业决定", "无数据依据地预测录用概率或行业增长", "把一次探索直接扩张为长期学习计划", "直接修改主应用状态"]
+    "include": [
+      "复用上一场景产生的用户画像",
+      "从具体工作活动出发形成3至5个待验证方向",
+      "采集目标城市近期发布的真实实习与应届岗位",
+      "比较岗位任务、交付物、协作对象和进入要求",
+      "将用户证据映射到具体岗位要求",
+      "筛选3个优先方向并安排未来4周验证行动"
+    ],
+    "exclude": [
+      "重新生成或修改用户画像",
+      "依据计算机专业或PyTorch经历直接限定目标行业",
+      "在没有真实反馈时断言用户适合某个岗位",
+      "使用缺少来源和时间信息的岗位数据"
+    ]
   },
-  "required_outputs": ["职业阶段、约束与未知项摘要", "跨领域探索假设集合", "产业问题与价值链机会地图", "岗位族、工作形态与要求矩阵", "组织生态与具体机会清单", "能力迁移性和证据缺口矩阵", "带来源、置信度和敏感性的机会组合", "下一轮验证实验及更新决策的规则"],
-  "quality_preferences": {"coverage": "high", "cross_domain_comparison": "required_when_target_open", "evidence_grounding": "required", "uncertainty_visible": true, "profile_scenario_leakage": "reject", "max_skill_candidates": 12, "target_skill_candidates": 8}
+  "required_outputs": [
+    "包含岗位链接、发布时间、城市、公司和工作内容的真实机会样本表",
+    "由具体工作活动定义的3至5个职业方向假设",
+    "岗位日常任务、交付物、协作对象和进入要求对照表",
+    "用户画像证据与岗位要求及未知项的对应表",
+    "包含支持证据、反对证据和不确定性的3个优先方向",
+    "未来4周的信息访谈、工作样本、岗位申请和复盘安排"
+  ],
+  "quality_preferences": {
+    "coverage": "high",
+    "cross_domain_comparison": "required_when_target_open",
+    "evidence_grounding": "required",
+    "uncertainty_visible": true,
+    "profile_scenario_leakage": "reject",
+    "max_skill_candidates": 12,
+    "target_skill_candidates": 8
+  },
+  "composition_preferences": {
+    "topology": "parallel_first",
+    "min_standalone_ratio": 0.6,
+    "min_root_ratio": 0.5,
+    "max_required_dependency_depth": 3
+  }
 }

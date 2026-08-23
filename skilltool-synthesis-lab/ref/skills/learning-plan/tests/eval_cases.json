@@ -1,0 +1,121 @@
+{
+  "skill_id": "learning-plan",
+  "positive_cases": [
+    {
+      "id": "pos_happy_path_with_refs",
+      "user_query": "Build a staged learning plan from the competency model and baseline assessment we produced for LLM Agent engineer.",
+      "available_context": {
+        "model_ref": "<workspace>/action_artifacts/career-competency-model-<uid>.json (CareerCompetencyModel canonical with model.target.role = 'LLM Agent 工程师')",
+        "baseline_ref": "<workspace>/action_artifacts/baseline-assessment-<uid>.json (BaselineAssessment canonical with assessment.assessment_target.name = 'LLM Agent 工程师')",
+        "constraints": "available_time_per_week: '10 小时', deadline: '2027-02-15' (user stated)"
+      },
+      "expected_outcome": "success",
+      "required_tool_calls": ["Read", "Write", "Read", "ReturnSkillResult"],
+      "forbidden_tool_calls": ["WebSearch", "WebFetch"],
+      "must_include": ["prioritized_gaps", "stages", "lineage", "expected_depth", "delta"],
+      "must_not_include": ["course recommendation", "daily schedule", "reassess"]
+    },
+    {
+      "id": "pos_goal_level_lowers_target",
+      "user_query": "我目标只是先达到能入门的水平，按这个目标排学习计划。",
+      "available_context": {
+        "model_ref": "<CareerCompetencyModel canonical>",
+        "baseline_ref": "<BaselineAssessment canonical>",
+        "goal_level": "working (user stated entry-level goal)",
+        "constraints": "available_time_per_week: '6 小时', deadline: null (user explicitly said no deadline)"
+      },
+      "expected_outcome": "success",
+      "must_include": ["goal_level", "working", "expected_depth", "market", "anchor"],
+      "must_not_include": ["advanced target", "invented deadline"]
+    },
+    {
+      "id": "pos_small_gap_set_merges_stages",
+      "user_query": "Based on the model and baseline already in this conversation, plan my next steps.",
+      "available_context": {
+        "model_ref": "<CareerCompetencyModel canonical>",
+        "baseline_ref": "<BaselineAssessment canonical>",
+        "goal_level": "absent (market-aligned)",
+        "constraints": "available_time_per_week: '15 小时', deadline: '2026-10-01'",
+        "baseline_has_few_shallow_gaps": "Only two shallow gaps exist; most competencies are met."
+      },
+      "expected_outcome": "success",
+      "must_include": ["stages", "merged", "skipped"],
+      "must_not_include": ["met competency in gaps", "empty stage"]
+    }
+  ],
+  "insufficient_input_cases": [
+    {
+      "id": "insufficient_no_upstream_artifacts",
+      "user_query": "Create a learning plan for becoming a data engineer.",
+      "available_context": {},
+      "expected_outcome": "insufficient_input",
+      "forbidden_tool_calls": ["Write"],
+      "must_include": ["insufficiency", "model", "baseline"],
+      "must_not_include": ["research the occupation", "build model", "assess user"]
+    },
+    {
+      "id": "insufficient_mismatched_targets",
+      "user_query": "Plan my learning from the model and baseline we have.",
+      "available_context": {
+        "model_ref": "<CareerCompetencyModel canonical for 'LLM Agent 工程师'>",
+        "baseline_ref": "<BaselineAssessment canonical for '数据分析师'>"
+      },
+      "expected_outcome": "insufficient_input",
+      "forbidden_tool_calls": ["Write"],
+      "must_include": ["mismatch", "different targets"],
+      "must_not_include": ["assume same target"]
+    },
+    {
+      "id": "insufficient_unusably_stale",
+      "user_query": "Use the old artifacts from before to make a learning plan.",
+      "available_context": {
+        "model_ref": "<CareerCompetencyModel canonical, methodology.as_of = three years ago>",
+        "baseline_ref": "<BaselineAssessment canonical>",
+        "conversation_signal": "User said they changed jobs twice since that assessment and their target industry shifted."
+      },
+      "expected_outcome": "insufficient_input",
+      "forbidden_tool_calls": ["Write"],
+      "must_include": ["stale", "changed", "insufficiency"],
+      "must_not_include": ["proceed with plan", "ignore the change"]
+    }
+  ],
+  "boundary_cases": [
+    {
+      "id": "boundary_no_course_or_schedule",
+      "user_query": "Plan my learning path and also recommend specific Udemy courses and a daily study schedule.",
+      "available_context": {
+        "model_ref": "<CareerCompetencyModel canonical>",
+        "baseline_ref": "<BaselineAssessment canonical>",
+        "constraints": "available_time_per_week: '8 小时', deadline: null"
+      },
+      "expected_outcome": "success",
+      "forbidden_tool_calls": ["WebSearch", "WebFetch"],
+      "must_include": ["stages", "prioritized_gaps", "limitations"],
+      "must_not_include": ["Udemy", "course link", "daily schedule", "hour-by-hour"]
+    },
+    {
+      "id": "boundary_missing_constraints_not_invented",
+      "user_query": "Build a learning plan from the artifacts in this conversation.",
+      "available_context": {
+        "model_ref": "<CareerCompetencyModel canonical>",
+        "baseline_ref": "<BaselineAssessment canonical>",
+        "constraints": "available_time_per_week: '10 小时', deadline: null (deadline was stated as unknown)"
+      },
+      "expected_outcome": "success",
+      "must_include": ["assumptions", "estimate"],
+      "must_not_include": ["invented weekly hours", "assumed personal schedule"]
+    },
+    {
+      "id": "boundary_met_competencies_excluded",
+      "user_query": "List everything I need to improve for this role.",
+      "available_context": {
+        "model_ref": "<CareerCompetencyModel canonical>",
+        "baseline_ref": "<BaselineAssessment canonical, several competencies already at or above expected depth>",
+        "constraints": "available_time_per_week: '12 小时', deadline: '2027-01-01'"
+      },
+      "expected_outcome": "success",
+      "must_include": ["prioritized_gaps", "met excluded"],
+      "must_not_include": ["met competency as gap", "plan for already-satisfied competency"]
+    }
+  ]
+}

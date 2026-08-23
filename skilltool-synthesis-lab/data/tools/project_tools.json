@@ -1,7 +1,12 @@
 {
-  "catalog_version": "2026-08-15",
+  "catalog_version": "2026-08-22",
   "source_of_truth": "CrescoAI-Backend/backend/src/tools.ts#getAllBaseTools",
   "snapshot_policy": "独立快照，不在运行时导入主程序；项目工具变化后需显式刷新此文件。",
+  "catalog_scope": {
+    "includes": "getAllBaseTools 中已有实现的内置工具，包括受平台、环境变量或 feature flag 控制的条件工具。",
+    "excludes": "MCP 工具、递归 Skill 入口、Harness 生命周期协议工具、测试专用工具，以及当前源码中实现为空或缺失的条件占位工具。",
+    "runtime_note": "availability 描述工具进入当前运行时所需的条件；合成结果仍须由目标 Harness 在执行时校验工具是否启用。"
+  },
   "selection_policy": {
     "default": "none",
     "rule": "SkillTool 只能选择完成业务目标确实需要的工具；不因工具存在而选用。",
@@ -15,10 +20,23 @@
     {"name": "generatedSkillActionTools", "reason": "由 Skill 合成得到的动作工具集合"},
     {"name": "BaselineAssessment", "reason": "已生成的 SkillActionTool 示例"}
   ],
+  "excluded_mcp_tools": [
+    {"name": "ListMcpResourcesTool", "reason": "MCP 资源发现工具，不属于本目录范围"},
+    {"name": "ReadMcpResourceTool", "reason": "MCP 资源读取工具，不属于本目录范围"},
+    {"name": "mcp__*", "reason": "由 MCP 服务动态注入的工具统一排除"}
+  ],
+  "excluded_unavailable_tools": [
+    {"name": "OverflowTest", "reason": "当前恢复源码仅为空占位，并且只用于测试"},
+    {"name": "CtxInspect", "reason": "当前恢复源码缺少工具实现"},
+    {"name": "WebBrowser", "reason": "当前恢复源码缺少工具实现"},
+    {"name": "ListPeers", "reason": "当前恢复源码缺少工具实现"},
+    {"name": "Monitor", "reason": "当前恢复源码仅为空占位"},
+    {"name": "TestingPermission", "reason": "仅在 NODE_ENV=test 时注册的测试工具"}
+  ],
   "tools": [
     {"name":"Agent","category":"delegation","description":"启动通用子代理处理独立任务。","availability":"base"},
     {"name":"TaskOutput","category":"delegation","description":"读取后台任务或子代理输出。","availability":"base"},
-    {"name":"Bash","category":"execution","description":"执行受控 shell 命令。","availability":"base_non_windows"},
+    {"name":"Bash","category":"execution","description":"执行受控 shell 命令。","availability":"base"},
     {"name":"PowerShell","category":"execution","description":"在 Windows 环境执行受控 PowerShell 命令。","availability":"windows_conditional"},
     {"name":"REPL","category":"execution","description":"执行交互式分析代码。","availability":"ant_only"},
     {"name":"Read","category":"filesystem","description":"读取文本、代码、文档或图片文件。","availability":"base"},
@@ -30,9 +48,6 @@
     {"name":"LSP","category":"code_intelligence","description":"查询代码符号、定义和引用。","availability":"feature_flag"},
     {"name":"WebSearch","category":"web","description":"搜索公开网络并返回带来源的结果。","availability":"base"},
     {"name":"WebFetch","category":"web","description":"读取指定网页内容。","availability":"base"},
-    {"name":"WebBrowser","category":"web","description":"操作浏览器完成需要交互的网页任务。","availability":"feature_flag"},
-    {"name":"ListMcpResourcesTool","category":"mcp","description":"列出已连接 MCP 服务的资源。","availability":"base"},
-    {"name":"ReadMcpResourceTool","category":"mcp","description":"读取一个明确的 MCP 资源。","availability":"base"},
     {"name":"ToolSearch","category":"discovery","description":"按需发现延迟加载的普通工具；不得用于发现 Skill。","availability":"tool_search_enabled"},
     {"name":"AskUserQuestion","category":"interaction","description":"关键输入缺失时向用户提出结构化问题。","availability":"base"},
     {"name":"SendUserMessage","category":"interaction","description":"向用户发送阶段性消息或请求。","availability":"base"},
@@ -63,7 +78,6 @@
     {"name":"CronDelete","category":"scheduling","description":"删除定时任务。","availability":"agent_triggers"},
     {"name":"CronList","category":"scheduling","description":"列出定时任务。","availability":"agent_triggers"},
     {"name":"RemoteTrigger","category":"scheduling","description":"创建远程触发器。","availability":"remote_triggers"},
-    {"name":"Monitor","category":"monitoring","description":"持续监控外部状态。","availability":"feature_flag"},
     {"name":"SubscribePR","category":"monitoring","description":"订阅 GitHub PR 事件。","availability":"github_webhooks"},
     {"name":"SuggestBackgroundPR","category":"development","description":"建议把变更转为后台 PR。","availability":"ant_only"},
     {"name":"snip","category":"conversation","description":"裁剪不再需要的历史上下文。","availability":"feature_flag"}

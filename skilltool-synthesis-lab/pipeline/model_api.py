@@ -61,15 +61,13 @@ def extract_json(text: str) -> Any:
     try:
         return json.loads(cleaned)
     except json.JSONDecodeError:
-        decoder = json.JSONDecoder()
-        for index, char in enumerate(cleaned):
-            if char not in "[{":
-                continue
+        indexes = [index for index in (cleaned.find("{"), cleaned.find("[")) if index >= 0]
+        if indexes:
             try:
-                value, _ = decoder.raw_decode(cleaned[index:])
+                value, _ = json.JSONDecoder().raw_decode(cleaned[min(indexes):])
                 return value
             except json.JSONDecodeError:
-                continue
+                pass
     raise ModelAPIError("model response did not contain valid JSON")
 
 
@@ -83,6 +81,8 @@ class OpenAICompatibleModel:
         config.validate()
         self.config = config
         self.transport = transport or self._default_transport
+        self.last_trace: dict[str, Any] = {}
+        self.max_tokens_override: int | None = None
 
     @staticmethod
     def _default_transport(request: urllib.request.Request, timeout: int) -> bytes:
@@ -93,7 +93,7 @@ class OpenAICompatibleModel:
         payload = {
             "model": self.config.model,
             "temperature": self.config.temperature,
-            "max_tokens": self.config.max_tokens,
+            "max_tokens": self.max_tokens_override or self.config.max_tokens,
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
@@ -115,9 +115,17 @@ class OpenAICompatibleModel:
             raise ModelAPIError(f"model API returned HTTP {error.code}: {detail[:1000]}") from error
         except (urllib.error.URLError, TimeoutError, OSError) as error:
             raise ModelAPIError(f"model API request failed: {error}") from error
+        raw_text = raw.decode("utf-8", errors="replace")
+        self.last_trace = {
+            "provider": "openai_compatible",
+            "endpoint": chat_completions_url(self.config.base_url),
+            "request": payload,
+            "raw_response": raw_text,
+        }
         try:
-            response = json.loads(raw.decode("utf-8"))
-            content = response["choices"][0]["message"]["content"]
+            response = json.loads(raw_text)
+            choice = response["choices"][0]
+            content = choice["message"]["content"]
             if isinstance(content, list):
                 content = "".join(
                     str(part.get("text", ""))
@@ -128,4 +136,68 @@ class OpenAICompatibleModel:
                 raise TypeError("message content is not text")
         except (KeyError, IndexError, TypeError, json.JSONDecodeError) as error:
             raise ModelAPIError("model API returned an unsupported response shape") from error
-        return extract_json(content)
+        self.last_trace["finish_reason"] = choice.get("finish_reason")
+        self.last_trace["response_content"] = content
+        if choice.get("finish_reason") == "length":
+            raise ModelAPIError("model response was truncated because max_tokens was reached")
+        try:
+            return extract_json(content)
+        except ModelAPIError as original_error:
+            repair_payload = {
+                "model": self.config.model,
+                "temperature": 0,
+                "max_tokens": self.max_tokens_override or self.config.max_tokens,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": (
+                            "Repair the supplied malformed JSON. Preserve all fields and values, "
+                            "change only JSON syntax, and return exactly one valid JSON value with "
+                            "no markdown fence or commentary."
+                        ),
+                    },
+                    {"role": "user", "content": content},
+                ],
+            }
+            repair_request = urllib.request.Request(
+                chat_completions_url(self.config.base_url),
+                data=json.dumps(repair_payload, ensure_ascii=False).encode("utf-8"),
+                headers=headers,
+                method="POST",
+            )
+            try:
+                repair_raw = self.transport(repair_request, self.config.timeout_seconds)
+            except urllib.error.HTTPError as error:
+                detail = error.read().decode("utf-8", errors="replace")
+                raise ModelAPIError(
+                    f"JSON repair request returned HTTP {error.code}: {detail[:1000]}"
+                ) from original_error
+            except (urllib.error.URLError, TimeoutError, OSError) as error:
+                raise ModelAPIError(f"JSON repair request failed: {error}") from original_error
+            repair_raw_text = repair_raw.decode("utf-8", errors="replace")
+            try:
+                repair_response = json.loads(repair_raw_text)
+                repair_choice = repair_response["choices"][0]
+                repaired_content = repair_choice["message"]["content"]
+                if isinstance(repaired_content, list):
+                    repaired_content = "".join(
+                        str(part.get("text", ""))
+                        for part in repaired_content
+                        if isinstance(part, dict)
+                    )
+                if not isinstance(repaired_content, str):
+                    raise TypeError("repair message content is not text")
+            except (KeyError, IndexError, TypeError, json.JSONDecodeError) as error:
+                raise ModelAPIError("JSON repair returned an unsupported response shape") from error
+            self.last_trace["json_repair"] = {
+                "request": repair_payload,
+                "raw_response": repair_raw_text,
+                "finish_reason": repair_choice.get("finish_reason"),
+                "response_content": repaired_content,
+            }
+            if repair_choice.get("finish_reason") == "length":
+                raise ModelAPIError("JSON repair response was truncated") from original_error
+            try:
+                return extract_json(repaired_content)
+            except ModelAPIError as repair_error:
+                raise ModelAPIError("model response remained invalid after one JSON repair") from repair_error

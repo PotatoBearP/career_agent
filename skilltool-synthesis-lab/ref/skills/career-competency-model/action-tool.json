@@ -1,0 +1,15 @@
+{
+  "tool_name": "CareerCompetencyModel",
+  "user_facing_name": "Career competency model",
+  "search_hint": "research current role competency requirements from web evidence",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "input": {
+    "career_target": {
+      "type": "string",
+      "required": true,
+      "description": "Clearly scoped career or job target. Include known industry, region, seniority, or specialization in the same string."
+    }
+  }
+}

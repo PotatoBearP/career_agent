@@ -1,40 +1,162 @@
 {
   "profile_id": "profile-computer-graduate-001",
-  "profile_version": "2.0",
-  "identity": {"persona": "计算机专业硕士研究生", "location": "中国", "languages": ["中文", "英文技术阅读"], "graduation_window": "12-18个月"},
-  "education": {"degree": "硕士在读", "major": "计算机科学与技术", "coursework": ["机器学习", "数据结构", "软件工程", "自然语言处理"], "research_mode": "应用研究为主", "evidence_confidence": "medium"},
+  "profile_version": "2.1",
+  "identity": {
+    "persona": "距离毕业12至18个月、尚无正式实习经历的计算机专业硕士研究生",
+    "location": "中国，求职地点优先考虑上海、杭州和深圳",
+    "languages": [
+      "中文工作沟通",
+      "英文论文、技术文档和岗位材料阅读"
+    ],
+    "graduation_window": "12-18个月"
+  },
+  "education": {
+    "degree": "硕士在读",
+    "major": "计算机科学与技术",
+    "coursework": [
+      "机器学习课程及模型实验",
+      "数据结构与算法课程",
+      "软件工程课程及原型开发",
+      "自然语言处理课程及相关项目"
+    ],
+    "research_mode": "以论文检索、模型实验、结果分析和技术报告为主，尚缺少生产环境和真实业务验证",
+    "evidence_confidence": "medium"
+  },
   "capability_evidence": [
-    {"capability": "Python", "level": "applied", "evidence": ["课程项目", "研究代码"], "confidence": "medium"},
-    {"capability": "PyTorch", "level": "applied", "evidence": ["模型训练实验"], "confidence": "medium"},
-    {"capability": "软件开发", "level": "foundational", "evidence": ["问答原型"], "confidence": "low"},
-    {"capability": "研究与分析", "level": "applied", "evidence": ["论文检索", "实验设计", "技术报告"], "confidence": "medium"},
-    {"capability": "商业问题理解", "level": "unknown", "evidence": [], "confidence": "low"}
+    {
+      "capability": "Python",
+      "level": "applied",
+      "evidence": [
+        "使用Python完成课程项目",
+        "使用Python编写研究实验代码"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "capability": "PyTorch",
+      "level": "applied",
+      "evidence": [
+        "使用PyTorch完成模型训练实验，但尚无生产部署或性能优化证据"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "capability": "软件开发",
+      "level": "foundational",
+      "evidence": [
+        "独立实现可运行的校园知识库问答原型，但尚无多人协作、自动化测试和线上部署证据"
+      ],
+      "confidence": "low"
+    },
+    {
+      "capability": "研究与分析",
+      "level": "applied",
+      "evidence": [
+        "围绕研究问题检索和整理论文",
+        "设计并执行模型对比实验",
+        "整理实验结果并撰写技术报告"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "capability": "商业问题理解",
+      "level": "unknown",
+      "evidence": [],
+      "confidence": "low"
+    }
   ],
   "experience": {
     "internships": [],
     "projects": [
-      {"name": "图像分类课程项目", "role": "独立完成", "outcome_evidence": "课程验收", "transferability": "unvalidated"},
-      {"name": "校园知识库问答原型", "role": "方案与实现", "outcome_evidence": "可运行原型", "transferability": "unvalidated"}
+      {
+        "name": "图像分类课程项目",
+        "role": "独立完成数据处理、模型训练和结果汇报",
+        "outcome_evidence": "项目通过课程验收，但缺少公开代码、外部用户和真实业务指标",
+        "transferability": "可以证明基础模型实验能力，尚不能证明对真实岗位开发流程的适应性"
+      },
+      {
+        "name": "校园知识库问答原型",
+        "role": "独立完成方案设计和可运行原型实现",
+        "outcome_evidence": "形成可运行原型，但暂无真实用户使用、多人协作或部署运行证据",
+        "transferability": "可以作为端到端实现证据，工程质量、产品价值和业务迁移性仍待验证"
+      }
     ],
-    "public_outputs": [], "collaboration_exposure": "limited"
+    "public_outputs": [],
+    "collaboration_exposure": "主要为个人课程和研究任务，缺少跨职能团队、正式开发流程和外部利益相关者协作经历"
   },
   "motivations_and_values": {
-    "motivators": ["解决复杂问题", "持续学习", "工作成果可见"],
-    "values": ["成长反馈", "工作自主性", "有意义的产品或研究影响"],
-    "anti_preferences": ["长期重复性工作", "完全缺少反馈的环境"], "confidence": "medium"
+    "motivators": [
+      "处理需要分析、实验或设计方案的复杂问题",
+      "在项目推进过程中持续学习新方法",
+      "能够看到代码、实验或方案被实际采用"
+    ],
+    "values": [
+      "能够从导师、同事、用户或业务结果中获得明确反馈",
+      "在目标明确的前提下保留一定方案自主权",
+      "工作成果能够对真实产品、研究问题或使用者产生可观察影响"
+    ],
+    "anti_preferences": [
+      "长期执行内容和判断空间都很少的重复任务",
+      "长期无法获得结果、用户或团队反馈的工作环境"
+    ],
+    "confidence": "medium"
   },
   "work_preferences": {
-    "locations": ["上海", "杭州", "深圳"], "organization_types": ["成长型公司", "成熟科技公司", "研究型组织"],
-    "work_modes": ["需要一定技术深度", "允许跨职能协作"], "risk_tolerance": "medium", "compensation_priority": "important_but_not_primary"
+    "locations": [
+      "上海",
+      "杭州",
+      "深圳"
+    ],
+    "organization_types": [
+      "能够参与核心项目并接触真实业务的成长型公司",
+      "具有较完整培养和协作流程的成熟科技公司",
+      "能够参与实际研究项目并产生公开或内部成果的研究型组织"
+    ],
+    "work_modes": [
+      "工作中包含需要理解原理、分析问题或实现系统的技术任务",
+      "能够与产品、研究、工程或业务人员进行跨职能协作"
+    ],
+    "risk_tolerance": "可以接受中等程度的业务和岗位不确定性，但需要存在可观察的成长反馈与退出路径",
+    "compensation_priority": "薪酬重要，但不会在工作内容、成长机会和团队环境明显不合适时单独决定选择"
   },
   "learning_and_decision_style": {
-    "learning_style": ["通过项目学习", "先建立框架再深入"], "decision_style": "先发散收集证据，再用小实验收敛",
-    "common_biases": ["容易把专业背景当成唯一方向", "可能高估课程项目的岗位迁移性"], "feedback_preference": "具体、基于证据、可以转化为行动"
+    "learning_style": [
+      "通过实现原型、完成实验或解决具体问题学习",
+      "先比较多个方向的基本结构，再对有证据支持的方向深入"
+    ],
+    "decision_style": "先查看真实岗位和从业者信息形成假设，再通过信息访谈、短期项目或实习投递验证",
+    "common_biases": [
+      "可能因为计算机专业和模型实验经历而过早把算法岗位视为默认选择",
+      "可能将课程验收或原型可运行高估为满足正式岗位工程要求的证据"
+    ],
+    "feedback_preference": "希望获得针对具体岗位、项目材料和行动结果的反馈，并能据此决定下一步继续、调整或停止"
   },
   "life_context_and_constraints": {
-    "time_budget_per_week": "8-12小时用于职业探索", "financial_runway": "未提供", "mobility": "可考虑异地，但优先目标城市",
-    "hard_constraints": ["需要在毕业前获得真实工作场景证据"], "soft_constraints": ["缺少正式实习", "行业信息来源零散"]
+    "time_budget_per_week": "每周可投入8至12小时，适合安排岗位研究、一次信息访谈或一个小型工作样本",
+    "financial_runway": "未提供，涉及低薪实习、异地成本或延迟就业时需要进一步确认",
+    "mobility": "可以考虑异地求职，但优先验证上海、杭州和深圳的机会",
+    "hard_constraints": [
+      "需要在毕业前通过实习、真实项目、从业者反馈或岗位申请获得至少一种工作场景证据"
+    ],
+    "soft_constraints": [
+      "没有正式实习经历，需要补充团队协作和真实交付证据",
+      "目前主要通过零散岗位信息理解职业，尚未形成稳定的信息来源和比较方法"
+    ]
   },
-  "unknowns": ["希望服务的业务问题与人群", "研究、工程、产品、咨询等工作形态的真实偏好", "能力在不同产业中的可迁移性", "压力、协作和模糊环境下的表现", "薪酬、稳定性、成长性之间的真实权重"],
-  "profile_boundaries": {"facts_only": true, "must_not_infer": ["目标行业", "目标岗位", "目标赛道"], "note": "专业和已有项目只是个人证据，不等于场景方向。"}
+  "unknowns": [
+    "相较于模型实验、系统开发、需求分析和跨团队协调，用户更愿意长期承担哪类日常任务",
+    "用户更适合以论文和实验结果、可运行系统、产品指标还是客户问题解决作为主要工作成果",
+    "课程项目和研究代码能否满足真实岗位对代码质量、协作、部署和交付的要求",
+    "用户在紧迫期限、多人协作、需求变化和任务模糊情况下的实际表现",
+    "当薪酬、稳定性、技术成长和工作内容发生冲突时，用户会如何排序"
+  ],
+  "profile_boundaries": {
+    "facts_only": true,
+    "must_not_infer": [
+      "目标行业",
+      "目标岗位",
+      "目标赛道"
+    ],
+    "note": "计算机专业、Python、PyTorch和问答原型只能作为已有证据；算法、工程、产品技术等方向均需要通过真实岗位、工作样本或实践反馈验证。"
+  }
 }

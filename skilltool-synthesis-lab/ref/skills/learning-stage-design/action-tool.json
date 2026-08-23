@@ -1,0 +1,20 @@
+{
+  "tool_name": "LearningStageDesign",
+  "user_facing_name": "Learning stage design",
+  "search_hint": "turn the current activated learning-plan stage into an executable learning package",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "input": {
+    "plan_id": {
+      "type": "string",
+      "required": false,
+      "description": "Optional logical plan ID. Omit to use the current focus plan."
+    },
+    "constraints": {
+      "type": "json",
+      "required": false,
+      "description": "Only constraints explicitly stated by the user for this stage, such as available_time, resource_constraints, learning_preferences, or notes."
+    }
+  }
+}

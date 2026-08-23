@@ -1,0 +1,82 @@
+{
+  "original_metadata": {
+    "skill_id": "learning-plan",
+    "name": "LearningPlan",
+    "type": "career_development_plan",
+    "kag_role": "skill_action",
+    "description": "对比目标职业能力模型与用户当前能力基线，识别并排序真实差距，组织成阶段化学习路径并输出 LearningPlan artifact。",
+    "inputs": [
+      "model_ref",
+      "baseline_ref",
+      "goal_level",
+      "constraints"
+    ],
+    "outputs": [
+      "LearningPlan artifact"
+    ],
+    "preconditions": [
+      "上游已产出 CareerCompetencyModel 与 BaselineAssessment 产物",
+      "用户已提供每周可投入时间与期限（或明确表示无期限）"
+    ],
+    "postconditions": [
+      "独立 JSON artifact 已写入工作区并通过 ReturnSkillResult 返回引用"
+    ],
+    "possible_next_skills": [],
+    "required_context_types": [],
+    "allowed_tools": [
+      "Read",
+      "Write",
+      "ReturnSkillResult"
+    ],
+    "recommended_verifiers": [
+      "gap_calculation_check",
+      "lineage_validation_check",
+      "boundary_compliance_check",
+      "artifact_integrity_check"
+    ]
+  },
+  "compiled_metadata": {
+    "skill_id": "learning-plan",
+    "claude_skill_name": "learning-plan",
+    "display_name": "LearningPlan",
+    "type": "career_development_plan",
+    "kag_role": "skill_action",
+    "summary": "Bridges a CareerCompetencyModel and a BaselineAssessment into a prioritized, stage-based LearningPlan artifact.",
+    "minimum_required_inputs": [
+      "constraints"
+    ],
+    "optional_inputs": [
+      "model_ref",
+      "baseline_ref",
+      "goal_level"
+    ],
+    "required_context_types": [],
+    "allowed_tools": [
+      "Read",
+      "Write",
+      "ReturnSkillResult"
+    ],
+    "recommended_verifiers": [
+      "gap_calculation_check",
+      "lineage_validation_check",
+      "boundary_compliance_check",
+      "artifact_integrity_check"
+    ],
+    "trigger_examples": [
+      "基于我的能力模型和基线评估，制定一个分阶段学习计划。",
+      "Build a staged learning plan from the competency model and baseline assessment we just produced.",
+      "我每周能投入 10 小时，希望六个月内达到市场要求，帮我排一个学习路径。"
+    ],
+    "negative_trigger_examples": [
+      "Research what abilities this role requires from scratch.",
+      "Assess my current level for this role.",
+      "Recommend specific online courses for machine learning."
+    ],
+    "handoff_conditions": {},
+    "output_artifact_type": "LearningPlan",
+    "risk_level": "medium",
+    "requires_current_information": false,
+    "requires_user_profile": false,
+    "requires_external_evidence": false
+  }
+}

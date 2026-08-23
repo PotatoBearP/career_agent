@@ -1,0 +1,6 @@
+[
+  {"id":"demonstrated-advance","expected_outcome":"success","invariants":["uses only visible evidence","does not mutate state"]},
+  {"id":"partial-continue","expected_outcome":"success","invariants":["preserves remaining gaps","calibrates confidence"]},
+  {"id":"unavailable-evidence","expected_outcome":"insufficient_input","invariants":["does not read or search","does not ask"]},
+  {"id":"self-report-only","expected_outcome":"success_or_insufficient_input","invariants":["never claims high-confidence mastery"]}
+]
