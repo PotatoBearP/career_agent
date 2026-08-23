@@ -1,0 +1,26 @@
+{
+  "tool_name": "ListUnverifiedFactsForSupplement",
+  "user_facing_name": "列出需要补充或确认的事实",
+  "search_hint": "list facts the user must supply or confirm before submitting application materials",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "evidence_gap_analysis": {
+      "type": "json",
+      "required": true,
+      "description": "经历与要求对照结果，用于确认哪些能力或事实已有证据、哪些仍待补充"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "已确认的用户画像，作为判断事实缺失的基准"
+    },
+    "draft_materials": {
+      "type": "json",
+      "required": true,
+      "description": "用户已起草的申请材料文本，按文档名组织；未提供时直接基于画像和岗位要求列出待确认事实"
+    }
+  }
+}

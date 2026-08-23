@@ -1,0 +1,81 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把接下来的计划拆成这周要做的清单",
+    "available_context": {
+      "networking_action_plan": "包含 2026-W34 至 2026-W36 的计划窗口，三条计划项各有优先级和时长提示",
+      "current_week_label": "2026-W34",
+      "weekly_time_budget": "{\"total_hours\": 6, \"available_days\": [\"周一\", \"周二\", \"周三\"]}",
+      "current_tracking_records": "其中一条计划项已标记为已结束"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "返回非空 weekly_execution_checklist 数组",
+      "每个元素含 week_label、checklist_item、suggested_day、estimated_time、done_criteria",
+      "已结束的计划项不在清单中",
+      "所有清单项可回源到 networking_action_plan"
+    ],
+    "must_not_include": [
+      "计划中不存在的新建任务",
+      "任何发送、投递或外部系统修改动作"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_budget",
+    "user_query": "帮我排下这周能做什么",
+    "available_context": {
+      "networking_action_plan": "已提供包含计划窗口和计划项",
+      "current_week_label": "2026-W34",
+      "weekly_time_budget": "缺失或空对象",
+      "current_tracking_records": "{}"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "不返回 weekly_execution_checklist",
+      "明确指出缺少 weekly_time_budget 或其总时长/可用日不可解析"
+    ],
+    "must_not_include": [
+      "编造一个默认时间预算",
+      "按假定时长生成清单"
+    ]
+  },
+  {
+    "id": "boundary_week_outside_plan",
+    "user_query": "把计划拆成这周能做的事",
+    "available_context": {
+      "networking_action_plan": "计划窗口仅覆盖 2026-W32 至 2026-W33",
+      "current_week_label": "2026-W35",
+      "weekly_time_budget": "{\"total_hours\": 4, \"available_days\": [\"周四\", \"周五\"]}",
+      "current_tracking_records": "{}"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "不返回 weekly_execution_checklist",
+      "说明本周不在计划窗口内且没有过期未完成项"
+    ],
+    "must_not_include": [
+      "把计划外事项强行放入清单",
+      "自行延伸计划窗口"
+    ]
+  },
+  {
+    "id": "boundary_budget_overflow",
+    "user_query": "这周只有 2 小时，帮我排一下能做的事",
+    "available_context": {
+      "networking_action_plan": "三条计划项预估共需 5 小时，其中一条标记为核心优先级",
+      "current_week_label": "2026-W34",
+      "weekly_time_budget": "{\"total_hours\": 2, \"available_days\": [\"周二\"]}",
+      "current_tracking_records": "{}"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "weekly_execution_checklist 只包含核心优先级子集",
+      "清单项预估时间总和不超过 2 小时",
+      "suggested_day 限定在周三之外的周二可用日"
+    ],
+    "must_not_include": [
+      "把 5 小时任务压缩成 2 小时虚假估计",
+      "未经保留同时返回超出预算的全部三条项"
+    ]
+  }
+]

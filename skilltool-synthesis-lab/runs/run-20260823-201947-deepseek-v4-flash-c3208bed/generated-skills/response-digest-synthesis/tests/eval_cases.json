@@ -1,0 +1,59 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+    "available_context": {
+      "application_tracking_ledger": "包含两条机会记录：一条最新状态为面试邀约并带收到时间，一条最新状态为需要跟进",
+      "verified_opportunity_list": "包含两个与台账机会 id 匹配的机会对象",
+      "tailored_application_packages": "包含每个机会对应的投递材料",
+      "reply_handling_preferences": "包含标准响应天数和面试确认偏好"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "返回有序 response_action_digest 数组",
+      "面试邀约条目优先级高于需要跟进条目",
+      "每项含 source_opportunity_id、response_type、required_action、due_time、priority、source、updated_at"
+    ],
+    "must_not_include": [
+      "调用 WebSearch 或修改台账",
+      "虚构回复内容或日期"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_ledger",
+    "user_query": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+    "available_context": {
+      "application_tracking_ledger": "未提供或为空对象",
+      "verified_opportunity_list": "存在机会清单",
+      "tailored_application_packages": "存在材料包",
+      "reply_handling_preferences": "存在用户偏好"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可读取的台账记录",
+      "不猜测任何回复"
+    ],
+    "must_not_include": [
+      "生成伪造的回复待办条目",
+      "尝试从机会清单推断回复状态"
+    ]
+  },
+  {
+    "id": "boundary_ambiguous_due_time",
+    "user_query": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+    "available_context": {
+      "application_tracking_ledger": "面试邀约记录只有收到时间，没有面试截止日期",
+      "verified_opportunity_list": "有对应机会",
+      "tailored_application_packages": "有材料包",
+      "reply_handling_preferences": "没有提供面试确认的响应窗口"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "该面试邀约条目的 due_time 为“未明确”",
+      "该条仍归入高优先级并排在总览前列"
+    ],
+    "must_not_include": [
+      "自行编造一个具体的日期或截止时间"
+    ]
+  }
+]

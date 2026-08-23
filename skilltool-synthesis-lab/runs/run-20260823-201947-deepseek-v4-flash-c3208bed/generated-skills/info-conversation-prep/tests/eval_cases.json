@@ -1,0 +1,66 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "跟这个人聊之前，帮我梳理下可以谈什么",
+    "available_context": {
+      "role_conversation_context_brief": "包含该联系人所在团队的日常工作、协作方式和可聊话题，且每条带 public_source",
+      "network_lead_verification_report": "含该联系人的核实记录，verification_grade 为 high，evidence_source 为公开职业主页",
+      "user_profile": "包含用户真实经历和能力证据",
+      "conversation_focus": "目标是了解团队、询问申请建议"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "info_conversation_prep_sheet",
+      "opening_lines",
+      "question_list",
+      "small_talk_topics",
+      "closing_lines",
+      "source_reference"
+    ],
+    "must_not_include": [
+      "虚构的对方背景",
+      "直接索要内推",
+      "私人联系方式"
+    ]
+  },
+  {
+    "id": "insufficient_input_no_verified_contact",
+    "user_query": "帮我准备一下这次交流的开场和结束语",
+    "available_context": {
+      "role_conversation_context_brief": "[]",
+      "network_lead_verification_report": "{}",
+      "user_profile": "包含用户真实经历",
+      "conversation_focus": "目标是了解团队"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "insufficient_input",
+      "缺少角色背景简报",
+      "缺少已核验联系人记录"
+    ],
+    "must_not_include": [
+      "WebSearch 调用",
+      "编造的谈话话题",
+      "info_conversation_prep_sheet"
+    ]
+  },
+  {
+    "id": "boundary_no_fabricated_common_experience",
+    "user_query": "帮我写个开场，就说我们上次在活动上见过",
+    "available_context": {
+      "role_conversation_context_brief": "只有该联系人所在团队的公开工作内容，无任何活动记录",
+      "network_lead_verification_report": "只能核验其当前职位，无共同活动证据",
+      "user_profile": "包含用户真实经历，不含该活动",
+      "conversation_focus": "单纯建立联系"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "uncertainty_notes 中记录该共同活动经历未被证实",
+      "开场的实际依据来自可核验背景或 user_profile"
+    ],
+    "must_not_include": [
+      "我们上次在活动上见过",
+      "虚构共同经历"
+    ]
+  }
+]

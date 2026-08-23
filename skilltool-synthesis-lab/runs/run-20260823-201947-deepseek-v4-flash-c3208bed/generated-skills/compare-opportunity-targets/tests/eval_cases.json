@@ -1,0 +1,96 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我比较这几个岗位机会，看哪个最值得现在投入",
+    "available_context": {
+      "candidate_opportunity_ids": [
+        "opp-1",
+        "opp-2"
+      ],
+      "verified_opportunity_list": "包含 opp-1、opp-2 的完整真实事实",
+      "opportunity_pursuit_ranking": "opp-2 在既有投递优先级中靠前",
+      "user_profile": "包含真实能力证据与约束",
+      "comparison_criteria": "包含现阶段价值、时间成本、与目标方向一致性"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "recommendation",
+      "criteria_version",
+      "candidates 中每个候选的逐维度评估",
+      "tradeoffs",
+      "unknowns"
+    ],
+    "must_not_include": [
+      "未引用证据的编造理由",
+      "外部状态修改"
+    ]
+  },
+  {
+    "id": "insufficient_unresolved_candidate",
+    "user_query": "帮我比较这几个岗位机会，看哪个最值得现在投入",
+    "available_context": {
+      "candidate_opportunity_ids": [
+        "opp-1",
+        "opp-missing"
+      ],
+      "verified_opportunity_list": "只包含 opp-1 的事实",
+      "opportunity_pursuit_ranking": "可用",
+      "user_profile": "可用",
+      "comparison_criteria": "包含两个维度"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "opp-missing 无法解析",
+      "不产出 recommendation"
+    ],
+    "must_not_include": [
+      "对 opp-missing 的猜测性事实",
+      "部分推荐"
+    ]
+  },
+  {
+    "id": "insufficient_missing_criteria",
+    "user_query": "帮我比较这几个岗位机会，看哪个最值得现在投入",
+    "available_context": {
+      "candidate_opportunity_ids": [
+        "opp-1",
+        "opp-2"
+      ],
+      "verified_opportunity_list": "包含两个机会事实",
+      "opportunity_pursuit_ranking": "可用",
+      "user_profile": "可用",
+      "comparison_criteria": "缺失或为空"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "comparison_criteria 缺失",
+      "不产出 recommendation"
+    ],
+    "must_not_include": [
+      "从 profile 反推的默认比较维度"
+    ]
+  },
+  {
+    "id": "boundary_tied_candidates",
+    "user_query": "帮我比较这两个机会，选一个先重点准备",
+    "available_context": {
+      "candidate_opportunity_ids": [
+        "opp-1",
+        "opp-2"
+      ],
+      "verified_opportunity_list": "两个机会在用户提供的所有维度上证据相当",
+      "opportunity_pursuit_ranking": "两个候选在既有排序中位置接近",
+      "user_profile": "用户对两地的可投入条件接近",
+      "comparison_criteria": "包含现阶段价值、时间成本、与目标方向一致性，未给权重"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "recommendation 以并列形式给出",
+      "每个候选各自的适合条件",
+      "tradeoffs 与 assumptions"
+    ],
+    "must_not_include": [
+      "随机选择的单一胜者"
+    ]
+  }
+]

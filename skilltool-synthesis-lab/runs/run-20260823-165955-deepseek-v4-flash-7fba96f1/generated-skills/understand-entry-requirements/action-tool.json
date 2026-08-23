@@ -1,0 +1,39 @@
+{
+  "tool_name": "EntryRequirementsReport",
+  "user_facing_name": "了解目标方向的进入要求和成长路径",
+  "search_hint": "understand entry requirements, qualification gates, progression paths, and regional differences for a specific career direction",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [
+    "WebSearch",
+    "WebFetch"
+  ],
+  "input": {
+    "target_direction": {
+      "type": "string",
+      "required": true,
+      "description": "要了解进入要求的目标方向或岗位类型"
+    },
+    "target_region": {
+      "type": "string",
+      "required": true,
+      "description": "用户关心的目标地区，用于限定地区差异"
+    },
+    "target_level": {
+      "type": "string",
+      "required": true,
+      "description": "用户关心的职级或经验阶段，如入门、初级、中级；为空则覆盖主要阶段"
+    },
+    "entry_search_results": {
+      "type": "json",
+      "required": true,
+      "description": "公开来源中关于该方向任职要求、招聘门槛和成长路径的检索结果"
+    },
+    "entry_page_extracts": {
+      "type": "json",
+      "required": true,
+      "description": "筛选后的原文页面内容，用于核对具体任职条件和路径"
+    }
+  }
+}

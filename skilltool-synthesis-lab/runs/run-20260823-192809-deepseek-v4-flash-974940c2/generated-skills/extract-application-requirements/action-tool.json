@@ -1,0 +1,33 @@
+{
+  "tool_name": "ExtractApplicationRequirements",
+  "user_facing_name": "梳理岗位要求交什么材料",
+  "search_hint": "extract required application materials, formats, length limits, language, and deadlines from a job posting or verified opportunity",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [
+    "WebFetch"
+  ],
+  "input": {
+    "job_posting_text": {
+      "type": "string",
+      "required": true,
+      "description": "用户提供的岗位描述或材料要求文本，与已验证岗位清单中内容等价时可省略"
+    },
+    "job_posting_url": {
+      "type": "string",
+      "required": true,
+      "description": "可选：用户提供的岗位页面链接，用于抓取岗位描述"
+    },
+    "job_posting_content": {
+      "type": "string",
+      "required": true,
+      "description": "通过 WebFetch 从岗位链接抓取到的页面正文；仅在用户提供链接时生成"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "已验证的真实岗位机会清单，用于核对岗位标识和已有要求"
+    }
+  }
+}

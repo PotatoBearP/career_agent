@@ -1,0 +1,31 @@
+{
+  "tool_name": "ReviewOutreachDrafts",
+  "user_facing_name": "帮我把要发出去的消息再过一遍，标出不合适的地方",
+  "search_hint": "review contact message drafts for risk flags and suggested revisions before sending",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "contact_message_drafts": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是针对不同联系场景生成的待发送消息草稿"
+    },
+    "user_contact_rules": {
+      "type": "json",
+      "required": true,
+      "description": "用户对隐私、可透露信息、称呼方式和不想越过的界限的说明"
+    },
+    "message_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户偏好的语气、长度、用词习惯和希望避免的表达"
+    },
+    "network_lead_verification_report": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是待联系对象与渠道的事实核实结果，用于检查消息里有没有与事实不符的说法"
+    }
+  }
+}

@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 runs/*
 !runs/.gitkeep
+!runs/run-20260823-165955-deepseek-v4-flash-7fba96f1/
+!runs/run-20260823-192809-deepseek-v4-flash-974940c2/
+!runs/run-20260823-201947-deepseek-v4-flash-c3208bed/

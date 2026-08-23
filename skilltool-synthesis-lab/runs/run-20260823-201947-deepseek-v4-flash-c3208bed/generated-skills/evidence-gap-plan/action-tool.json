@@ -1,0 +1,31 @@
+{
+  "tool_name": "EvidenceGapPlan",
+  "user_facing_name": "帮我对照这些机会的要求，看看我还有哪些差距、补什么证据",
+  "search_hint": "compare user's existing truthful evidence against verified opportunity requirements and produce a gap-and-evidence plan",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的画像信息，包含真实经历和能力证据"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已经确认的真实机会清单，作为要求对照的目标"
+    },
+    "material_quality_report": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有投递材料的质量检查结果，用于判断哪些材料可以作为现有证据"
+    },
+    "user_evidence_input": {
+      "type": "json",
+      "required": true,
+      "description": "用户愿意提供的额外真实经历、课程、项目、成果、评价或其他证明材料"
+    }
+  }
+}

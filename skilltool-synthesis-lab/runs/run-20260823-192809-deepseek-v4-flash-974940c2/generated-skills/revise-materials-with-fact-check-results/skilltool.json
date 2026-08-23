@@ -1,0 +1,272 @@
+{
+  "skill_id": "revise_materials_with_fact_check_results",
+  "skill_name": "revise-materials-with-fact-check-results",
+  "tool_name": "ReviseMaterialsWithFactCheckResults",
+  "title": "按检查结果修订材料",
+  "business_goal": "把材料事实核验报告中的每条问题逐项落到待修订材料上，产出一版事实边界清晰的修订稿和逐条修改说明，供用户直接继续编辑或提交。",
+  "invocation_mode": "aggregate",
+  "composition": {
+    "required_prior_outputs": [
+      "fact_check_report"
+    ],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "用户已经拿到一份材料事实核验报告，并明确要求把核验发现的问题直接改掉、出一版修订稿时使用；不应在缺少核验报告、用户只要求重新检查材料，或用户只要求审查而非修改时使用。",
+  "reference_pattern": "借鉴 learning-progress-assessment 的冻结证据边界和 outcome_rules 做法，以及 learning-plan 对上游 artifact 作为不可变输入的消费方式；仅采用其结构模式，不复制其学习管理业务内容。",
+  "task_ids": [
+    "task_revise_materials_with_fact_check_results"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "explicit",
+    "explicit_domains": [
+      "岗位材料准备"
+    ],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "逐条解析 fact_check_report 中的问题位置、问题类型、事实依据和修改建议",
+      "只修改核验报告指向的文本片段，并保持未涉及内容不变",
+      "对照 user_profile 与核验报告的事实依据完成修订",
+      "输出 revised_materials 对象，包含修订后文本和每条修改的原因说明",
+      "对缺少证据、无法安全定稿的问题标记为待用户确认，不擅自补全"
+    ],
+    "excludes": [
+      "不重新开展材料事实核验或生成新的核验报告",
+      "不为修复问题而编造经历、数字、职责或成果",
+      "不修改用户画像、岗位事实或投递排序",
+      "不代替用户发送、提交或导出材料",
+      "不做格式排版、语言翻译或版式转换"
+    ]
+  },
+  "input_schema": {
+    "fact_check_report": {
+      "type": "object",
+      "required": true,
+      "description": "材料事实核验报告，包含问题位置、问题类型、事实依据和修改建议",
+      "source": "prior_skill_output",
+      "source_ref": "fact_check_report",
+      "available": true,
+      "acquisition": {
+        "mode": "prior_skill",
+        "provider": "task_fact_check_application_materials",
+        "fallback": null
+      }
+    },
+    "draft_materials": {
+      "type": "object",
+      "required": true,
+      "description": "用户提供的待修订申请材料，按文档名组织，包含简历、求职信和项目描述文本",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "已确认的用户画像，用于在修订时保持所有表述在事实范围内",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "revised_materials": {
+      "type": "object",
+      "description": "应用核验结果修订后的材料文本，以及每条修改对应的原因说明，便于用户核对后继续编辑或提交"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "apply fact check report findings to revise draft application materials within evidence bounds",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": false
+  },
+  "operating_model": {
+    "role": "事实边界受限的材料修订编辑：把核验报告的结论逐条落到具体文档片段上，不引入任何报告与画像之外的新事实。",
+    "hard_boundaries": [
+      "冻结证据边界：只使用 fact_check_report、draft_materials 和 user_profile 三个输入，不调用 Web、不读取其他文件或 Skill，不向用户补充提问后再重跑核验",
+      "每一次文本改动必须能追溯到 fact_check_report 中的一条问题；不得顺带改写报告未指出的内容",
+      "不得为修复被标记的问题而编造或推断新的经历、数字、职责、成果或技能",
+      "不得重新生成核验报告、缺口报告或任何新的诊断类产出",
+      "不得代替用户发送、提交或导出材料；所有输出先交回用户核对"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "校验输入并建立问题清单",
+        "instructions": [
+          "确认 fact_check_report 是包含问题条目的对象，且每条包含定位信息（文档名或段落位置）、问题类型、事实依据和修改建议",
+          "确认 draft_materials 是非空对象，且 fact_check_report 引用到的文档名能在 draft_materials 中找到",
+          "确认 user_profile 已提供，用于判断事实边界",
+          "把 report 的问题逐条列为 operation 清单，并为每条绑定 target_document"
+        ],
+        "success_criteria": [
+          "每条问题都能定位到 draft_materials 中的具体文档，或已明确标记为无法定位",
+          "无法定位时按 insufficient_input 处理，不猜测目标位置"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "为每条问题确定事实裁决",
+        "instructions": [
+          "对每条问题，取出 user_profile 与核验报告中的事实依据，判断该问题属于：无证据支撑、与画像冲突、夸大表述、表述不清晰或前后不一致",
+          "若画像或报告依据能给出正确事实，则记录替换文本",
+          "若找不到可信的替换事实，则判定为 pending_confirmation：删除该表述、保留原文并标注待确认，或留空请用户补充，绝不自创答案"
+        ],
+        "success_criteria": [
+          "每条问题都被归入可修订或待用户确认两类之一",
+          "待确认条目明确写出缺失事实是什么，而非给出猜测文本"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "逐文档应用修订",
+        "instructions": [
+          "对 draft_materials 的每个文档创建 revised_text 副本",
+          "只替换 fact_check_report 指向的片段：应用已裁决的替换文本，或删除无证据表述，或插入待确认占位说明",
+          "保持文档原有结构、语言、节序和未涉及内容不变",
+          "为每个改动生成 change 记录：原片段、新片段、对应问题、原因、事实依据、状态（applied 或 pending_confirmation）"
+        ],
+        "success_criteria": [
+          "所有被修改的片段都能对应到一条问题",
+          "所有 applied 改动的事实依据来自 user_profile 或 fact_check_report，未引入外部事实"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "组装并核验输出",
+        "instructions": [
+          "构造 revised_materials 对象：每个文档包含文档名、修订后文本和该文档的 changes 列表",
+          "核对每个 change 的状态、reason、fact_basis 与问题来源一致",
+          "确认输出对象中不存在未在 fact_check_report 中出现的改动",
+          "调用一次 ReturnSkillResult 返回修订结果，之后不再补充额外建议或执行其他操作"
+        ],
+        "success_criteria": [
+          "revised_materials 是一个可直接供用户编辑或提交的结构化对象",
+          "存在至少一条已应用或被明确拒绝的改动，或所有问题都处于待确认状态且有原因说明"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "核验报告建议优先采用，但当建议会引入画像之外的新事实时，改为删除问题表述或标记 pending_confirmation",
+      "当报告说某数字或职责夸大而画像没有可替代数值时，去掉该具体数值或职责表述，不自行估算",
+      "当报告指出前后不一致且画像能确定正确写法的，以画像写法为准并记录原因",
+      "当多处问题相互冲突时，按 user_profile 优先、核验报告事实依据其次的顺序裁决，并把冲突记录在 change.reason 中"
+    ],
+    "outcome_rules": {
+      "success": [
+        "fact_check_report、draft_materials、user_profile 三个输入齐备",
+        "report 中至少存在一条问题，且能定位到某个文档",
+        "输出对象中每个改动都能追溯到 report 中的一条问题",
+        "所有改动都落在事实边界内，或明确标记 pending_confirmation 并说明缺失证据"
+      ],
+      "insufficient_input": [
+        "fact_check_report 缺失、为空或不含任何问题条目",
+        "draft_materials 缺失、为空，或 report 中引用的文档名无法匹配任何文档",
+        "user_profile 缺失或无法提供任何可用于裁决的事实依据"
+      ],
+      "error": [
+        "无法把改动组合为结构合法的 revised_materials 对象",
+        "ReturnSkillResult 调用未被接受"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "逐一核对：每个 change 条目都存在对应的 fact_check_report 问题标识",
+      "逐一核对：所有 applied 改动的事实依据都来自 user_profile、核验报告事实依据或用户显式补充，未使用其他来源",
+      "确认 revised_materials 中不存在 report 之外的新增事实、数字或职责",
+      "确认每份文档的修订后文本保留了原结构，且未修改未被 report 标记的片段",
+      "确认未调用 WebSearch、WebFetch、Read、Write、Bash 或其他 Skill，仅使用输入快照和 ReturnSkillResult"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 4,
+    "rationale": "涉及对核验报告的逐条裁决、证据边界控制和多文档改写的一致性维护，属于有判断空间的编辑决策；同时业务边界清晰，不应再拆分为更小的子任务。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "运行环境在调用前已解析并注入 fact_check_report、draft_materials 和 user_profile 快照",
+      "不依赖任何主程序、数据库、文件系统路径或内部服务",
+      "对外唯一的工具输出是 ReturnSkillResult"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "检查出来的问题帮我都改掉，出一版修订稿",
+      "available_context": {
+        "fact_check_report": "包含两条问题：简历中某项目量化结果无证据支撑、求职信中项目名称与画像不一致，且每条含修改建议",
+        "draft_materials": "含 resume 和 cover_letter 两个文档，文本与 report 定位匹配",
+        "user_profile": "包含该项目真实角色、真实结果范围和正确项目名称"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "revised_materials 中两个文档均有修订后文本",
+        "每个变化条目都能指向报告中的对应问题并获得事实依据"
+      ],
+      "must_not_include": [
+        "未在报告或画像中出现的新数字或新职责"
+      ]
+    },
+    {
+      "id": "insufficient_input_missing_report",
+      "user_query": "既然发现了几处不一致，那就请帮我改好再给我",
+      "available_context": {
+        "fact_check_report": "未提供或为空",
+        "draft_materials": "提供了简历和求职信草稿",
+        "user_profile": "已提供"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "说明缺少可应用的核验结论，无法执行修订"
+      ],
+      "must_not_include": [
+        "基于猜测自行修改材料"
+      ]
+    },
+    {
+      "id": "boundary_unresolvable_claim",
+      "user_query": "报告说我的项目经历夸大了，帮我在求取信里修好",
+      "available_context": {
+        "fact_check_report": "标记“主导了两个项目”为无证据支撑",
+        "draft_materials": "cover_letter 中存在该表述",
+        "user_profile": "没有可证明项目主导角色的任何信息"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "该表述被删除或标记 pending_confirmation 并说明缺少证据",
+        "change 记录中明确写出缺失事实内容"
+      ],
+      "must_not_include": [
+        "自创如“负责了一个项目”之类的替代事实"
+      ]
+    }
+  ]
+}

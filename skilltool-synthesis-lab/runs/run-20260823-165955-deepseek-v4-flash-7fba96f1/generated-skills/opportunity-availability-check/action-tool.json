@@ -1,0 +1,29 @@
+{
+  "tool_name": "OpportunityAvailabilityCheck",
+  "user_facing_name": "确认这些岗位机会是否仍然有效",
+  "search_hint": "确认这些岗位机会是否仍然有效：链接能否打开、是否仍在招聘期、是否已过期或下架",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [
+    "WebFetch",
+    "WebSearch"
+  ],
+  "input": {
+    "opportunities_to_check": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供的待确认岗位清单，每项含标题、组织、链接和已知信息"
+    },
+    "status_page_extracts": {
+      "type": "json",
+      "required": true,
+      "description": "从待确认链接取得的页面原文，用于判断链接可访问性与当前发布状态"
+    },
+    "status_search_results": {
+      "type": "json",
+      "required": true,
+      "description": "针对岗位名称与组织的补充检索结果，用于交叉确认机会是否仍在招聘期"
+    }
+  }
+}

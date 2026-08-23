@@ -1,0 +1,31 @@
+{
+  "tool_name": "TranslateApplicationMaterial",
+  "user_facing_name": "把材料翻译成指定语言",
+  "search_hint": "translate finalized application material into a specified language with fact preservation and term confirmation notes",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "tailored_resume": {
+      "type": "json",
+      "required": true,
+      "description": "已按目标岗位要求调整好的简历内容，作为翻译对象"
+    },
+    "target_language": {
+      "type": "string",
+      "required": true,
+      "description": "用户指定的目标语言"
+    },
+    "translation_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户对专有名词保留策略、是否输出术语确认清单和目标读者的要求"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "已确认的用户画像，用于核对姓名、机构等专有信息的固定写法"
+    }
+  }
+}

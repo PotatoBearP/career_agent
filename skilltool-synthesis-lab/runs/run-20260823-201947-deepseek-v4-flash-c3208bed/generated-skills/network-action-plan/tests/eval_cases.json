@@ -1,0 +1,75 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我安排接下来几周的人脉跟进计划",
+    "available_context": {
+      "current_situation_snapshot": "包含已投递清单、已有联系人、待核验线索和当前进展的对象",
+      "opportunity_pursuit_ranking": "包含机会标识和优先顺序的数组",
+      "user_time_and_rules": "包含计划周期、每周可投入时间、偏好渠道和不可打扰时间的对象",
+      "user_profile": "包含用户真实偏好和约束的对象"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "networking_action_plan 含 plan_window、actions、milestones、checkpoints、constraints_version",
+      "动作按机会优先级和依赖关系有序排列",
+      "所有排程时间和渠道来自用户输入"
+    ],
+    "must_not_include": [
+      "实际发送或投递指令",
+      "模型自造的每周时间或联系上限"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_snapshot",
+    "user_query": "帮我做个计划，什么时候联系谁、什么时候跟进",
+    "available_context": {
+      "current_situation_snapshot": "缺失",
+      "opportunity_pursuit_ranking": "已有",
+      "user_time_and_rules": "已有",
+      "user_profile": "已有"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确指出缺少 current_situation_snapshot",
+      "说明无法在不了解已投递和已联系情况的前提下排程"
+    ],
+    "must_not_include": [
+      "编造已投递清单或联系人"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_time_rules",
+    "user_query": "帮我安排接下来几周的人脉跟进计划",
+    "available_context": {
+      "current_situation_snapshot": "已有",
+      "opportunity_pursuit_ranking": "已有",
+      "user_time_and_rules": "缺少计划周期和每周可投入时间",
+      "user_profile": "已有"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确指出无法确定计划窗口和每周时间容量"
+    ],
+    "must_not_include": [
+      "默认假设每周可投入时长或固定周期"
+    ]
+  },
+  {
+    "id": "boundary_no_external_actions",
+    "user_query": "帮我安排接下来几周的人脉跟进计划",
+    "available_context": {
+      "current_situation_snapshot": "包含待联系和待跟进条目的现状对象",
+      "opportunity_pursuit_ranking": "包含多个机会的数组",
+      "user_time_and_rules": "包含周期、每周时间、渠道上限和不可打扰时间",
+      "user_profile": "包含用户偏好"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "所有外发联系动作被标记为待用户确认的草稿或提醒",
+      "计划中明确保留需要用户确认后才可执行的边界"
+    ],
+    "must_not_include": [
+      "任何自动发送、投递或撤回指令"
+    ]
+  }
+]

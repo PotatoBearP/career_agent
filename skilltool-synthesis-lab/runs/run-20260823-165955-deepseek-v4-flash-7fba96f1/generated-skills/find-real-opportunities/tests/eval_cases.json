@@ -1,0 +1,61 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我寻找符合我条件的真实岗位机会。",
+    "available_context": {
+      "opportunity_criteria": "{\"target_regions\":[\"样本地区\"],\"target_role\":\"样本岗位类型\",\"posted_within_days\":30}",
+      "opportunity_search_results": "[{\"title\":\"样本岗位甲\",\"organization\":\"样本组织甲\",\"url\":\"https://example.com/job-a\",\"snippet\":\"样本地区 样本组织甲 招聘样本岗位甲\"},{\"title\":\"无关岗位\",\"organization\":\"样本组织乙\",\"url\":\"https://example.com/job-other\"}]",
+      "opportunity_detail_extracts": "[{\"url\":\"https://example.com/job-a\",\"content\":\"样本组织甲 样本地区 发布于2026-01-10 职责：完成样本岗位核心工作 状态：招聘中\"}]",
+      "result_size_limit": 5
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "verified_opportunity_list 非空且仅含样本岗位甲",
+      "条目包含 source_url、organization、posted_at、location、work_content_summary、verification_status=verified",
+      "每条结果可追溯到原始链接"
+    ],
+    "must_not_include": [
+      "无详情页支撑的字段",
+      "关于用户是否适合该岗位的结论"
+    ]
+  },
+  {
+    "id": "insufficient_input_no_evidence",
+    "user_query": "帮我寻找符合我条件的真实岗位机会。",
+    "available_context": {
+      "opportunity_criteria": "{\"target_regions\":[\"样本地区\"],\"target_role\":\"样本岗位类型\"}",
+      "opportunity_search_results": "[]",
+      "opportunity_detail_extracts": "[]",
+      "result_size_limit": 5
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确返回 insufficient_input",
+      "说明检索结果与岗位详情页原文均缺失，无法产生候选清单"
+    ],
+    "must_not_include": [
+      "编造候选岗位",
+      "用通用岗位知识代替真实检索结果"
+    ]
+  },
+  {
+    "id": "boundary_dedupe_and_partial",
+    "user_query": "帮我寻找符合我条件的真实岗位机会，最多给 10 个。",
+    "available_context": {
+      "opportunity_criteria": "{\"target_regions\":[\"样本地区\"],\"target_role\":\"样本岗位类型\"}",
+      "opportunity_search_results": "[{\"title\":\"样本岗位甲\",\"organization\":\"样本组织甲\",\"url\":\"https://example.com/job-a\"},{\"title\":\"样本岗位甲（急招）\",\"organization\":\"样本组织甲\",\"url\":\"https://example.com/job-a\"},{\"title\":\"不符合条件的岗位\",\"organization\":\"样本组织丙\",\"url\":\"https://example.com/job-other\"}]",
+      "opportunity_detail_extracts": "[{\"url\":\"https://example.com/job-a\",\"content\":\"样本组织甲 样本地区 职责：样本岗位核心工作 页面未显示发布日期 状态：招聘中\"}]",
+      "result_size_limit": 10
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "同链接两条检索结果被合并为一条",
+      "不符合目标地区的岗位被排除",
+      "合并后条目 verification_status 为 partial，并注明发布时间缺失"
+    ],
+    "must_not_include": [
+      "同一链接出现重复条目",
+      "缺失发布时间的条目被视为 verified"
+    ]
+  }
+]

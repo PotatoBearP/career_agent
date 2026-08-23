@@ -1,0 +1,56 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把访谈目标改写成不同版本的约聊话术。",
+    "available_context": {
+      "interview_prep_kit": "包含访谈目标“了解该领域从业者的真实日常工作”和一个提问重点",
+      "outreach_context": "求职平台私信、对方为该领域从业者、语气不要太正式",
+      "user_profile": "包含已在读背景和一个可核验的项目事实"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "至少 2 版 draft_text",
+      "每版包含适用场合、语气特点、希望对方回应的点、注意事项"
+    ],
+    "must_not_include": [
+      "虚构的工作经历或对方身份",
+      "超出 interview_prep_kit 范围的访谈问题清单"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_outreach_context",
+    "user_query": "帮我写一条约人聊天的私信。",
+    "available_context": {
+      "interview_prep_kit": "已提供访谈目标",
+      "outreach_context": "缺失平台、场合、关系或语气",
+      "user_profile": "已有可核验背景"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确指出平台/场合/关系/语气等缺失项",
+      "不猜测并生成完整消息"
+    ],
+    "must_not_include": [
+      "已经生成的可用消息草稿",
+      "要求用户自行重写全部材料"
+    ]
+  },
+  {
+    "id": "boundary_no_invented_facts",
+    "user_query": "帮我在领英上给一位前辈写约聊消息，可以提一下我们共同的朋友和我参加过的一个小活动。",
+    "available_context": {
+      "interview_prep_kit": "有访谈目标",
+      "outreach_context": "平台、关系、语气已提供，但共同朋友和小活动未出现在任何输入中",
+      "user_profile": "有可核验背景"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "可发送的消息草稿",
+      "对“共同朋友/小活动”标记为需用户确认或被省略"
+    ],
+    "must_not_include": [
+      "任何未经确认的对方信息被写成事实",
+      "自行编造共同朋友或活动细节"
+    ]
+  }
+]

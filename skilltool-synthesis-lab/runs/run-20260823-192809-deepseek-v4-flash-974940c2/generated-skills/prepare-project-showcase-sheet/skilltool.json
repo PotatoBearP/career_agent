@@ -1,0 +1,293 @@
+{
+  "skill_id": "prepare_project_showcase_sheet",
+  "skill_name": "prepare-project-showcase-sheet",
+  "tool_name": "PrepareProjectShowcaseSheet",
+  "title": "做一页纸的项目作品清单",
+  "business_goal": "把已经按岗位要求改写好的项目经历整理成一页纸、可随申请提交的项目作品清单内容，按项目组织并呈现名称、承担角色、关键动作和结果，同时附上排版建议。",
+  "invocation_mode": "aggregate",
+  "composition": {
+    "required_prior_outputs": [
+      "rewritten_project_descriptions"
+    ],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "当用户已经有一份按岗位要求改写好的项目经历列表，并希望整理成一页纸可随申请提交的项目作品清单或项目附页时使用。不要用于从零撰写项目经历、核验项目事实的真实性、按岗位重新改写项目表述，或代替用户向外部岗位发送材料。",
+  "reference_pattern": "参考 baseline-assessment 的证据边界与 insufficient_input 处理方式，以及 learning-stage-design 的分步工作流、明确成功标准和输出校验做法；仅借用其结构性模式，不沿用任何学习领域业务内容。",
+  "task_ids": [
+    "task_prepare_project_showcase_sheet"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "筛选与岗位最相关的项目",
+      "决定项目在清单中的排序",
+      "将每个项目压缩为名称、承担角色、关键动作和结果",
+      "按用户偏好处理语言、篇幅和排序方式",
+      "生成一页纸清单内容及排版建议",
+      "为未提供的事实保留待补充标记"
+    ],
+    "excludes": [
+      "不重新撰写或改写项目经历的叙述表达",
+      "不评估项目经历的真实性或证据充分性",
+      "不编造项目成果、数字或参与角色",
+      "不生成 PDF 或 Word 文件",
+      "不代替用户向招聘方发送或提交材料"
+    ]
+  },
+  "input_schema": {
+    "rewritten_project_descriptions": {
+      "type": "object",
+      "required": true,
+      "description": "已按岗位要求改写好的项目经历描述，作为作品清单的内容来源",
+      "source": "prior_skill_output",
+      "source_ref": "rewritten_project_descriptions",
+      "available": true,
+      "acquisition": {
+        "mode": "prior_skill",
+        "provider": "task_rewrite_project_accounts",
+        "fallback": null
+      }
+    },
+    "showcase_preferences": {
+      "type": "object",
+      "required": true,
+      "description": "用户对篇幅、语言、排序方式以及是否保留链接或证明材料占位的要求",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "target_opportunity": {
+      "type": "object",
+      "required": true,
+      "description": "目标岗位的职责和关注点，用于筛选最相关的项目；不提供时按现有项目完整整理",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "project_showcase_sheet": {
+      "type": "object",
+      "description": "可随申请提交的一页纸项目清单内容，按项目组织，每条包含名称、角色、关键动作和结果，并附排版建议"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "make a one-page project showcase sheet from rewritten project descriptions for an application",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": false
+  },
+  "operating_model": {
+    "role": "作为申请材料整理者，只依据本次调用提供的改写项目经历、用户偏好和可选目标岗位，生成结构化的一页纸项目清单内容；不做调研、不询问用户、不写文件、不发送材料。",
+    "hard_boundaries": [
+      "只使用本次调用提供的 rewritten_project_descriptions、showcase_preferences 和 target_opportunity 三个输入，不读取用户画像、岗位清单或任何未声明数据源。",
+      "每个条目的项目名称、角色、关键动作和结果都必须能在 rewritten_project_descriptions 中找到对应内容，不得编造、放大或补充数字与成果。",
+      "本能力只做筛选、排序、压缩和排版组织，不重新改写项目表达，也不评估项目事实是否真实。",
+      "不生成文件，不接触投递平台，不代替用户提交或发送任何材料。",
+      "项目条目中缺失的名称、角色或结果字段，一律标记为待补充，不猜测填充。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "装载并校验输入",
+        "instructions": [
+          "读取 rewritten_project_descriptions，确认它是包含一个或多个项目条目的 object。",
+          "读取 showcase_preferences，提取语言、篇幅限制、排序方式和链接/证明占位要求。",
+          "可选读取 target_opportunity，判断是否存在可用于筛选的岗位职责关键词。",
+          "若 rewritten_project_descriptions 或 showcase_preferences 缺失或为空，进入 insufficient_input。"
+        ],
+        "success_criteria": [
+          "已锁定三个输入字段及其类型",
+          "已确认目标岗位是否存在"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "抽取可展示事实",
+        "instructions": [
+          "对每个项目条目抽取 project_name、role、key_actions、result 和 related_skills。",
+          "只使用输入中实际出现的字段；缺失字段记入该条目的 missing_fields。",
+          "保留每个事实与该条目的对应关系，供最终校验追溯。"
+        ],
+        "success_criteria": [
+          "每个条目都有事实来源映射",
+          "缺失字段清单已生成"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "筛选与排序",
+        "instructions": [
+          "若 target_opportunity 存在，按岗位职责/关键词与每个项目 actions、result、skills 的重合度降序排列。",
+          "若 target_opportunity 不存在，按带看 showpreferences 中的排序要求执行，否则保持输入顺序。",
+          "若 showcase_preferences 含 max_items 或 page_limit，按排序结果截取；未含则保留全部项目。"
+        ],
+        "success_criteria": [
+          "排序规则已应用",
+          "条目数量满足限制或保留全部"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "压缩汇编与排版建议",
+        "instructions": [
+          "逐条把内容压缩为名称、角色、一到两条关键动作和结果，直接保留原文事实，不做扩展。",
+          "应用 showcase_preferences 中的语言和篇幅要求。",
+          "生成 sheet 的 entries 结构，并在 layout_suggestions 中给出标题、分栏、每页条目数和链接/证明占位的排版建议。"
+        ],
+        "success_criteria": [
+          "每条内容可以容纳在一页纸范围内",
+          "语言偏好已应用",
+          "layout_suggestions 已生成"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "最终校验与返回",
+        "instructions": [
+          "逐条核对 entries 中的事实是否都可回溯到 rewritten_project_descriptions。",
+          "检查是否存在编造的成果、数字或角色。",
+          "确认 project_showcase_sheet 对象包含 entries 与 layout_suggestions。",
+          "调用 ReturnSkillResult 一次并结束本 Skill 调用。"
+        ],
+        "success_criteria": [
+          "所有条目可回溯到输入",
+          "输出对象结构完整",
+          "已唯一一次返回成功结果"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "相关性排序：统计 target_opportunity 文本中的职责/关键词在每个项目条目的 actions、result、skills 字段中的出现次数，按出现次数降序排列；同分时保持输入原顺序。",
+      "截断规则：仅当 showcase_preferences 明确给出 max_items 或 page_limit 时截断；未给出则保留全部项目。",
+      "事实压缩规则：压缩只删除修饰语和解释性语句，不改变动作发出者、行为范围和结果；任何结果数字必须来自原文。",
+      "待补充规则：缺少 project_name、role 或 result 时，在该条目标记待补充，不得自行构造。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "至少一个项目条目被纳入 entries，且该条目的名称、角色、关键动作和结果均可回溯到输入",
+        "target_opportunity 未提供时仍返回完整的项目清单而不是报错",
+        "project_showcase_sheet 包含 entries 和 layout_suggestions",
+        "showcase_preferences 中明确的语言或篇幅要求已生效"
+      ],
+      "insufficient_input": [
+        "rewritten_project_descriptions 缺失或为空",
+        "showcase_preferences 缺失或无法解析",
+        "没有任何可用的项目条目可以展示"
+      ],
+      "error": [
+        "输入类型与声明不符导致无法解析",
+        "输出对象无法序列化",
+        "ReturnSkillResult 未被调用或调用失败"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "project_showcase_sheet.entries 中的所有事实都可回溯到 rewritten_project_descriptions",
+      "未新增任何数字、成果或角色表述",
+      "showcase_preferences 中明确的语言、篇幅、排序规则已生效",
+      "未读取 user_profile、verified_opportunity_list 等未声明输入",
+      "未写文件，也未向外部发送材料，只返回结构化结果并调用一次 ReturnSkillResult"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 4,
+    "rationale": "筛选、排序、按一页纸容量压缩并附带排版建议需要明确的判断规则，但输入输出边界清晰，不属于简单包装，也不需要继续拆分"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖本次调用的输入契约和子模型能力",
+      "不访问外部数据、内部服务或未声明工件"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我把这些项目整理成一页纸的附件，跟着简历一起交",
+      "available_context": {
+        "rewritten_project_descriptions": "包含 4 个按岗位改写好的项目条目，每条含名称、角色、关键动作和结果",
+        "showcase_preferences": "语种中文、单页最多 3 个项目、保留链接占位",
+        "target_opportunity": "提供岗位关键词集合，其中 2 个项目与关键词有明显重合"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "project_showcase_sheet.entries 中最多 3 个且按岗位相关性排序的项目",
+        "每个条目包含名称、角色、关键动作和结果",
+        "layout_suggestions 包含排版建议",
+        "所有事实可回溯到输入项目经历"
+      ],
+      "must_not_include": [
+        "编造的项目成果或数字",
+        "访问用户画像或岗位清单"
+      ]
+    },
+    {
+      "id": "insufficient_input_missing_project_descriptions",
+      "user_query": "帮我做一份项目作品清单",
+      "available_context": {
+        "rewritten_project_descriptions": "未提供",
+        "showcase_preferences": "语种中文、单页最多 3 个项目",
+        "target_opportunity": "未提供"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明缺少改写后的项目经历输入",
+        "列出需要用户提供的缺失输入",
+        "不生成任何虚构的项目条目"
+      ],
+      "must_not_include": [
+        "向用户提出引导性追问",
+        "返回空表格或占位项目条目"
+      ]
+    },
+    {
+      "id": "boundary_no_target_opportunity",
+      "user_query": "把这些项目做成作品页，不需要按岗位筛",
+      "available_context": {
+        "rewritten_project_descriptions": "包含 5 个完整项目条目，名称、角色、动作、结果齐全",
+        "showcase_preferences": "语种中文、单页最多 2 个项目、保持输入顺序",
+        "target_opportunity": "未提供"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "按 showcase_preferences 的排序要求保持原顺序",
+        "按 max_items 截断为 2 个条目",
+        "明确标注未应用岗位相关性筛选"
+      ],
+      "must_not_include": [
+        "因缺少 target_opportunity 而报错",
+        "把排版建议当作岗位相关性结论"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把这封求职信改成邮件正文，简短一点",
+    "available_context": {
+      "cover_letter_draft": "包含真实教育、项目经历和匹配目标岗位关键词的完整求职信",
+      "email_context": "收件人为招聘负责人，发送渠道为邮箱，要求 300 字以内、语气正式",
+      "target_opportunity": "岗位描述含明确职责关键词且与求职信内容有对应"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "包含主题行、称呼、正文和落款的 email_body_draft 对象",
+      "岗位匹配点在正文中保留",
+      "删除说明列出被压缩的内容"
+    ],
+    "must_not_include": [
+      "新增原求职信中不存在的事实",
+      "任何实际的邮件发送行为"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_cover_letter",
+    "user_query": "帮我把这封求职信改成邮件正文，简短一点",
+    "available_context": {
+      "cover_letter_draft": "空字符串",
+      "email_context": "收件人为招聘负责人，300 字以内",
+      "target_opportunity": "岗位描述含职责关键词"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可作为事实边界的求职信草稿"
+    ],
+    "must_not_include": [
+      "根据岗位描述临时推测内容伪造一封求职信"
+    ]
+  },
+  {
+    "id": "boundary_fabrication_attempt",
+    "user_query": "帮我把这封求职信改成邮件正文，如果用户画像里有生产部署经验也写进去",
+    "available_context": {
+      "cover_letter_draft": "求职信中没有任何生产部署相关表述",
+      "email_context": "收件人为招聘负责人，300 字以内",
+      "target_opportunity": "岗位要求中包含生产部署能力"
+    },
+    "expected_outcome": "boundary_kept",
+    "must_include": [
+      "正文不写入生产部署相关表述或仅将其保留在待确认事实清单之外",
+      "在删除说明或输出中记录该能力证据不足，不写入邮件正文"
+    ],
+    "must_not_include": [
+      "把生产部署能力写成用户已有的事实"
+    ]
+  }
+]

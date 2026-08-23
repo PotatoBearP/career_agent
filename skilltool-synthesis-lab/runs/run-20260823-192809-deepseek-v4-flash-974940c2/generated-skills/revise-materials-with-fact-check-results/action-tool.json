@@ -1,0 +1,26 @@
+{
+  "tool_name": "ReviseMaterialsWithFactCheckResults",
+  "user_facing_name": "按检查结果修订材料",
+  "search_hint": "apply fact check report findings to revise draft application materials within evidence bounds",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "fact_check_report": {
+      "type": "json",
+      "required": true,
+      "description": "材料事实核验报告，包含问题位置、问题类型、事实依据和修改建议"
+    },
+    "draft_materials": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供的待修订申请材料，按文档名组织，包含简历、求职信和项目描述文本"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "已确认的用户画像，用于在修订时保持所有表述在事实范围内"
+    }
+  }
+}

@@ -1,0 +1,87 @@
+[
+  {
+    "task_id": "verify_opportunity_sources",
+    "name": "核实岗位信息来源与有效性",
+    "scene": "职业方向探索与真实机会验证",
+    "business_goal": "想让我提供或找到的岗位链接和信息经过核实，确认来源真实、仍在有效期，并指出不确定的地方。",
+    "user_request_examples": [
+      "帮我核实这几个岗位链接是不是真实有效的。",
+      "这些招聘信息靠谱吗？帮我查一下来源和组织。",
+      "帮我确认这些机会是否还在招人。"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "opportunity_intelligence",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要对用户提供的链接逐项核查真实性、有效性和组织一致性，生成带不确定性的核验结论，属于独立决策。",
+    "execution_provider": null,
+    "need_ids": [
+      "need_opportunity_verification"
+    ],
+    "inputs": [
+      {
+        "name": "opportunities_to_verify",
+        "description": "用户提供的待核实岗位清单，每项含标题、组织、链接等",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "verification_page_extracts",
+        "description": "从待核实链接取得的页面原文，用于检查链接有效性与内容一致性",
+        "type": "array",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebFetch"
+        }
+      },
+      {
+        "name": "verification_search_results",
+        "description": "针对组织和岗位名称的补充检索结果，用于交叉验证来源可信度",
+        "type": "array",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebSearch"
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "opportunity_verification_report",
+        "display_name": "岗位信息核验结果",
+        "description": "逐项说明链接有效性、发布状态、组织与内容一致性、可疑信号和证据不足处",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "opportunity_verification_report",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": true,
+    "iteration": 1,
+    "output_hypotheses": [
+      "opportunity_verification_report"
+    ]
+  }
+]

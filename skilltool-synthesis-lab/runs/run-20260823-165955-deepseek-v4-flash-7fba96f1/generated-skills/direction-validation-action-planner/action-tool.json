@@ -1,0 +1,26 @@
+{
+  "tool_name": "DirectionValidationActionPlanner",
+  "user_facing_name": "帮我制定方向验证行动计划",
+  "search_hint": "create a staged direction-validation action plan from a given period, weekly hours, and directions to validate",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "validation_period": {
+      "type": "json",
+      "required": true,
+      "description": "验证周期的起止时间与每周可投入时间"
+    },
+    "directions_to_validate": {
+      "type": "json",
+      "required": true,
+      "description": "用户希望验证的方向或机会列表，各项含名称、现状和相关链接"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户画像中的现实约束与偏好，用于安排可行的行动节奏"
+    }
+  }
+}

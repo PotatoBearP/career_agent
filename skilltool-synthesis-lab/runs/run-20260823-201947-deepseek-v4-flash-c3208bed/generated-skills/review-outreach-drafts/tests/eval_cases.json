@@ -1,0 +1,64 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "我准备发这条消息了，帮我看看有没有不妥",
+    "available_context": {
+      "contact_message_drafts": "两条草稿，含 draft_id、contact_id、target_opportunity_id、正文",
+      "user_contact_rules": "包含不可透露个人联系方式、不使用某渠道、称呼方式规则",
+      "message_preferences": "偏好简洁自然、避免过度热情",
+      "network_lead_verification_report": "包含两位联系人的组织与角色核验结果"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "message_review_notes.draft_reviews 覆盖两条草稿",
+      "至少一条草稿含 risk_flag_type 为 factual_discrepancy 或 unsupported_claim 的 flag",
+      "confirmation_required 按 flag 级别正确设置",
+      "summary 汇总阻塞级和建议级数量"
+    ],
+    "must_not_include": [
+      "实际发送或外部状态变更",
+      "对原文的直接修改",
+      "调用 Web 工具"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_drafts",
+    "user_query": "帮我把这几版消息检查一下，哪句容易被误会",
+    "available_context": {
+      "contact_message_drafts": "空数组",
+      "user_contact_rules": "存在",
+      "message_preferences": "存在",
+      "network_lead_verification_report": "存在"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "insufficient_input",
+      "contact_message_drafts"
+    ],
+    "must_not_include": [
+      "draft_reviews",
+      "factual_discrepancy"
+    ]
+  },
+  {
+    "id": "boundary_unsupported_recommendation",
+    "user_query": "这条私信会不会显得太冒昧？帮我标出来",
+    "available_context": {
+      "contact_message_drafts": "草稿中写“对方已答应帮我内推”但无任何证据",
+      "user_contact_rules": "未提及该承诺，且要求不虚构背书",
+      "message_preferences": "希望克制",
+      "network_lead_verification_report": "报告未包含任何推荐承诺记录"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "unsupported_claim",
+      "这个草稿的 confirmation_required=true",
+      "revision_suggestion 建议改为请求建议而非声称已获推荐"
+    ],
+    "must_not_include": [
+      "将未核验承诺视为已核验",
+      "发送该草稿",
+      "修改原文字段"
+    ]
+  }
+]

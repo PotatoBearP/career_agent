@@ -1,0 +1,981 @@
+[
+  {
+    "task_id": "task_find_referral_entry_points",
+    "name": "帮我找这些机会的公开内推入口和人脉线索",
+    "scene": "人脉申请追踪 - 寻找公开接触入口",
+    "business_goal": "用户希望为已确认的真实机会找到可公开接触的内推入口、官方推荐渠道、活动或社区线索，并尽量附上来源和核验状态。",
+    "user_request_examples": [
+      "帮我找找这些公司的内推入口和官方推荐渠道",
+      "我想看看这些机会有没有公开的校友或员工可以联系",
+      "帮我把每个机会的申请入口和人脉线索整理一下",
+      "找个能接触到这些团队的方式，最好有公开链接"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "人脉发现与核验",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把多个机会分别映射到公开渠道并去重、标注来源和可信度，是跨来源的综合判断，不是简单抓取。",
+    "execution_provider": null,
+    "need_ids": [
+      "public_referral_entry_discovery"
+    ],
+    "inputs": [
+      {
+        "name": "verified_opportunity_list",
+        "description": "用户已经确认的真实机会清单，作为寻找内推入口和人脉线索的目标对象",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "verified_opportunity_list",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户已有的画像信息，用于匹配与用户背景相关的公开线索和判断适用渠道",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "search_result_web",
+        "description": "公开网络检索到的机会对应公司或机构的内推、招聘、活动或联系人线索，需带来源",
+        "type": "array",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebSearch"
+        }
+      },
+      {
+        "name": "user_preferred_channels",
+        "description": "用户愿意使用的平台和渠道范围，例如官方网站、公开社区、职业社交平台等",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "referral_entry_lead_list",
+        "display_name": "公开人脉入口线索清单",
+        "description": "按机会整理的内推入口、公开渠道、活动线索和可能联系人，含来源与核验状态",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "opportunity_id|lead_kind|public_source|verification_status",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 5,
+    "fresh_data_required": true
+  },
+  {
+    "task_id": "task_find_contacts_from_network",
+    "name": "帮我看看我现有联系人里有没有能帮上忙的人",
+    "scene": "人脉申请追踪 - 个人关系筛选",
+    "business_goal": "用户希望从自己明确提供的关系名单中，筛选出与目标机会相关、可以自然联系的人，并说明关系来源和适合的开口方式。",
+    "user_request_examples": [
+      "帮我看看我认识的人里有谁能帮我内推",
+      "我把联系人导出来了，帮我筛一下哪些跟我的目标机会相关",
+      "我有哪些熟人可能认识这些团队的人？"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "人脉发现与核验",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要将非结构化的关系名单与机会清单做语义匹配、去重并判断是否构成可用的内推线索，是判断型转换。",
+    "execution_provider": null,
+    "need_ids": [
+      "personal_network_lead_matching"
+    ],
+    "inputs": [
+      {
+        "name": "user_contact_list",
+        "description": "用户明确提供的关系名单，每条含称呼、关系类型、公开可核验信息或来源，不允许猜测联系方式和共同经历",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "verified_opportunity_list",
+        "description": "用户已经确认的真实机会清单，用于匹配联系人可能关联的机会",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "verified_opportunity_list",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户已有的画像信息，用于判断关系与用户背景的真实交集",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_contact_rules",
+        "description": "用户对联系方式的限制、可透露的信息范围以及哪些人暂时不想打扰",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "matched_network_lead_list",
+        "display_name": "可匹配的熟人内推线索清单",
+        "description": "从用户提供的联系人中筛出的可接触线索，含匹配机会、关系来源和推荐的联系方式范围",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "contact_id|matched_opportunity_ids|relationship_source",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": false
+  },
+  {
+    "task_id": "task_verify_ref_lead",
+    "name": "帮我核实这些内推线索和人脉信息靠不靠谱",
+    "scene": "人脉申请追踪 - 线索核验",
+    "business_goal": "用户希望验证联系人、内推渠道或职位关系是否可公开核验、是否仍然相关，以及能否合法接触，并识别可能过时或不可信的线索。",
+    "user_request_examples": [
+      "帮我看下这个所谓的内推人是不是真的在这家公司",
+      "这个人脉线索靠谱吗？帮我核实一下公开信息",
+      "这些联系渠道有没有风险，哪些不能碰？"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "人脉发现与核验",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要根据公开来源判断真实性和接触风险并形成分级结论，是关键判断而非简单查询。",
+    "execution_provider": null,
+    "need_ids": [
+      "network_lead_verification"
+    ],
+    "inputs": [
+      {
+        "name": "lead_candidates",
+        "description": "用户提供或从其他途径得到的联系人、内推渠道线索，必须含可公开核验的姓名、组织、链接或其他标识",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "search_result_web",
+        "description": "公开网络检索到的与线索相关的职业信息、组织信息和关联证据",
+        "type": "array",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebSearch"
+        }
+      },
+      {
+        "name": "page_content",
+        "description": "被检视的具体页面或主页内容，用于核验联系人职业身份和关系真实性",
+        "type": "object",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebFetch"
+        }
+      },
+      {
+        "name": "user_contact_rules",
+        "description": "用户对联系方式的限制和风险容忍度，以及哪些渠道被明确排除",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "network_lead_verification_report",
+        "display_name": "人脉线索核验报告",
+        "description": "逐条线索的可核验性、真实程度、相关性、接触风险和证据来源分级报告",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "lead_id|verification_grade|evidence_source|last_checked",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 5,
+    "fresh_data_required": true
+  },
+  {
+    "task_id": "task_draft_contact_message",
+    "name": "帮我写一段自然、克制的联系消息",
+    "scene": "人脉申请追踪 - 联系消息准备",
+    "business_goal": "用户希望在联系前获得一段说明真实来意、双方关系和可回应内容的草稿，不夸大关系、不虚构背书、不越权索求，并保持克制。",
+    "user_request_examples": [
+      "帮我写一段联系校友的消息，说明我在申请这个岗位",
+      "帮我写个私信草稿，问问对方能不能给点建议",
+      "我想联系这个人但不知道怎么说，帮我起草一版"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "联系准备",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把真实关系和机会信息转化为合宜的对话草稿，把握分寸并避免虚构，是内容决策而非模板调用。",
+    "execution_provider": null,
+    "need_ids": [
+      "contact_message_drafting"
+    ],
+    "inputs": [
+      {
+        "name": "contact_context",
+        "description": "对方称呼、关系类型、真实共同点或交集、公开联系方式以及拟使用的场合说明",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "verified_opportunity_list",
+        "description": "用户已经确认的真实机会清单，用于在消息中准确说明申请目标",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "verified_opportunity_list",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "tailored_application_packages",
+        "description": "用户已准备好的投递材料，用于在消息中引用真实材料而不是虚构经历",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "tailored_application_packages",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户已有的画像信息，用于保证消息中对自身的描述真实一致",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "message_preferences",
+        "description": "用户对语气、长度、渠道语言风格、称谓以及希望避免的措辞的偏好",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "contact_message_drafts",
+        "display_name": "联系消息草稿",
+        "description": "针对不同场景和语气生成的自然、克制、可进一步编辑的联系消息草稿",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "contact_id|target_opportunity_id|message_variant|tone",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": false
+  },
+  {
+    "task_id": "task_record_tracking_status",
+    "name": "帮我记录投递、回复和跟进状态",
+    "scene": "人脉申请追踪 - 状态记录",
+    "business_goal": "用户希望把每次投递、回复、面试、跟进或关闭的动作整理成结构化记录，区分尚未投递、已投递、等待回复、需要跟进、进入面试和已结束，并保留来源、时间和下一步动作。",
+    "user_request_examples": [
+      "帮我记一下我今天投了这个岗位",
+      "这个公司回我了，约了周三面试，帮我更新一下",
+      "我上个月投的还没消息，帮我记下该跟进了"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "申请追踪与跟进",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把杂乱的用户动作归类到明确状态机并计算下一步动作，属于语义判断而非单纯存储。",
+    "execution_provider": null,
+    "need_ids": [
+      "application_status_tracking"
+    ],
+    "inputs": [
+      {
+        "name": "status_update_events",
+        "description": "用户口述或粘贴的投递、回复、面试、跟进、关闭事件，时间和来源由用户提供",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "current_tracking_records",
+        "description": "用户已有的追踪记录，可为空，用于增量更新而不是覆盖",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "verified_opportunity_list",
+        "description": "用户已经确认的真实机会清单，用于关联每一条状态记录到正确机会",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "verified_opportunity_list",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_followup_cadence",
+        "description": "用户希望多久跟进一次、用什么方式跟进，具体节奏由用户提供",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "application_tracking_ledger",
+        "display_name": "投递与跟进状态台账",
+        "description": "按机会聚合的状态记录，含最新状态、来源、更新时间、下一步动作和提醒依据",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "opportunity_id|latest_status|updated_at|next_action",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": false
+  },
+  {
+    "task_id": "task_next_followup_actions",
+    "name": "帮我整理投递情况，告诉下一步该跟进谁",
+    "scene": "人脉申请追踪 - 跟进优先级",
+    "business_goal": "用户希望基于当前追踪记录和机会优先级，得到一份按紧迫度和价值排序的跟进清单，包括具体动作、渠道和时限。",
+    "user_request_examples": [
+      "帮我看看我最该跟进哪个机会",
+      "把这周该跟进的整理一下",
+      "哪些还没投、哪些该等、哪些该催一催？"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "申请追踪与跟进",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "综合状态、机会优先级、用户时间偏好计算谁先谁后和具体做什么，是决策型转化。",
+    "execution_provider": null,
+    "need_ids": [
+      "followup_priority_planning"
+    ],
+    "inputs": [
+      {
+        "name": "application_tracking_ledger",
+        "description": "用户的追踪记录，由用户直接提供当前版本，包含各机会的状态和下一步动作",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "opportunity_pursuit_ranking",
+        "description": "用户已确认的机会投递优先顺序，用于计算跟进价值",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "opportunity_pursuit_ranking",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_followup_preferences",
+        "description": "用户偏好的联系渠道、时间段、频率和不想反复打扰的对象",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_available_time",
+        "description": "用户可投入跟进的时间窗口或总体时间上限，具体数值由用户提供",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "prioritized_followup_plan",
+        "display_name": "优先跟进清单",
+        "description": "按优先级排序的跟进动作，含机会、动作类型、建议时限和具体下一步",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "opportunity_id|action_type|priority_score|due_time|next_action",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": false
+  },
+  {
+    "task_id": "task_compare_pursuit_targets",
+    "name": "帮我比较这几个机会或人脉渠道，选一个先重点投入",
+    "scene": "人脉申请追踪 - 目标比较",
+    "business_goal": "用户希望按自己关心的标准比较几个候选机会或内推渠道，并得到明确的优先建议和理由。",
+    "user_request_examples": [
+      "帮我比较这几个岗位，看哪个最值得现在投",
+      "这几个内推渠道先经营哪个比较好？",
+      "我拿不定主意，帮我把选择标准和结果列出来"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "比较与规划",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "把多目标比较按用户标准权衡并给出理由，不是简单罗列差异。",
+    "execution_provider": null,
+    "need_ids": [
+      "pursuit_target_comparison"
+    ],
+    "inputs": [
+      {
+        "name": "candidate_options",
+        "description": "用户指定的待比较机会或人脉渠道标识，可以引用已有清单中的对象",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "opportunity_pursuit_ranking",
+        "description": "用户已确认的机会投递优先顺序，作为比较的参考依据",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "opportunity_pursuit_ranking",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户已有的画像信息，用于判断候选对象与用户的匹配程度",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "comparison_criteria",
+        "description": "用户重视的维度，例如接触难度、回复可能、长期价值、时间成本等",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "opportunity_or_lead_comparison",
+        "display_name": "机会与人脉渠道比较结果",
+        "description": "按用户标准比较候选对象，给出优先建议、理由和权衡说明",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "candidate_ids|criteria_version|recommendation",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": false
+  },
+  {
+    "task_id": "task_role_context_brief",
+    "name": "帮我了解待联系的人平时做什么、团队怎么协作、看重什么",
+    "scene": "人脉申请追踪 - 联系前了解",
+    "business_goal": "用户希望在联系前了解目标机会中相关人员的日常职责、工作场景、协作方式和入门要求，以便问对问题、展示真实兴趣。",
+    "user_request_examples": [
+      "帮我看下这个岗位的团队平时做什么",
+      "我想知道联系这个人时该了解哪些他的工作内容",
+      "这个公司要求的经验到底是什么样的？"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "联系准备",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要从不同公开资料中提炼出可实际用于对话的人物与工作情境理解，是综合归纳而非检索包装。",
+    "execution_provider": null,
+    "need_ids": [
+      "role_context_research"
+    ],
+    "inputs": [
+      {
+        "name": "target_opportunities",
+        "description": "用户已经确认的真实机会清单，用于确定要了解的对象",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "verified_opportunity_list",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户已有的画像信息，用于把工作情境与用户已有经历联系起来",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "search_result_web",
+        "description": "公开网络检索到的岗位职责、团队信息、行业讨论和公司公开资料",
+        "type": "array",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebSearch"
+        }
+      },
+      {
+        "name": "page_content",
+        "description": "被检视的具体页面内容，用于确认岗位要求、团队构成和工作方式",
+        "type": "object",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebFetch"
+        }
+      },
+      {
+        "name": "research_focus",
+        "description": "用户想了解的方面，例如日常工作、团队协作、考核要求、入口路径等",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "role_conversation_context_brief",
+        "display_name": "目标角色联系背景简报",
+        "description": "按机会整理的工作日常、团队协作、能力要求和可聊话题要点，附公开来源",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "opportunity_id|context_aspect|public_source",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 5,
+    "fresh_data_required": true
+  },
+  {
+    "task_id": "task_gap_evidence_plan",
+    "name": "帮我对照这些机会的要求，看看我还有哪些差距、补什么证据",
+    "scene": "人脉申请追踪 - 差距与证据准备",
+    "business_goal": "用户希望把自己的真实经历和材料与目标机会的要求逐项对照，找出差距，并准备在联系和申请中能说明的补充证据，而不是编造。",
+    "user_request_examples": [
+      "帮我看看我现在跟这些机会要求差在哪",
+      "我该怎么证明我适合这个方向？",
+      "这些岗位要求的经验，我有哪些可以拿出来说？"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "联系准备",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "把机会要求拆解、与个人真实证据映射并判定差距，属于判断型综合分析。",
+    "execution_provider": null,
+    "need_ids": [
+      "evidence_gap_analysis"
+    ],
+    "inputs": [
+      {
+        "name": "user_profile",
+        "description": "用户已有的画像信息，包含真实经历和能力证据",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "verified_opportunity_list",
+        "description": "用户已经确认的真实机会清单，作为要求对照的目标",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "verified_opportunity_list",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "material_quality_report",
+        "description": "用户已有投递材料的质量检查结果，用于判断哪些材料可以作为现有证据",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "material_quality_report",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_evidence_input",
+        "description": "用户愿意提供的额外真实经历、课程、项目、成果、评价或其他证明材料",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "evidence_gap_analysis",
+        "display_name": "证据差距与补充清单",
+        "description": "按机会和分析维度列出的差距等级、已有证据、可补充证据和表达建议",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "opportunity_id|requirement_id|gap_level|evidence_action",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": false
+  },
+  {
+    "task_id": "task_network_action_plan",
+    "name": "帮我制定接下来一段时间的跟进和拓展行动计划",
+    "scene": "人脉申请追踪 - 近期行动规划",
+    "business_goal": "用户希望把找入口、核验、联系、投递、跟进等动作排进一个可执行的近期计划，并根据自己可投入的时间和偏好设检查点。",
+    "user_request_examples": [
+      "帮我安排接下来几周的人脉跟进计划",
+      "我每周只有一点时间，帮我排一下先做什么",
+      "帮我做个计划，什么时候联系谁、什么时候跟进"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "比较与规划",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "把多个异步动作按用户约束编排成有序计划并设检查点，是计划型决策。",
+    "execution_provider": null,
+    "need_ids": [
+      "network_action_scheduling"
+    ],
+    "inputs": [
+      {
+        "name": "current_situation_snapshot",
+        "description": "用户当前的进展、已投递清单、已有联系人、待核验线索等现状信息，由用户直接提供",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "opportunity_pursuit_ranking",
+        "description": "用户已确认的机会投递优先顺序，用于安排行动计划中的先后",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "opportunity_pursuit_ranking",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_time_and_rules",
+        "description": "用户可投入的周期、每周时间、联系方式上限、偏好渠道和不能打扰的时间",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户已有的画像信息，用于确保计划符合用户真实条件和偏好",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "networking_action_plan",
+        "display_name": "人脉跟进与拓展行动计划",
+        "description": "按时间窗口编排的接触、核验、联系、投递、跟进动作和检查点计划",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "plan_window|user_constraints_version|milestones",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 5,
+    "fresh_data_required": false
+  }
+]

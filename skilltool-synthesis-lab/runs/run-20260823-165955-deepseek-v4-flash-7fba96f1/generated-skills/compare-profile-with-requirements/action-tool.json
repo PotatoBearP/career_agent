@@ -1,0 +1,33 @@
+{
+  "tool_name": "CompareProfileWithRequirements",
+  "user_facing_name": "把我的经历与目标岗位要求对照",
+  "search_hint": "将用户画像中的个人证据与目标岗位要求逐项对照，输出证据差距分析",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [
+    "WebSearch"
+  ],
+  "input": {
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户画像中的已有事实、证据和偏好，作为对照的个人侧输入"
+    },
+    "target_direction": {
+      "type": "string",
+      "required": true,
+      "description": "要对照的目标方向或岗位类型"
+    },
+    "requirements_input": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供的任职要求文本或要求清单；用户未提供时可留空"
+    },
+    "requirement_search_results": {
+      "type": "json",
+      "required": true,
+      "description": "当用户未提供要求清单时，检索到的该方向典型任职要求，用于补充对照依据"
+    }
+  }
+}

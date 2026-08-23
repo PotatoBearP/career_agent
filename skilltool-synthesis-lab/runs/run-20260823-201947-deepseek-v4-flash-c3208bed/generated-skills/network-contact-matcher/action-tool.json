@@ -1,0 +1,31 @@
+{
+  "tool_name": "NetworkContactMatcher",
+  "user_facing_name": "帮我看看我现有联系人里有没有能帮上忙的人",
+  "search_hint": "match user-provided contacts to verified opportunities using only supplied relationship evidence",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "user_contact_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户明确提供的关系名单，每条含称呼、关系类型、公开可核验信息或来源，不允许猜测联系方式和共同经历"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已经确认的真实机会清单，用于匹配联系人可能关联的机会"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的画像信息，用于判断关系与用户背景的真实交集"
+    },
+    "user_contact_rules": {
+      "type": "json",
+      "required": true,
+      "description": "用户对联系方式的限制、可透露的信息范围以及哪些人暂时不想打扰"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "tool_name": "RecordMeetingOutcome",
+  "user_facing_name": "记录沟通结果与待办",
+  "search_hint": "record meeting communication outcomes, commitments, and follow-up items",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "meeting_notes": {
+      "type": "json",
+      "required": true,
+      "description": "用户口述或粘贴的交流内容，例如对方提到的事、自己的回应、被问到的问题和口头承诺"
+    },
+    "application_tracking_ledger": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是与该沟通相关机会的当前追踪状态，用于把新记录接进去"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "场景已有产物，是用户确认过的真实机会清单，用于把本次沟通绑定到对应机会"
+    },
+    "followup_rules": {
+      "type": "json",
+      "required": true,
+      "description": "用户对自己要履行的承诺、跟进方式和不希望再接触的对象的说明"
+    }
+  }
+}

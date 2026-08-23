@@ -1,0 +1,74 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我看看做这个方向的人每天到底在做什么。",
+    "available_context": {
+      "target_direction": "数据产品方向",
+      "real_work_search_results": "包含多篇岗位描述和从业者经验分享的检索结果",
+      "real_work_page_extracts": "包含具体任务、交付物和协作对象的原文页面"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "typical_tasks",
+      "deliverables",
+      "collaborators",
+      "typical_rhythm",
+      "source_links"
+    ],
+    "must_not_include": [
+      "任职门槛",
+      "是否适合该方向"
+    ]
+  },
+  {
+    "id": "insufficient_no_evidence",
+    "user_query": "这个岗位实际要交付什么成果，平时和哪些人配合？",
+    "available_context": {
+      "target_direction": "数据产品方向",
+      "real_work_search_results": [],
+      "real_work_page_extracts": []
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "证据不足",
+      "无法生成真实工作活动画像"
+    ],
+    "must_not_include": [
+      "凭空编造的工作任务",
+      "向用户追问额外输入"
+    ]
+  },
+  {
+    "id": "boundary_no_target",
+    "user_query": "帮我看下这个方向日常工作是什么样的。",
+    "available_context": {
+      "target_direction": null,
+      "real_work_search_results": [],
+      "real_work_page_extracts": []
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "未明确目标方向"
+    ],
+    "must_not_include": [
+      "猜测具体岗位",
+      "输出虚构画像"
+    ]
+  },
+  {
+    "id": "boundary_irrelevant_sources",
+    "user_query": "这个岗位平时要交付什么成果？",
+    "available_context": {
+      "target_direction": "数据产品方向",
+      "real_work_search_results": "只包含公司新闻和招聘政策，不含工作活动",
+      "real_work_page_extracts": "只包含组织介绍，不含任务或交付物"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "不涉及实际工作活动"
+    ],
+    "must_not_include": [
+      "把组织介绍当作工作任务"
+    ]
+  }
+]

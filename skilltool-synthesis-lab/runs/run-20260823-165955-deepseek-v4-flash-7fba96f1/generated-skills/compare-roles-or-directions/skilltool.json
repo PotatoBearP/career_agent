@@ -1,0 +1,279 @@
+{
+  "skill_id": "compare_roles_or_directions",
+  "skill_name": "compare-roles-or-directions",
+  "tool_name": "CompareRolesOrDirections",
+  "title": "比较几个方向或岗位",
+  "business_goal": "把用户提供的多个职业方向或岗位放入同一套比较维度下，生成可核验的对比矩阵、关键取舍、待验证问题与后续验证提示，且不替用户断言某个选项绝对更好。",
+  "invocation_mode": "standalone",
+  "composition": {
+    "required_prior_outputs": [],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "用户明确给出至少两个方向或岗位并要求比较时使用；用户要求从零探索方向、检索外部岗位、或对单个岗位做深度研究时不使用本能力。",
+  "reference_pattern": "baseline-assessment 的证据冻结与裁判角色：只使用调用时已提供的输入，不采集新证据，把来源与判断分离，并用 success/insufficient_input 明确区分。同时借鉴 learning-plan 的确定性排序与结果规则，把用户维度缺失时的默认维度标注为 model_derived，而非权威市场标准。",
+  "task_ids": [
+    "compare_roles_or_directions"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "对 options_to_compare 中的选项做逐维度对比",
+      "把用户画像中的证据作为匹配度维度的个人侧依据",
+      "输出对比矩阵、关键取舍、待验证问题和验证提示",
+      "对缺失证据或冲突证据明确标注不确定性"
+    ],
+    "excludes": [
+      "不检索外部岗位库或招聘信息来扩充选项",
+      "不替用户做出最终选择或断言某个选项一定更适合",
+      "不生成新的方向候选",
+      "不修改或重写 user_profile"
+    ]
+  },
+  "input_schema": {
+    "options_to_compare": {
+      "type": "array",
+      "required": true,
+      "description": "用户希望比较的方向或岗位列表，每项包含名称、描述、来源链接等",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "comparison_dimensions": {
+      "type": "array",
+      "required": true,
+      "description": "用户关心的比较维度，如工作内容、进入门槛、发展空间、与自身证据的匹配度等；为空时使用默认维度",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "用户画像中的证据与偏好，用于判断各选项与用户的契合度",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "option_comparison_report": {
+      "type": "object",
+      "description": "按用户选定维度展开的对比矩阵、关键取舍、待验证问题和对后续验证的提示"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "compare user-supplied career directions or roles across chosen dimensions without fetching external data",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": true
+  },
+  "operating_model": {
+    "role": "选项比较审查官：把用户提供的异构选项映射到统一维度，像证据裁判一样区分事实、推断与未知，只输出可追溯到输入的对比结论。",
+    "hard_boundaries": [
+      "只使用 options_to_compare、comparison_dimensions 与 user_profile 中已提供的信息，不调用任何外部工具获取新证据。",
+      "不得虚构或推断用户画像中不存在的个人经历、偏好、约束、城市、专业或技术栈。",
+      "不得把某个选项直接标注为用户\"应选择\"或\"最适合\"；只能呈现维度差异、取舍和待验证点。",
+      "当某维度缺少任何选项侧或用户侧证据时，必须记录 unknown，不能用常识补足后当作事实。",
+      "不得修改、重建或向其他系统写入 user_profile。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "解析比较范围",
+        "instructions": [
+          "检查 options_to_compare 是否为至少 2 个有效选项，每个选项至少包含名称和可理解的描述；少于 2 项或存在无法理解描述的选项时进入 insufficient_input。",
+          "读取 comparison_dimensions；为空时采用默认维度：实际工作内容与交付物、进入门槛、发展空间、与用户证据匹配度、待验证事项，并在报告中标记 dimensions_basis 为 model_derived。"
+        ],
+        "success_criteria": [
+          "比较范围已确定，维度列表明确，选项数量与可比较性已确认"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "建立逐项证据清单",
+        "instructions": [
+          "对每个选项提取名称、描述、来源链接及任何已有角色/岗位属性，记录为 option_evidence。",
+          "从 user_profile 中提取仅与比较相关的事实、证据、偏好和约束，逐条记录来源为 profile_evidence。",
+          "将每个证据项标记为 option_description、source_link 或 profile_evidence，禁止混用来源。"
+        ],
+        "success_criteria": [
+          "所有输入证据已按选项和来源登记，且没有新增外部信息"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "逐维度对比",
+        "instructions": [
+          "对每个比较维度，为每个选项生成一段结论，结论必须引用证据项。",
+          "匹配度维度只允许把 profile_evidence 与选项描述做对应；无直接对应时记录 unknown，不推断匹配或差距。",
+          "当两个选项在同一维度上呈现冲突或显著不同时，在关键取舍中显式列出。",
+          "识别哪些差异直接影响用户能否进入、工作内容是否符合偏好、证据是否足够，标为差异显著性。"
+        ],
+        "success_criteria": [
+          "每个维度都有每个选项的对比条目，且每个条目都有证据引用或 unknown 标记"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "生成对比报告",
+        "instructions": [
+          "构造 option_comparison_report，包含 comparison_matrix、key_tradeoffs、pending_questions、validation_hints。",
+          "comparison_matrix 的行是选项，列是选定维度，单元格为简洁结论并附证据来源标识。",
+          "pending_questions 指阻隔最终取舍且当前证据无法回答的问题；validation_hints 列出可执行的下一个验证动作，如信息访谈、查找真实岗位、短期项目。",
+          "不要生成总分或加权排序，除非用户明确提供权重并要求排序。"
+        ],
+        "success_criteria": [
+          "报告包含全部选项、全部维度、关键取舍、待验证问题与验证提示"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "校验并返回结果",
+        "instructions": [
+          "检查报告字段类型与任务输出契约一致：option_comparison_report 为 object。",
+          "核对所有断言都能在输入证据中找到对应来源引用，所有无证据处均为 unknown。",
+          "确认未给出绝对推荐，未修改用户画像。",
+          "调用 ReturnSkillResult 一次并结束。"
+        ],
+        "success_criteria": [
+          "报告通过来源追溯检查、无越界断言、ReturnSkillResult 仅调用一次"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "维度解析规则：comparison_dimensions 非空时完全使用用户维度；为空时使用默认维度并把 dimensions_basis 标注为 model_derived。",
+      "证据优先级规则：选项原始描述与用户画像证据冲突时，同一维度内并列展示双方证据并标记 conflict，不以画像覆盖选项描述。",
+      "未知标注规则：维度缺少选项证据或用户证据时输出 unknown，禁止用常识补全为事实。",
+      "差异显著性规则：若某维度下所有选项结论本质相同，标为 no_material_difference，不虚构差异。",
+      "结论边界规则：只有在用户显式提供权重并要求排序时才给出排序；否则只给取舍结构。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "options_to_compare 至少包含 2 个可理解选项",
+        "option_comparison_report 已生成且包含对比矩阵、关键取舍、待验证问题和验证提示",
+        "所有结论可追溯到输入证据或明确标记为 unknown"
+      ],
+      "insufficient_input": [
+        "options_to_compare 少于 2 项",
+        "用户画像缺失或无法读取（user_profile 未提供）",
+        "选项缺少名称或足够描述，导致无法在默认维度上做任何有意义的对比",
+        "comparison_dimensions 提供但全部为无法识别的维度名称，同时没有可推断为默认维度的语义"
+      ],
+      "error": [
+        "输出无法序列化为 object 或字段类型不符合任务输出契约",
+        "执行过程中被要求写入或修改 user_profile"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "options_to_compare、comparison_dimensions、user_profile 三个输入名称均保留且来源映射正确",
+      "每个输出维度都有对照条目，且每个条目有 evidence_ref 或 unknown",
+      "报告未包含绝对推荐或伪造的用户画像事实",
+      "报告包含关键取舍、待验证问题与验证提示",
+      "未调用未选中的外部普通工具，ReturnSkillResult 只调用一次"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 5,
+    "rationale": "这是一个将异构输入映射到统一维度并生成带证据引用与取舍说明的决策支持任务，包含默认维度、证据来源、冲突与未知标记等明确规则，但不需要外部检索或持久化，因此是 bounded 而非 split_required。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖调用时传入的 options_to_compare、comparison_dimensions 和 user_profile",
+      "外部模型 API 具备结构化输出能力，可返回符合 output_schema 的 JSON",
+      "不依赖主程序、数据库、UI 状态或内部服务"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我把这几个方向放在一起比一比。",
+      "available_context": {
+        "options_to_compare": "两个方向，各自包含名称、描述和来源链接",
+        "comparison_dimensions": "[]",
+        "user_profile": "包含用户证据、偏好与约束的用户画像"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "option_comparison_report 为 object",
+        "comparison_matrix 覆盖全部选项和默认维度",
+        "key_tradeoffs、pending_questions、validation_hints 均存在",
+        "每项结论带有证据来源标识或 unknown"
+      ],
+      "must_not_include": [
+        "外部检索调用",
+        "对某个选项的绝对推荐"
+      ]
+    },
+    {
+      "id": "insufficient_input_single_option",
+      "user_query": "帮我比较一下这个方向怎么样。",
+      "available_context": {
+        "options_to_compare": "只有一个方向，包含名称和描述",
+        "comparison_dimensions": "[]",
+        "user_profile": "用户画像已提供"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明需要至少两个可比较的选项"
+      ],
+      "must_not_include": [
+        "假装比较并生成完整报告",
+        "把单个选项的优缺点当作对比结果"
+      ]
+    },
+    {
+      "id": "boundary_no_matching_evidence",
+      "user_query": "帮我比较这两个岗位和我的匹配度。",
+      "available_context": {
+        "options_to_compare": "两个岗位，均只有职责描述，无任何与用户证据相关的字段",
+        "comparison_dimensions": "[\"与自身证据的匹配度\"]",
+        "user_profile": "用户画像包含若干个人证据"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "匹配度维度标记为 unknown 或列出无法建立对应关系的说明",
+        "报告中不出现未经证据支持的匹配断言"
+      ],
+      "must_not_include": [
+        "基于用户画像推断出选项描述中不存在的岗位内容",
+        "给出\"更适合/更不适合\"的绝对结论"
+      ]
+    }
+  ]
+}

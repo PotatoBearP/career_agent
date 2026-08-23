@@ -1,0 +1,391 @@
+Discover the next batch of modular tasks through iterative synthesis.
+
+ITERATION: 1
+ITERATION DIRECTION: initialization
+
+REFERENCE PROFILE (personal evidence and constraints only):
+用户是一名计算机科学与技术硕士研究生，预计 12 至 18 个月后毕业，目前没有正式实习经历。求职地点优先考虑上海、杭州和深圳，每周可投入 8 至 12 小时进行方向探索。
+
+已有证据包括：用 Python 和 PyTorch 完成课程及研究实验；独立完成过图像分类课程项目和校园知识库问答原型；能够检索论文、设计对比实验并撰写技术报告。尚无生产部署、多人协作、真实用户、业务指标或正式开发流程方面的可靠证据，商业问题理解能力也尚未验证。
+
+用户喜欢分析复杂问题、做实验或设计方案，希望成果能被真实采用并获得明确反馈；不喜欢长期重复且缺少判断空间的工作。倾向先比较多个方向，再通过真实岗位、信息访谈、短期项目或实习投递验证。
+
+画像只提供个人事实、证据、偏好和现实约束。不得因为计算机专业、Python、PyTorch 或问答原型，直接推断用户的目标行业、目标岗位或目标赛道。
+
+REFERENCE SCENARIO (scope and boundary only):
+本轮场景是“职业方向探索与真实机会验证”。这是一个面向不同自然用户的通用场景，不预设城市、学校、专业、技术栈、行业、岗位或毕业时间。
+
+上一场景是“用户画像分析”，已经产生并由用户确认已有产物 `user_profile`（用户画像，object 类型）。本轮可以读取该产物中的事实、证据、偏好和现实约束，但不得重新生成或修改用户画像，也不得把某个样例用户的具体属性固化成通用任务名称、任务目标或示例问法。
+
+用户希望从实际工作活动出发探索可能的职业方向，了解真实岗位每天处理的问题、交付成果、协作对象和进入要求，将自身证据与岗位要求进行对照，缩小值得继续验证的方向，并制定可执行的验证行动。目标地区、目标行业、机会类型、方向数量、计划周期和每周可投入时间都应在调用时从用户处获取，不能在场景或任务中写死。
+
+岗位机会需要来自可核验的信息源，并保留链接、发布时间、地点、组织和工作内容。缺少真实反馈时，只能呈现证据、不确定性和待验证项，不能断言用户适合某个岗位。
+
+任务输入只能来自四类：调用时向用户获取的输入、现有普通工具生成的输出、场景声明的已有产物、第二轮及以后已经存在的任务输出。每个输入和输出必须声明 object、array、string、number 或 boolean 类型。MCP 工具不在本场景范围内。
+
+合成出的任务必须像普通用户会直接提出的一条完整请求。岗位检索应表达为“帮我寻找符合我条件的真实岗位机会”，而不是写成某几个城市的岗位采集；方向筛选和行动规划同样必须把数量、地点、期限等个人条件保留为调用参数。
+
+EXISTING SCENARIO ARTIFACTS (existing_artifact inputs must reference one of these asset_id values):
+[
+  {
+    "asset_id": "user_profile",
+    "name": "用户画像",
+    "type": "object",
+    "source": "upstream_artifact",
+    "availability": "available",
+    "producer": {
+      "kind": "previous_scenario",
+      "name": "previous_scenario",
+      "stage": "upstream"
+    },
+    "derived_from": [],
+    "description": "自然语言场景声明的已有产物 user_profile"
+  }
+]
+
+AVAILABLE ORDINARY TOOLS (tool_generated inputs must name one of these exact providers):
+[
+  {
+    "name": "Agent",
+    "category": "delegation",
+    "description": "启动通用子代理处理独立任务。",
+    "availability": "base"
+  },
+  {
+    "name": "TaskOutput",
+    "category": "delegation",
+    "description": "读取后台任务或子代理输出。",
+    "availability": "base"
+  },
+  {
+    "name": "Bash",
+    "category": "execution",
+    "description": "执行受控 shell 命令。",
+    "availability": "base"
+  },
+  {
+    "name": "PowerShell",
+    "category": "execution",
+    "description": "在 Windows 环境执行受控 PowerShell 命令。",
+    "availability": "windows_conditional"
+  },
+  {
+    "name": "REPL",
+    "category": "execution",
+    "description": "执行交互式分析代码。",
+    "availability": "ant_only"
+  },
+  {
+    "name": "Read",
+    "category": "filesystem",
+    "description": "读取文本、代码、文档或图片文件。",
+    "availability": "base"
+  },
+  {
+    "name": "Write",
+    "category": "filesystem",
+    "description": "创建完整文件。",
+    "availability": "base"
+  },
+  {
+    "name": "Edit",
+    "category": "filesystem",
+    "description": "对现有文件做精确修改。",
+    "availability": "base"
+  },
+  {
+    "name": "Glob",
+    "category": "filesystem",
+    "description": "按路径模式查找文件。",
+    "availability": "base_when_no_embedded_search"
+  },
+  {
+    "name": "Grep",
+    "category": "filesystem",
+    "description": "在文件中搜索文本。",
+    "availability": "base_when_no_embedded_search"
+  },
+  {
+    "name": "NotebookEdit",
+    "category": "filesystem",
+    "description": "编辑 Jupyter notebook 单元格。",
+    "availability": "base"
+  },
+  {
+    "name": "LSP",
+    "category": "code_intelligence",
+    "description": "查询代码符号、定义和引用。",
+    "availability": "feature_flag"
+  },
+  {
+    "name": "WebSearch",
+    "category": "web",
+    "description": "搜索公开网络并返回带来源的结果。",
+    "availability": "base"
+  },
+  {
+    "name": "WebFetch",
+    "category": "web",
+    "description": "读取指定网页内容。",
+    "availability": "base"
+  },
+  {
+    "name": "ToolSearch",
+    "category": "discovery",
+    "description": "按需发现延迟加载的普通工具；不得用于发现 Skill。",
+    "availability": "tool_search_enabled"
+  },
+  {
+    "name": "AskUserQuestion",
+    "category": "interaction",
+    "description": "关键输入缺失时向用户提出结构化问题。",
+    "availability": "base"
+  },
+  {
+    "name": "SendUserMessage",
+    "category": "interaction",
+    "description": "向用户发送阶段性消息或请求。",
+    "availability": "base"
+  },
+  {
+    "name": "send_user_file",
+    "category": "interaction",
+    "description": "向用户交付生成文件。",
+    "availability": "kairos"
+  },
+  {
+    "name": "PushNotification",
+    "category": "interaction",
+    "description": "发送异步推送通知。",
+    "availability": "kairos"
+  },
+  {
+    "name": "ImageGenerate",
+    "category": "media",
+    "description": "根据提示生成或编辑图片。",
+    "availability": "base"
+  },
+  {
+    "name": "VideoGenerate",
+    "category": "media",
+    "description": "根据提示生成视频。",
+    "availability": "base"
+  },
+  {
+    "name": "terminal_capture",
+    "category": "media",
+    "description": "捕获终端面板内容。",
+    "availability": "feature_flag"
+  },
+  {
+    "name": "TodoWrite",
+    "category": "task_management",
+    "description": "维护轻量任务清单。",
+    "availability": "base_legacy_tasks"
+  },
+  {
+    "name": "TaskCreate",
+    "category": "task_management",
+    "description": "创建持久任务。",
+    "availability": "todo_v2"
+  },
+  {
+    "name": "TaskGet",
+    "category": "task_management",
+    "description": "读取任务详情。",
+    "availability": "todo_v2"
+  },
+  {
+    "name": "TaskUpdate",
+    "category": "task_management",
+    "description": "更新任务状态或属性。",
+    "availability": "todo_v2"
+  },
+  {
+    "name": "TaskList",
+    "category": "task_management",
+    "description": "列出任务。",
+    "availability": "todo_v2"
+  },
+  {
+    "name": "TaskStop",
+    "category": "task_management",
+    "description": "停止后台任务。",
+    "availability": "base"
+  },
+  {
+    "name": "EnterPlanMode",
+    "category": "workflow_control",
+    "description": "进入规划模式。",
+    "availability": "base"
+  },
+  {
+    "name": "ExitPlanMode",
+    "category": "workflow_control",
+    "description": "提交并退出规划模式。",
+    "availability": "base"
+  },
+  {
+    "name": "verify_plan_execution",
+    "category": "workflow_control",
+    "description": "验证计划执行结果。",
+    "availability": "environment_flag"
+  },
+  {
+    "name": "workflow",
+    "category": "workflow_control",
+    "description": "运行项目工作流脚本。",
+    "availability": "feature_flag"
+  },
+  {
+    "name": "EnterWorktree",
+    "category": "workspace",
+    "description": "创建或进入隔离工作树。",
+    "availability": "worktree_mode"
+  },
+  {
+    "name": "ExitWorktree",
+    "category": "workspace",
+    "description": "退出隔离工作树。",
+    "availability": "worktree_mode"
+  },
+  {
+    "name": "Config",
+    "category": "configuration",
+    "description": "读取或修改运行配置。",
+    "availability": "ant_only"
+  },
+  {
+    "name": "tungsten",
+    "category": "internal_service",
+    "description": "调用 Tungsten 服务。",
+    "availability": "ant_only"
+  },
+  {
+    "name": "SendMessage",
+    "category": "multi_agent",
+    "description": "向现有代理或队友发送消息。",
+    "availability": "base"
+  },
+  {
+    "name": "TeamCreate",
+    "category": "multi_agent",
+    "description": "创建代理团队。",
+    "availability": "agent_swarms"
+  },
+  {
+    "name": "TeamDelete",
+    "category": "multi_agent",
+    "description": "删除代理团队。",
+    "availability": "agent_swarms"
+  },
+  {
+    "name": "Sleep",
+    "category": "scheduling",
+    "description": "等待外部状态或指定时间。",
+    "availability": "proactive_or_kairos"
+  },
+  {
+    "name": "CronCreate",
+    "category": "scheduling",
+    "description": "创建定时任务。",
+    "availability": "agent_triggers"
+  },
+  {
+    "name": "CronDelete",
+    "category": "scheduling",
+    "description": "删除定时任务。",
+    "availability": "agent_triggers"
+  },
+  {
+    "name": "CronList",
+    "category": "scheduling",
+    "description": "列出定时任务。",
+    "availability": "agent_triggers"
+  },
+  {
+    "name": "RemoteTrigger",
+    "category": "scheduling",
+    "description": "创建远程触发器。",
+    "availability": "remote_triggers"
+  },
+  {
+    "name": "SubscribePR",
+    "category": "monitoring",
+    "description": "订阅 GitHub PR 事件。",
+    "availability": "github_webhooks"
+  },
+  {
+    "name": "SuggestBackgroundPR",
+    "category": "development",
+    "description": "建议把变更转为后台 PR。",
+    "availability": "ant_only"
+  },
+  {
+    "name": "snip",
+    "category": "conversation",
+    "description": "裁剪不再需要的历史上下文。",
+    "availability": "feature_flag"
+  }
+]
+
+
+ITERATION RULE: This is the first iteration. Profile and scenario guide which capabilities belong in scope, but are not required runtime artifacts. Inputs may be inferred user input, outputs produced by a named tool in AVAILABLE ORDINARY TOOLS, or existing artifacts in EXISTING SCENARIO ARTIFACTS. Prior task outputs and task dependencies are forbidden in the first iteration.
+DIRECTION RULE: INITIALIZATION COVERAGE ONLY. Build a realistic first pool of 8-10 complete, user-recognizable tasks directly supported by inferred user inputs, available ordinary tools, or existing scenario artifacts. Cover the scenario end to end with distinct requests a user could make at different moments: exploring possible directions; understanding real daily work, deliverables and collaboration; understanding entry requirements and paths; finding and verifying real opportunities; comparing roles or opportunities supplied by the user; comparing personal evidence with role requirements; preparing conversations or other evidence-gathering activities; and planning practical direction-validation actions. Add another scenario-grounded intent only when it is genuinely distinct. Do not bundle these into a few mega-tasks, but also do not expose internal steps merely to reach the count. Each task must stand alone, use evolution_direction initialization, and keep source_task_ids empty. Do not use prior task outputs.
+TASK COUNT RULE: Return 8-10 distinct initialization tasks. Fewer than 8 is incomplete coverage; more than 10 is likely over-fragmented.
+
+Return one top-level JSON object containing tasks and coverage:
+{
+  "tasks": [
+    {
+      "task_id": "task_snake_case",
+      "name": "a concise user-facing service name in everyday language",
+      "scene": "string",
+      "business_goal": "the concrete result the user wants, phrased from the user's perspective",
+      "user_request_examples": ["2-4 realistic first-person or direct requests a normal user might actually type"],
+      "evolution_direction": "initialization|discovery|decomposition|extension",
+      "source_task_ids": ["exactly one parent task ID for each decomposition child; exact producer task IDs for extension; empty for initialization/discovery"],
+      "invocation_mode": "standalone|aggregate",
+      "parallel_group": "independent capability family",
+      "synthesis_decision": "skilltool|ordinary_tool|input_only",
+      "decision_reason": "why a reusable SkillTool is or is not needed",
+      "execution_provider": "exact ordinary tool name for ordinary_tool tasks; null otherwise",
+      "need_ids": ["need_id"],
+      "inputs": [
+        {"name": "string", "description": "stable input semantics", "type": "object|array|string|number|boolean", "input_origin": "user_provided|tool_generated|existing_artifact|prior_task_output", "source": "user_input|ordinary_tool_output|upstream_artifact|prior_output", "source_ref": "artifact asset_id, prior output pool_id/semantic_key, or null", "available": true, "from_task": null, "acquisition": {"mode": "request_user|ordinary_tool|provided|prior_task", "provider": "exact tool name, prior task_id, or null"}}
+      ],
+      "outputs": [
+        {"name": "string", "display_name": "string", "description": "predicted output semantics used for task deduplication", "type": "object|array|string|number|boolean", "output_origin": "task_generated", "dedupe_key": "stable semantic key", "inferred": true, "consumer_tasks": ["task_id"], "final_consumer": "user|decision|another system|null"}
+      ],
+      "dependencies": ["task_id"],
+      "estimated_steps": 3,
+      "fresh_data_required": false
+    }
+  ],
+  "coverage": [
+    {"required_output": "string", "covered_by": ["task_id"]}
+  ],
+  "iteration_control": {
+    "continue": true,
+    "reason": "why another output-enabled iteration is or is not useful"
+  }
+}
+
+USER-EXPRESSIBILITY GATE:
+- A task is a user-recognizable request, not an internal analysis step, ontology operation, or pipeline component.
+- Start from what a normal user would ask for in one message. Use everyday service language such as “帮我看看我适合哪些方向”, “帮我比较这几个岗位”, or “我接下来四周先做什么”.
+- Do not expose abstract implementation labels as tasks, including “映射”, “矩阵构建”, “假设生成”, “提取”, “模式分析”, “方向模式”, “建模”, “聚类”, “框架设计”, or “优先级计算”, unless that exact technical artifact is explicitly requested by the user. These may be internal workflow steps inside a broader user-facing task.
+- Run the utterance test before returning each task: if its `name` and `business_goal` cannot naturally complete “我想请你……” or “帮我……”, rewrite, merge into a user-facing outcome, or remove it.
+- `user_request_examples` is mandatory and must contain 2-4 distinct, realistic utterances without analyst jargon. It is evidence that the task passes the utterance test; do not merely paraphrase an abstract task label.
+- For extension tasks, run the continuation test: every example must sound natural after “那接下来……”. Rewrite phrases such as “形成可验证假设”, “建立证据闭环”, or “输出置信度评估” into the concrete thing the user wants to compare, choose, check, prepare, or schedule.
+- Prefer the smallest set that still satisfies the direction's explicit coverage and count rule. Never create analytical subtasks merely to increase the count. Keep inputs and outputs structured internally, but keep the task boundary and visible wording natural.
+
+GENERALITY AND PARAMETERIZATION GATE:
+- The scenario defines a reusable capability for many users. The reference profile is only one sample used to select relevant capabilities; none of its literal facts may become fixed task scope.
+- Do not copy cities, regions, employers, schools, degrees, majors, technologies, personal projects, dates, numeric targets, time budgets, or other sample-user values into any task field, including input names and descriptions.
+- Do not generalize a sample computer-science profile into “技术岗位”, “技术方向”, “算法”, “软件”, “开发”, or similar domain language. Use domain-neutral terms such as “目标岗位类型”, “目标方向”, and “用户指定领域”.
+- Keep variable details as typed invocation inputs. Say “目标地区”, “用户指定的机会类型”, “希望保留的方向数量”, and “可用验证周期” rather than inserting sample values.
+- A generic job-search task should be “帮我寻找符合我条件的真实岗位机会”, never “帮我寻找某几个具体城市的某类岗位”. A generic planning task must not hard-code a four-week duration or a fixed number of directions.
+- Before returning, compare every user-visible task field against REFERENCE PROFILE and remove or parameterize any copied personal detail.
+
+Follow TASK COUNT RULE exactly. In initialization, `coverage` must contain at least 8 distinct scenario outcomes and every proposed task ID must appear in at least one `covered_by` list. Every proposed task must predict at least one concrete output before it can be retained. Input descriptions and output `dedupe_key` values must describe stable semantics rather than wording so input, output, and task-description similarity can all be checked. Enforce the source/origin pairs exactly: user_input/user_provided, ordinary_tool_output/tool_generated, upstream_artifact/existing_artifact, prior_output/prior_task_output. User input may be inferred when it is reasonable to ask at invocation time. A tool-generated input must name an exact AVAILABLE ORDINARY TOOLS provider. An existing-artifact input must reference an asset_id from EXISTING SCENARIO ARTIFACTS. A prior-task-output input must reference TASK OUTPUT POOL and is forbidden in iteration 1. Every input and output must declare type; every output must use output_origin task_generated. Mark simple collection, CRUD, retrieval, and profile persistence tasks ordinary_tool or input_only; synthesize only non-trivial reusable decisions or transformations. Stay inside the reference scenario. Treat the task map as a user-facing capability menu, not an execution plan. A technical profile must not turn a generic scenario into a technology-specific scenario.

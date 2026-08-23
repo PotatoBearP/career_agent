@@ -1,0 +1,26 @@
+{
+  "tool_name": "PrepareInformationalQuestions",
+  "user_facing_name": "整理需要向相关人员确认的材料问题",
+  "search_hint": "prepare clarifying questions to confirm application material requirements with hiring contacts or insiders",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "evidence_gap_analysis": {
+      "type": "json",
+      "required": true,
+      "description": "经历与要求对照结果，用于确定哪些材料要求最需要向外部确认"
+    },
+    "target_opportunity": {
+      "type": "json",
+      "required": true,
+      "description": "目标岗位的描述、材料要求和用户已经了解到的信息"
+    },
+    "conversation_context": {
+      "type": "json",
+      "required": true,
+      "description": "用户打算通过什么渠道确认，例如招聘方、内部员工、校友，以及对方可接受的沟通方式和时长"
+    }
+  }
+}

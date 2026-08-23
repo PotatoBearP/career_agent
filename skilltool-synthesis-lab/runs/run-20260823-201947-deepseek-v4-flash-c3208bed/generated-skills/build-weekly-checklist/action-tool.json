@@ -1,0 +1,31 @@
+{
+  "tool_name": "BuildWeeklyChecklist",
+  "user_facing_name": "本周做事清单",
+  "search_hint": "build a weekly execution checklist from an action plan and current tracking records",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "networking_action_plan": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是接下来一段时间的接触、联系、投递、跟进和检查点计划"
+    },
+    "current_week_label": {
+      "type": "string",
+      "required": true,
+      "description": "用户指明的当前周或起止日期，用于确定本周在计划中的位置"
+    },
+    "weekly_time_budget": {
+      "type": "json",
+      "required": true,
+      "description": "用户这周可投入的总时长和可用的时间段"
+    },
+    "current_tracking_records": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的最新追踪记录，可为空，用于判断哪些计划事项已经完成或需要顺延"
+    }
+  }
+}

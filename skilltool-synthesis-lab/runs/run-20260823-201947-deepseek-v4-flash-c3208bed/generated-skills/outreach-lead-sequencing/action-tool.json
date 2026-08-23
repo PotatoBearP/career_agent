@@ -1,0 +1,36 @@
+{
+  "tool_name": "OutreachLeadSequencing",
+  "user_facing_name": "排定联系先后顺序",
+  "search_hint": "sequence outreach and referral leads by opportunity priority and user contact constraints",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "referral_entry_lead_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是按机会整理的公开入口、渠道和联系人线索清单"
+    },
+    "matched_network_lead_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是从现有联系人中筛出的可接触内推线索清单"
+    },
+    "opportunity_pursuit_ranking": {
+      "type": "json",
+      "required": true,
+      "description": "场景已有产物，是用户已确认的机会投递优先顺序，用于决定先围绕哪个机会接触人"
+    },
+    "user_contact_rules": {
+      "type": "json",
+      "required": true,
+      "description": "用户对接触方式的限制、不想打扰的人、渠道排除项和频率上限"
+    },
+    "user_time_budget": {
+      "type": "json",
+      "required": true,
+      "description": "用户最近一段可投入的总时间和希望分批接触的节奏"
+    }
+  }
+}

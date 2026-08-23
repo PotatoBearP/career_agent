@@ -1,0 +1,54 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "投这个方向一般会被问哪些问题？根据我的经历和岗位要求，帮我想想对方可能会考察我什么，并给回答要点。",
+    "available_context": {
+      "evidence_gap_analysis": "包含多个 partial 和 uncertain 条目，例如项目评估指标不明确、缺少生产环境验证记录",
+      "entry_requirements_report": "目标方向为同一方向，包含任职条件、常见考察主题和阶段要求",
+      "target_direction": "用户指定的同一个目标方向"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "按主题分组的问题清单",
+      "每项包含问题、可能被问原因、参考答案思路、与个人证据的关联、需要补充的准备",
+      "对只基于共性要求推断的问题标注不确定性和待验证项"
+    ],
+    "must_not_include": [
+      "断言用户一定会被问到某个具体问题",
+      "调用 WebSearch、WebFetch 或读取用户画像"
+    ]
+  },
+  {
+    "id": "insufficient_missing_artifact",
+    "user_query": "投这个方向通常会被问哪些问题？",
+    "available_context": {
+      "entry_requirements_report": "存在但无法对照的进入要求摘要",
+      "target_direction": "用户指定的目标方向"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "insufficient_input 结果",
+      "说明缺少 evidence_gap_analysis 工件，无法定位个人侧追问点"
+    ],
+    "must_not_include": [
+      "生成一份不基于个人证据的问题清单"
+    ]
+  },
+  {
+    "id": "boundary_direction_mismatch",
+    "user_query": "帮我预判申请这些方向时可能被问到的问题。",
+    "available_context": {
+      "evidence_gap_analysis": "对照的是方向 A",
+      "entry_requirements_report": "描述的是方向 B 的进入要求",
+      "target_direction": "方向 B"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "insufficient_input 结果",
+      "说明 evidence_gap_analysis 与 entry_requirements_report 目标方向不一致，不能安全合并推断"
+    ],
+    "must_not_include": [
+      "按方向 A 的缺口与方向 B 的要求混合生成问题清单"
+    ]
+  }
+]

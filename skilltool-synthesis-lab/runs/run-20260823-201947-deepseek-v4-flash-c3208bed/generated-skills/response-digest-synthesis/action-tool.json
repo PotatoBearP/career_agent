@@ -1,0 +1,31 @@
+{
+  "tool_name": "ResponseActionDigest",
+  "user_facing_name": "回复待办总览",
+  "search_hint": "organize received application responses into prioritized next actions",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "application_tracking_ledger": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是按机会记录的投递、回复、面试、跟进和关闭状态台账"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "场景已有产物，是用户确认过的真实机会清单，用于把回复对应到具体机会"
+    },
+    "tailored_application_packages": {
+      "type": "json",
+      "required": true,
+      "description": "场景已有产物，是用户准备过的投递材料，用于判断回复中提到的材料是否满足要求"
+    },
+    "reply_handling_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户希望以什么方式处理不同回复、多少天内响应、以及哪些回复想先看不想直接处理"
+    }
+  }
+}

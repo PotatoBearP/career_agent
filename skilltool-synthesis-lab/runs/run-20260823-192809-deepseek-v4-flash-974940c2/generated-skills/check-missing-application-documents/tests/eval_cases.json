@@ -1,0 +1,76 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我看申请这个岗位还差哪几份材料",
+    "available_context": {
+      "material_requirements": "包含简历PDF、成绩单、两封推荐信及各自的格式约束",
+      "prepared_materials": "仅包含一份已完成简历PDF",
+      "application_focus_brief": "强调成绩单为必需材料",
+      "target_opportunity": "与 material_requirements 信息一致"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "missing_items 包含 成绩单 与 推荐信",
+      "每个缺失项标注对应格式要求和信息来源",
+      "成绩单优先级高于推荐信并给出理由"
+    ],
+    "must_not_include": [
+      "岗位要求之外的编造材料如自我介绍",
+      "来源无法回溯的缺失项"
+    ]
+  },
+  {
+    "id": "insufficient_input_no_requirements",
+    "user_query": "帮我看看申请这个岗位还缺哪些材料",
+    "available_context": {
+      "material_requirements": "缺失",
+      "target_opportunity": "未包含任何要提交材料的说明",
+      "prepared_materials": "包含一份简历",
+      "application_focus_brief": "不存在或内容为空"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明无法从当前输入确定岗位材料要求",
+      "不把缺要求的事实编成具体缺失文件"
+    ],
+    "must_not_include": [
+      "列出具体缺失材料清单"
+    ]
+  },
+  {
+    "id": "boundary_fallback_to_target_opportunity",
+    "user_query": "这个岗位要求交的材料里，我还没有准备哪些文件",
+    "available_context": {
+      "material_requirements": "缺失",
+      "target_opportunity": "明确要求提交简历与成绩单，并给出成绩单格式",
+      "prepared_materials": "只有简历",
+      "application_focus_brief": "存在且未强调新材料"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "从 target_opportunity 提取要求并标注来源 target_opportunity",
+      "缺失项仅包含成绩单"
+    ],
+    "must_not_include": [
+      "因缺少 material_requirements 而直接返回失败"
+    ]
+  },
+  {
+    "id": "boundary_semantic_alias_not_marked_missing",
+    "user_query": "对照岗位要求，把我手头有的和缺的对一遍",
+    "available_context": {
+      "material_requirements": "要求提交简历、项目作品清单",
+      "prepared_materials": "包含一份命名 CV 的已完成文件、一份项目作品页",
+      "application_focus_brief": "存在",
+      "target_opportunity": "与 material_requirements 一致"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "将 CV 判定为 简历 的等价项而不列为缺失",
+      "missing_items 为空或仅包含真实缺失项"
+    ],
+    "must_not_include": [
+      "同义不同名被误判为缺失"
+    ]
+  }
+]

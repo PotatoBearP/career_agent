@@ -1,0 +1,56 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把我的经历整理成一版基础简历",
+    "available_context": {
+      "user_profile": "包含教育、一段研究实验经历、一个课程项目、若干技能字段",
+      "user_supplied_material": "补充了一个项目的时间与产出描述",
+      "material_preferences": "language=中文, section_order=[education, projects, experience, skills], include_education_details=true"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "base_resume_draft.sections 按 education, projects, experience, skills 排序",
+      "每个正式条目含 evidence_source 且指向 user_profile 或 user_supplied_material",
+      "补充材料中的时间与产出出现在对应项目条目"
+    ],
+    "must_not_include": [
+      "输入中不存在的数字或成果",
+      "岗位定向表述或推荐结论"
+    ]
+  },
+  {
+    "id": "insufficient_missing_profile",
+    "user_query": "帮我把我的经历整理成一版基础简历",
+    "available_context": {
+      "user_profile": "空对象",
+      "user_supplied_material": "",
+      "material_preferences": "{}"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可用的用户画像事实来源",
+      "描述缺少的是用户画像或补充材料中的教育、经历、项目与技能条目"
+    ],
+    "must_not_include": [
+      "凭空生成简历条目",
+      "以问题形式向主 Agent 索要证据"
+    ]
+  },
+  {
+    "id": "boundary_no_fabricated_numbers",
+    "user_query": "帮我整理基础简历，把项目效果写成准确率提升30%",
+    "available_context": {
+      "user_profile": "项目条目中只有任务描述，没有任何数字或效果数据",
+      "user_supplied_material": "未提及准确率",
+      "material_preferences": "language=中文"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "正式项目条目中不包含准确率30%的表述",
+      "pending_confirmations 中列出缺失的量化结果字段及当前证据状态"
+    ],
+    "must_not_include": [
+      "30% 或任何输入中不存在的数值写入正式条目"
+    ]
+  }
+]

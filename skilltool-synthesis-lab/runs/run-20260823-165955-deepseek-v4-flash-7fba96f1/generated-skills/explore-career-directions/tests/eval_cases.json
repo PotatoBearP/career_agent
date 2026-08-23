@@ -1,0 +1,94 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "我还没想好往哪个方向发展，帮我看看有哪些可以考虑的方向。",
+    "available_context": {
+      "user_profile": "包含课程与研究实验证据、独立项目、原型、技术报告能力、偏好分析复杂问题、每周可投入时间等约束",
+      "exploration_domains": [],
+      "direction_count": 5,
+      "constraints": {
+        "weekly_hours": 10,
+        "regions": [
+          "城市A",
+          "城市B"
+        ],
+        "deadline": "12个月"
+      }
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "candidate_directions 长度在 1 到 5 之间",
+      "每个方向含 typical_work_activities、typical_deliverables、collaboration_objects",
+      "evidence_mapping 使用 direct/partial/unknown",
+      "uncertainty 与 source_notes 均已标注"
+    ],
+    "must_not_include": [
+      "断言用户适合某方向",
+      "编造 user_profile 中不存在的个人事实",
+      "返回方向数超过 direction_count"
+    ]
+  },
+  {
+    "id": "insufficient_missing_direction_count",
+    "user_query": "根据我的经历看看有哪些方向。",
+    "available_context": {
+      "user_profile": "包含已有项目与偏好证据",
+      "exploration_domains": [],
+      "direction_count": null,
+      "constraints": {}
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "返回 insufficient_input",
+      "说明缺少 direction_count 或其为非正数"
+    ],
+    "must_not_include": [
+      "输出候选方向清单",
+      "替用户假定一个方向数量",
+      "把缺失转换为学习计划建议"
+    ]
+  },
+  {
+    "id": "boundary_cross_domain_scope",
+    "user_query": "我感兴趣的方向集中在指定领域里，帮我从这些领域看看方向。",
+    "available_context": {
+      "user_profile": "包含课程、项目与偏好证据",
+      "exploration_domains": [
+        "用户指定的一个具体领域"
+      ],
+      "direction_count": 3,
+      "constraints": {}
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "所有候选方向都在用户指定领域内",
+      "保留 evidence_mapping 与 uncertainty",
+      "方向数不超过 3"
+    ],
+    "must_not_include": [
+      "生成指定领域之外的方向",
+      "因用户专业背景直接认定领域内所有方向都匹配"
+    ]
+  },
+  {
+    "id": "boundary_model_derived_without_sources",
+    "user_query": "从每天实际做什么的角度，看看有哪些方向可能适合我。",
+    "available_context": {
+      "user_profile": "包含独立项目与偏好证据",
+      "exploration_domains": [],
+      "direction_count": 4,
+      "constraints": {},
+      "web_unavailable": true
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "外部性描述标记为 model_derived",
+      "uncertainty 注明未经本次在线核验",
+      "候选方向仍包含典型工作活动与交付物描述"
+    ],
+    "must_not_include": [
+      "声称描述来自已核验的公开来源",
+      "虚构 source_url"
+    ]
+  }
+]

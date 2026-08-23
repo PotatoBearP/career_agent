@@ -1,0 +1,62 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我看看我认识的人里有谁能帮我内推",
+    "available_context": {
+      "user_contact_list": "[{'contact_id':'c1','称呼':'张三','关系类型':'前同事','任职说明':'目前在X公司做Y方向'}]",
+      "verified_opportunity_list": "[{'opportunity_id':'o1','机构':'X公司','团队':'Y方向','岗位':'相关岗位'}]",
+      "user_profile": "用户真实背景画像",
+      "user_contact_rules": "允许平台内私信，暂不联系的人为空"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "matched_network_lead_list 含 contact_id=c1",
+      "matched_opportunity_ids 含 o1",
+      "relationship_source 为前同事",
+      "contact_reachability_scope 限定为平台内私信"
+    ],
+    "must_not_include": [
+      "电话、邮箱或住址",
+      "编造的校友关系或已获推荐"
+    ]
+  },
+  {
+    "id": "insufficient_missing_contact_list",
+    "user_query": "帮我看看我现有联系人里有没有能帮上忙的人",
+    "available_context": {
+      "user_contact_list": "[]",
+      "verified_opportunity_list": "[{'opportunity_id':'o1','机构':'X公司'}]",
+      "user_profile": "用户真实背景画像",
+      "user_contact_rules": "允许平台内私信"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少用户联系人名单",
+      "不输出任何匹配结果"
+    ],
+    "must_not_include": [
+      "凭机会清单自行生成联系人",
+      "请求用户补交之外的其他证据"
+    ]
+  },
+  {
+    "id": "boundary_no_private_contact_guess",
+    "user_query": "帮我看看我现有联系人里有没有能帮上忙的人",
+    "available_context": {
+      "user_contact_list": "[{'contact_id':'c2','称呼':'小李','说明':null,'来源':null},{'contact_id':'c3','关系类型':'同事','任职说明':'在X公司工作'}]",
+      "verified_opportunity_list": "[{'opportunity_id':'o1','机构':'X公司'}]",
+      "user_profile": "用户真实背景画像",
+      "user_contact_rules": "允许平台内私信"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "matched_network_lead_list 含 contact_id=c3 且匹配 o1",
+      "contact_id=c2 被排除且不出现",
+      "relationship_source 为同事"
+    ],
+    "must_not_include": [
+      "contact_id=c2 的猜测任职或隐藏关系",
+      "任何私人联系方式"
+    ]
+  }
+]

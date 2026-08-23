@@ -1,0 +1,103 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我记一下刚才这次聊的结果和我要答应对方的事",
+    "available_context": {
+      "meeting_notes": "和张三聊了目标岗位，对方说会看看我的材料，我答应周三前把简历发过去，还约了下周一面试",
+      "application_tracking_ledger": {
+        "opportunity_x": {
+          "latest_status": "waiting_reply"
+        }
+      },
+      "verified_opportunity_list": [
+        {
+          "id": "opportunity_x",
+          "name": "目标公司 XX 岗位"
+        }
+      ],
+      "followup_rules": {
+        "channels": [
+          "email"
+        ],
+        "unwanted_contacts": []
+      }
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "meeting_outcome_record.related_opportunity_ids 包含 opportunity_x",
+      "meeting_outcome_record.user_commitments 包含周三前发简历",
+      "followup_items 包含下周一面试待办且 status 为 open",
+      "source_refs 标注来源为 meeting_notes"
+    ],
+    "must_not_include": [
+      "未在笔记中出现的联系人身份",
+      "未在笔记中出现的截止时间",
+      "任何发送或修改外部系统的动作"
+    ]
+  },
+  {
+    "id": "insufficient_input_no_content",
+    "user_query": "帮我记一下这次聊的结果",
+    "available_context": {
+      "meeting_notes": {
+        "content": "就打了个招呼，没有聊具体内容"
+      },
+      "application_tracking_ledger": {},
+      "verified_opportunity_list": [],
+      "followup_rules": {}
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明无法从会议记录提取沟通结果、承诺或待办",
+      "不返回会议记录对象"
+    ],
+    "must_not_include": [
+      "编造的沟通摘要",
+      "编造的待办项"
+    ]
+  },
+  {
+    "id": "boundary_missing_contact_and_date",
+    "user_query": "把这次交流的内容和答应的事整理成记录",
+    "available_context": {
+      "meeting_notes": {
+        "content": "聊了团队分工，我说会把项目链接整理后发过去"
+      },
+      "application_tracking_ledger": {},
+      "verified_opportunity_list": [],
+      "followup_rules": {}
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "contact_id 为 unidentified",
+      "meeting_date 为 unstated",
+      "user_commitments 包含整理项目链接",
+      "related_opportunity_ids 为空数组"
+    ],
+    "must_not_include": [
+      "猜测的联系人身份或日期",
+      "编造的公司或机会关联",
+      "编造的截止时间"
+    ]
+  },
+  {
+    "id": "error_multiple_events",
+    "user_query": "帮我把这周两次沟通都记下来",
+    "available_context": {
+      "meeting_notes": {
+        "content": "周一和甲聊了岗位一，周三和乙聊了岗位二"
+      },
+      "application_tracking_ledger": {},
+      "verified_opportunity_list": [],
+      "followup_rules": {}
+    },
+    "expected_outcome": "error",
+    "must_include": [
+      "MULTIPLE_EVENTS",
+      "不合并两个事件"
+    ],
+    "must_not_include": [
+      "合并后的单条记录"
+    ]
+  }
+]

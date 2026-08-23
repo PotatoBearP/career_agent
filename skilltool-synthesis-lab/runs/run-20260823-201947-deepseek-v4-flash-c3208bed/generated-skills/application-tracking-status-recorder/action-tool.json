@@ -1,0 +1,31 @@
+{
+  "tool_name": "ApplicationTrackingStatusRecorder",
+  "user_facing_name": "帮我记录投递、回复和跟进状态",
+  "search_hint": "记录并更新投递、回复、面试、跟进和关闭状态为结构化台账",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "status_update_events": {
+      "type": "json",
+      "required": true,
+      "description": "用户口述或粘贴的投递、回复、面试、跟进、关闭事件，时间和来源由用户提供"
+    },
+    "current_tracking_records": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的追踪记录，可为空，用于增量更新而不是覆盖"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已经确认的真实机会清单，用于关联每一条状态记录到正确机会"
+    },
+    "user_followup_cadence": {
+      "type": "json",
+      "required": true,
+      "description": "用户希望多久跟进一次、用什么方式跟进，具体节奏由用户提供"
+    }
+  }
+}

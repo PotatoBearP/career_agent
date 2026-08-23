@@ -1,0 +1,41 @@
+{
+  "tool_name": "CompareOutreachLeads",
+  "user_facing_name": "人脉渠道与联系人比较",
+  "search_hint": "compare referral channels and contacts under user-selected criteria",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "candidate_lead_ids": {
+      "type": "json",
+      "required": true,
+      "description": "用户指定的待比较人脉渠道或联系人标识，可引用已有线索清单中的对象"
+    },
+    "referral_entry_lead_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是按机会整理的公开入口、渠道和联系人线索清单"
+    },
+    "matched_network_lead_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是从现有联系人中筛出的可接触内推线索清单"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的画像信息，用于判断候选线索与用户真实背景的相关程度"
+    },
+    "user_contact_rules": {
+      "type": "json",
+      "required": true,
+      "description": "用户对接触方式、不想打扰对象、渠道排除项和频率上限的说明"
+    },
+    "comparison_criteria": {
+      "type": "json",
+      "required": true,
+      "description": "用户重视的维度，例如接触难度、回复可能、长期价值、时间成本等"
+    }
+  }
+}

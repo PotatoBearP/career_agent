@@ -1,0 +1,990 @@
+[
+  {
+    "name": "user_profile",
+    "description": "用户画像中的事实、证据、偏好与现实约束，作为生成候选方向的个体依据",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "explore_possible_directions:input:user_profile:1",
+    "consumer_task_id": "explore_possible_directions",
+    "task_name": "探索可能适合我的职业方向",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "exploration_domains",
+    "description": "用户希望聚焦的领域或行业列表；为空表示跨领域探索",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "explore_possible_directions:input:exploration_domains:2",
+    "consumer_task_id": "explore_possible_directions",
+    "task_name": "探索可能适合我的职业方向",
+    "iteration": 1,
+    "semantic_key": "exploration_domains"
+  },
+  {
+    "name": "direction_count",
+    "description": "希望返回的方向数量上限",
+    "type": "number",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "explore_possible_directions:input:direction_count:3",
+    "consumer_task_id": "explore_possible_directions",
+    "task_name": "探索可能适合我的职业方向",
+    "iteration": 1,
+    "semantic_key": "direction_count"
+  },
+  {
+    "name": "constraints",
+    "description": "影响方向取舍的现实约束，如每周可投入时间、地域偏好和计划期限",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "explore_possible_directions:input:constraints:4",
+    "consumer_task_id": "explore_possible_directions",
+    "task_name": "探索可能适合我的职业方向",
+    "iteration": 1,
+    "semantic_key": "constraints"
+  },
+  {
+    "name": "target_direction",
+    "description": "用户要了解工作内容的具体方向或岗位类型",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "understand_real_work:input:target_direction:1",
+    "consumer_task_id": "understand_real_work",
+    "task_name": "了解一个方向的实际日常工作",
+    "iteration": 1,
+    "semantic_key": "target_direction"
+  },
+  {
+    "name": "work_context",
+    "description": "用户指定的行业、组织类型或地区等背景，用于限定工作内容描述",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "understand_real_work:input:work_context:2",
+    "consumer_task_id": "understand_real_work",
+    "task_name": "了解一个方向的实际日常工作",
+    "iteration": 1,
+    "semantic_key": "work_context"
+  },
+  {
+    "name": "real_work_search_results",
+    "description": "公开来源中关于该方向日常工作、项目和交付物的检索结果，用于提炼真实工作活动",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebSearch"
+    },
+    "pool_id": "understand_real_work:input:real_work_search_results:3",
+    "consumer_task_id": "understand_real_work",
+    "task_name": "了解一个方向的实际日常工作",
+    "iteration": 1,
+    "semantic_key": "real_work_search_results"
+  },
+  {
+    "name": "real_work_page_extracts",
+    "description": "从检索结果中筛选出的原文页面内容，用于提炼真实工作活动",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebFetch"
+    },
+    "pool_id": "understand_real_work:input:real_work_page_extracts:4",
+    "consumer_task_id": "understand_real_work",
+    "task_name": "了解一个方向的实际日常工作",
+    "iteration": 1,
+    "semantic_key": "real_work_page_extracts"
+  },
+  {
+    "name": "target_direction",
+    "description": "要了解进入要求的目标方向或岗位类型",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "understand_entry_requirements:input:target_direction:1",
+    "consumer_task_id": "understand_entry_requirements",
+    "task_name": "了解目标方向的进入要求和成长路径",
+    "iteration": 1,
+    "semantic_key": "target_direction"
+  },
+  {
+    "name": "target_region",
+    "description": "用户关心的目标地区，用于限定地区差异",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "understand_entry_requirements:input:target_region:2",
+    "consumer_task_id": "understand_entry_requirements",
+    "task_name": "了解目标方向的进入要求和成长路径",
+    "iteration": 1,
+    "semantic_key": "target_region"
+  },
+  {
+    "name": "target_level",
+    "description": "用户关心的职级或经验阶段，如入门、初级、中级；为空则覆盖主要阶段",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "understand_entry_requirements:input:target_level:3",
+    "consumer_task_id": "understand_entry_requirements",
+    "task_name": "了解目标方向的进入要求和成长路径",
+    "iteration": 1,
+    "semantic_key": "target_level"
+  },
+  {
+    "name": "entry_search_results",
+    "description": "公开来源中关于该方向任职要求、招聘门槛和成长路径的检索结果",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebSearch"
+    },
+    "pool_id": "understand_entry_requirements:input:entry_search_results:4",
+    "consumer_task_id": "understand_entry_requirements",
+    "task_name": "了解目标方向的进入要求和成长路径",
+    "iteration": 1,
+    "semantic_key": "entry_search_results"
+  },
+  {
+    "name": "entry_page_extracts",
+    "description": "筛选后的原文页面内容，用于核对具体任职条件和路径",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebFetch"
+    },
+    "pool_id": "understand_entry_requirements:input:entry_page_extracts:5",
+    "consumer_task_id": "understand_entry_requirements",
+    "task_name": "了解目标方向的进入要求和成长路径",
+    "iteration": 1,
+    "semantic_key": "entry_page_extracts"
+  },
+  {
+    "name": "opportunity_criteria",
+    "description": "用户对目标机会的要求，包括目标地区、机会类型、方向或领域、发布时间等",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "find_real_opportunities:input:opportunity_criteria:1",
+    "consumer_task_id": "find_real_opportunities",
+    "task_name": "寻找符合我条件的真实岗位机会",
+    "iteration": 1,
+    "semantic_key": "opportunity_criteria"
+  },
+  {
+    "name": "opportunity_search_results",
+    "description": "按用户条件检索到的公开岗位信息结果，用于找出候选机会",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebSearch"
+    },
+    "pool_id": "find_real_opportunities:input:opportunity_search_results:2",
+    "consumer_task_id": "find_real_opportunities",
+    "task_name": "寻找符合我条件的真实岗位机会",
+    "iteration": 1,
+    "semantic_key": "opportunity_search_results"
+  },
+  {
+    "name": "opportunity_detail_extracts",
+    "description": "岗位详情页原文，用于核对岗位状态、职责、组织与链接有效性",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebFetch"
+    },
+    "pool_id": "find_real_opportunities:input:opportunity_detail_extracts:3",
+    "consumer_task_id": "find_real_opportunities",
+    "task_name": "寻找符合我条件的真实岗位机会",
+    "iteration": 1,
+    "semantic_key": "opportunity_detail_extracts"
+  },
+  {
+    "name": "result_size_limit",
+    "description": "用户希望返回的岗位数量上限",
+    "type": "number",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "find_real_opportunities:input:result_size_limit:4",
+    "consumer_task_id": "find_real_opportunities",
+    "task_name": "寻找符合我条件的真实岗位机会",
+    "iteration": 1,
+    "semantic_key": "result_size_limit"
+  },
+  {
+    "name": "options_to_compare",
+    "description": "用户希望比较的方向或岗位列表，每项包含名称、描述、来源链接等",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "compare_roles_or_directions:input:options_to_compare:1",
+    "consumer_task_id": "compare_roles_or_directions",
+    "task_name": "比较几个方向或岗位",
+    "iteration": 1,
+    "semantic_key": "options_to_compare"
+  },
+  {
+    "name": "comparison_dimensions",
+    "description": "用户关心的比较维度，如工作内容、进入门槛、发展空间、与自身证据的匹配度等；为空时使用默认维度",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "compare_roles_or_directions:input:comparison_dimensions:2",
+    "consumer_task_id": "compare_roles_or_directions",
+    "task_name": "比较几个方向或岗位",
+    "iteration": 1,
+    "semantic_key": "comparison_dimensions"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户画像中的证据与偏好，用于判断各选项与用户的契合度",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "compare_roles_or_directions:input:user_profile:3",
+    "consumer_task_id": "compare_roles_or_directions",
+    "task_name": "比较几个方向或岗位",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户画像中的已有事实、证据和偏好，作为对照的个人侧输入",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "compare_profile_with_requirements:input:user_profile:1",
+    "consumer_task_id": "compare_profile_with_requirements",
+    "task_name": "把我的经历与目标岗位要求对照",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "target_direction",
+    "description": "要对照的目标方向或岗位类型",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "compare_profile_with_requirements:input:target_direction:2",
+    "consumer_task_id": "compare_profile_with_requirements",
+    "task_name": "把我的经历与目标岗位要求对照",
+    "iteration": 1,
+    "semantic_key": "target_direction"
+  },
+  {
+    "name": "requirements_input",
+    "description": "用户提供的任职要求文本或要求清单；用户未提供时可留空",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "compare_profile_with_requirements:input:requirements_input:3",
+    "consumer_task_id": "compare_profile_with_requirements",
+    "task_name": "把我的经历与目标岗位要求对照",
+    "iteration": 1,
+    "semantic_key": "requirements_input"
+  },
+  {
+    "name": "requirement_search_results",
+    "description": "当用户未提供要求清单时，检索到的该方向典型任职要求，用于补充对照依据",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebSearch"
+    },
+    "pool_id": "compare_profile_with_requirements:input:requirement_search_results:4",
+    "consumer_task_id": "compare_profile_with_requirements",
+    "task_name": "把我的经历与目标岗位要求对照",
+    "iteration": 1,
+    "semantic_key": "requirement_search_results"
+  },
+  {
+    "name": "conversation_goal",
+    "description": "用户想通过这次交流弄清的核心问题",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "prepare_informational_interviews:input:conversation_goal:1",
+    "consumer_task_id": "prepare_informational_interviews",
+    "task_name": "准备信息访谈与提问清单",
+    "iteration": 1,
+    "semantic_key": "conversation_goal"
+  },
+  {
+    "name": "target_direction",
+    "description": "信息访谈涉及的目标方向或岗位类型",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "prepare_informational_interviews:input:target_direction:2",
+    "consumer_task_id": "prepare_informational_interviews",
+    "task_name": "准备信息访谈与提问清单",
+    "iteration": 1,
+    "semantic_key": "target_direction"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户画像中的已有证据和待验证疑点，用于生成针对性问题",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "prepare_informational_interviews:input:user_profile:3",
+    "consumer_task_id": "prepare_informational_interviews",
+    "task_name": "准备信息访谈与提问清单",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "validation_period",
+    "description": "验证周期的起止时间与每周可投入时间",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "plan_validation_actions:input:validation_period:1",
+    "consumer_task_id": "plan_validation_actions",
+    "task_name": "帮我制定方向验证行动计划",
+    "iteration": 1,
+    "semantic_key": "validation_period"
+  },
+  {
+    "name": "directions_to_validate",
+    "description": "用户希望验证的方向或机会列表，各项含名称、现状和相关链接",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "plan_validation_actions:input:directions_to_validate:2",
+    "consumer_task_id": "plan_validation_actions",
+    "task_name": "帮我制定方向验证行动计划",
+    "iteration": 1,
+    "semantic_key": "directions_to_validate"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户画像中的现实约束与偏好，用于安排可行的行动节奏",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "plan_validation_actions:input:user_profile:3",
+    "consumer_task_id": "plan_validation_actions",
+    "task_name": "帮我制定方向验证行动计划",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "candidate_directions",
+    "description": "用户已有的候选方向列表，各项含名称、了解程度与来源",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "narrow_directions_to_validate:input:candidate_directions:1",
+    "consumer_task_id": "narrow_directions_to_validate",
+    "task_name": "缩小值得优先验证的方向",
+    "iteration": 1,
+    "semantic_key": "candidate_directions"
+  },
+  {
+    "name": "decision_weights",
+    "description": "用户在取舍时看重的因素及相对权重；为空时按默认维度排序",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "narrow_directions_to_validate:input:decision_weights:2",
+    "consumer_task_id": "narrow_directions_to_validate",
+    "task_name": "缩小值得优先验证的方向",
+    "iteration": 1,
+    "semantic_key": "decision_weights"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户画像中的证据、偏好与现实约束，用于判断候选方向的贴合度",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "narrow_directions_to_validate:input:user_profile:3",
+    "consumer_task_id": "narrow_directions_to_validate",
+    "task_name": "缩小值得优先验证的方向",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "已核验的真实岗位机会清单，作为待排序的候选机会",
+    "type": "array",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "find_real_opportunities:output:verified_opportunity_list:1",
+    "available": true,
+    "from_task": "find_real_opportunities",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "find_real_opportunities"
+    },
+    "pool_id": "rank_opportunities_to_pursue:input:verified_opportunity_list:1",
+    "consumer_task_id": "rank_opportunities_to_pursue",
+    "task_name": "帮我排一下这些岗位先投哪些",
+    "iteration": 2,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户画像中的证据、偏好与现实约束，用于判断各岗位的贴合度与优先级",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "rank_opportunities_to_pursue:input:user_profile:2",
+    "consumer_task_id": "rank_opportunities_to_pursue",
+    "task_name": "帮我排一下这些岗位先投哪些",
+    "iteration": 2,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "ranking_preferences",
+    "description": "用户关心的排序因素，如地理位置、组织类型、机会类型、时间紧迫性和准备成本",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "rank_opportunities_to_pursue:input:ranking_preferences:3",
+    "consumer_task_id": "rank_opportunities_to_pursue",
+    "task_name": "帮我排一下这些岗位先投哪些",
+    "iteration": 2,
+    "semantic_key": "ranking_preferences"
+  },
+  {
+    "name": "evidence_gap_analysis",
+    "description": "已有经历与目标方向要求的对照结果，作为排序时的匹配度补充参考；没有时忽略",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "compare_profile_with_requirements:output:evidence_gap_analysis:1",
+    "available": true,
+    "from_task": "compare_profile_with_requirements",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "compare_profile_with_requirements"
+    },
+    "pool_id": "rank_opportunities_to_pursue:input:evidence_gap_analysis:4",
+    "consumer_task_id": "rank_opportunities_to_pursue",
+    "task_name": "帮我排一下这些岗位先投哪些",
+    "iteration": 2,
+    "semantic_key": "evidence_gap_analysis"
+  },
+  {
+    "name": "evidence_gap_analysis",
+    "description": "已有经历与目标方向要求的逐项对照结果，作为生成投递重点的基础",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "compare_profile_with_requirements:output:evidence_gap_analysis:1",
+    "available": true,
+    "from_task": "compare_profile_with_requirements",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "compare_profile_with_requirements"
+    },
+    "pool_id": "prepare_application_focus_brief:input:evidence_gap_analysis:1",
+    "consumer_task_id": "prepare_application_focus_brief",
+    "task_name": "投这些岗位时重点突出什么、需要补什么",
+    "iteration": 2,
+    "semantic_key": "evidence_gap_analysis"
+  },
+  {
+    "name": "target_direction",
+    "description": "要准备投递或展示的目标方向或岗位类型",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "prepare_application_focus_brief:input:target_direction:2",
+    "consumer_task_id": "prepare_application_focus_brief",
+    "task_name": "投这些岗位时重点突出什么、需要补什么",
+    "iteration": 2,
+    "semantic_key": "target_direction"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户画像中的已有证据与偏好，用于确认哪些经历可以如实突出",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "prepare_application_focus_brief:input:user_profile:3",
+    "consumer_task_id": "prepare_application_focus_brief",
+    "task_name": "投这些岗位时重点突出什么、需要补什么",
+    "iteration": 2,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "interview_prep_kit",
+    "description": "已生成的信息访谈目标与提问重点，作为消息内容的基础",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "prepare_informational_interviews:output:interview_prep_kit:1",
+    "available": true,
+    "from_task": "prepare_informational_interviews",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "prepare_informational_interviews"
+    },
+    "pool_id": "draft_informational_interview_outreach:input:interview_prep_kit:1",
+    "consumer_task_id": "draft_informational_interview_outreach",
+    "task_name": "帮我写联系从业者约聊的开口消息",
+    "iteration": 2,
+    "semantic_key": "interview_prep_kit"
+  },
+  {
+    "name": "outreach_context",
+    "description": "联系场合、平台类型、与对方的关系以及希望的语气",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "draft_informational_interview_outreach:input:outreach_context:2",
+    "consumer_task_id": "draft_informational_interview_outreach",
+    "task_name": "帮我写联系从业者约聊的开口消息",
+    "iteration": 2,
+    "semantic_key": "outreach_context"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户画像中的已有背景与约束，用于写出真实可信的自我介绍",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "draft_informational_interview_outreach:input:user_profile:3",
+    "consumer_task_id": "draft_informational_interview_outreach",
+    "task_name": "帮我写联系从业者约聊的开口消息",
+    "iteration": 2,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "evidence_gap_analysis",
+    "description": "已有经历与目标方向要求的对照结果，用于找到容易被追问的部分",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "compare_profile_with_requirements:output:evidence_gap_analysis:1",
+    "available": true,
+    "from_task": "compare_profile_with_requirements",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "compare_profile_with_requirements"
+    },
+    "pool_id": "preview_likely_evaluation_questions:input:evidence_gap_analysis:1",
+    "consumer_task_id": "preview_likely_evaluation_questions",
+    "task_name": "预判申请这些方向时可能被问到的问题",
+    "iteration": 2,
+    "semantic_key": "evidence_gap_analysis"
+  },
+  {
+    "name": "entry_requirements_report",
+    "description": "目标方向的进入条件与常见路径说明，用于判断最可能被考察的共性要求",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "understand_entry_requirements:output:entry_requirements_report:1",
+    "available": true,
+    "from_task": "understand_entry_requirements",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "understand_entry_requirements"
+    },
+    "pool_id": "preview_likely_evaluation_questions:input:entry_requirements_report:2",
+    "consumer_task_id": "preview_likely_evaluation_questions",
+    "task_name": "预判申请这些方向时可能被问到的问题",
+    "iteration": 2,
+    "semantic_key": "entry_requirements_report"
+  },
+  {
+    "name": "target_direction",
+    "description": "用户关心的目标方向或岗位类型",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "preview_likely_evaluation_questions:input:target_direction:3",
+    "consumer_task_id": "preview_likely_evaluation_questions",
+    "task_name": "预判申请这些方向时可能被问到的问题",
+    "iteration": 2,
+    "semantic_key": "target_direction"
+  },
+  {
+    "name": "opportunities_to_check",
+    "description": "用户提供的待确认岗位清单，每项含标题、组织、链接和已知信息",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "check_opportunity_availability:input:opportunities_to_check:1",
+    "consumer_task_id": "check_opportunity_availability",
+    "task_name": "确认这些岗位机会是否仍然有效",
+    "iteration": 3,
+    "semantic_key": "opportunities_to_check"
+  },
+  {
+    "name": "status_page_extracts",
+    "description": "从待确认链接取得的页面原文，用于判断链接可访问性与当前发布状态",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebFetch"
+    },
+    "pool_id": "check_opportunity_availability:input:status_page_extracts:2",
+    "consumer_task_id": "check_opportunity_availability",
+    "task_name": "确认这些岗位机会是否仍然有效",
+    "iteration": 3,
+    "semantic_key": "status_page_extracts"
+  },
+  {
+    "name": "status_search_results",
+    "description": "针对岗位名称与组织的补充检索结果，用于交叉确认机会是否仍在招聘期",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebSearch"
+    },
+    "pool_id": "check_opportunity_availability:input:status_search_results:3",
+    "consumer_task_id": "check_opportunity_availability",
+    "task_name": "确认这些岗位机会是否仍然有效",
+    "iteration": 3,
+    "semantic_key": "status_search_results"
+  },
+  {
+    "name": "organizations_to_verify",
+    "description": "用户提供的待核实组织清单，每项含组织名称、招聘上下文与相关链接",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "verify_organization_credibility:input:organizations_to_verify:1",
+    "consumer_task_id": "verify_organization_credibility",
+    "task_name": "核实招聘方组织身份与可信度",
+    "iteration": 3,
+    "semantic_key": "organizations_to_verify"
+  },
+  {
+    "name": "credibility_search_results",
+    "description": "关于组织身份、注册信息、经营动态和投诉记录的公开检索结果",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebSearch"
+    },
+    "pool_id": "verify_organization_credibility:input:credibility_search_results:2",
+    "consumer_task_id": "verify_organization_credibility",
+    "task_name": "核实招聘方组织身份与可信度",
+    "iteration": 3,
+    "semantic_key": "credibility_search_results"
+  },
+  {
+    "name": "credibility_page_extracts",
+    "description": "官网、企业信息页等原文内容，用于核对组织身份与风险信号",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebFetch"
+    },
+    "pool_id": "verify_organization_credibility:input:credibility_page_extracts:3",
+    "consumer_task_id": "verify_organization_credibility",
+    "task_name": "核实招聘方组织身份与可信度",
+    "iteration": 3,
+    "semantic_key": "credibility_page_extracts"
+  }
+]

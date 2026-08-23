@@ -1,0 +1,31 @@
+{
+  "tool_name": "FindRealOpportunities",
+  "user_facing_name": "寻找符合我条件的真实岗位机会",
+  "search_hint": "寻找符合用户条件并带可核验来源的真实岗位机会",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "opportunity_criteria": {
+      "type": "json",
+      "required": true,
+      "description": "用户对目标机会的要求，包括目标地区、机会类型、方向或领域、发布时间等"
+    },
+    "opportunity_search_results": {
+      "type": "json",
+      "required": true,
+      "description": "按用户条件检索到的公开岗位信息结果，用于找出候选机会"
+    },
+    "opportunity_detail_extracts": {
+      "type": "json",
+      "required": true,
+      "description": "岗位详情页原文，用于核对岗位状态、职责、组织与链接有效性"
+    },
+    "result_size_limit": {
+      "type": "number",
+      "required": true,
+      "description": "用户希望返回的岗位数量上限"
+    }
+  }
+}

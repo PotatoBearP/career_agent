@@ -1,0 +1,1275 @@
+[
+  {
+    "name": "verified_opportunity_list",
+    "description": "用户已经确认的真实机会清单，作为寻找内推入口和人脉线索的目标对象",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_find_referral_entry_points:input:verified_opportunity_list:1",
+    "consumer_task_id": "task_find_referral_entry_points",
+    "task_name": "帮我找这些机会的公开内推入口和人脉线索",
+    "iteration": 1,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户已有的画像信息，用于匹配与用户背景相关的公开线索和判断适用渠道",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_find_referral_entry_points:input:user_profile:2",
+    "consumer_task_id": "task_find_referral_entry_points",
+    "task_name": "帮我找这些机会的公开内推入口和人脉线索",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "search_result_web",
+    "description": "公开网络检索到的机会对应公司或机构的内推、招聘、活动或联系人线索，需带来源",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebSearch"
+    },
+    "pool_id": "task_find_referral_entry_points:input:search_result_web:3",
+    "consumer_task_id": "task_find_referral_entry_points",
+    "task_name": "帮我找这些机会的公开内推入口和人脉线索",
+    "iteration": 1,
+    "semantic_key": "search_result_web"
+  },
+  {
+    "name": "user_preferred_channels",
+    "description": "用户愿意使用的平台和渠道范围，例如官方网站、公开社区、职业社交平台等",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_find_referral_entry_points:input:user_preferred_channels:4",
+    "consumer_task_id": "task_find_referral_entry_points",
+    "task_name": "帮我找这些机会的公开内推入口和人脉线索",
+    "iteration": 1,
+    "semantic_key": "user_preferred_channels"
+  },
+  {
+    "name": "user_contact_list",
+    "description": "用户明确提供的关系名单，每条含称呼、关系类型、公开可核验信息或来源，不允许猜测联系方式和共同经历",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_find_contacts_from_network:input:user_contact_list:1",
+    "consumer_task_id": "task_find_contacts_from_network",
+    "task_name": "帮我看看我现有联系人里有没有能帮上忙的人",
+    "iteration": 1,
+    "semantic_key": "user_contact_list"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "用户已经确认的真实机会清单，用于匹配联系人可能关联的机会",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_find_contacts_from_network:input:verified_opportunity_list:2",
+    "consumer_task_id": "task_find_contacts_from_network",
+    "task_name": "帮我看看我现有联系人里有没有能帮上忙的人",
+    "iteration": 1,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户已有的画像信息，用于判断关系与用户背景的真实交集",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_find_contacts_from_network:input:user_profile:3",
+    "consumer_task_id": "task_find_contacts_from_network",
+    "task_name": "帮我看看我现有联系人里有没有能帮上忙的人",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "user_contact_rules",
+    "description": "用户对联系方式的限制、可透露的信息范围以及哪些人暂时不想打扰",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_find_contacts_from_network:input:user_contact_rules:4",
+    "consumer_task_id": "task_find_contacts_from_network",
+    "task_name": "帮我看看我现有联系人里有没有能帮上忙的人",
+    "iteration": 1,
+    "semantic_key": "user_contact_rules"
+  },
+  {
+    "name": "lead_candidates",
+    "description": "用户提供或从其他途径得到的联系人、内推渠道线索，必须含可公开核验的姓名、组织、链接或其他标识",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_verify_ref_lead:input:lead_candidates:1",
+    "consumer_task_id": "task_verify_ref_lead",
+    "task_name": "帮我核实这些内推线索和人脉信息靠不靠谱",
+    "iteration": 1,
+    "semantic_key": "lead_candidates"
+  },
+  {
+    "name": "search_result_web",
+    "description": "公开网络检索到的与线索相关的职业信息、组织信息和关联证据",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebSearch"
+    },
+    "pool_id": "task_verify_ref_lead:input:search_result_web:2",
+    "consumer_task_id": "task_verify_ref_lead",
+    "task_name": "帮我核实这些内推线索和人脉信息靠不靠谱",
+    "iteration": 1,
+    "semantic_key": "search_result_web"
+  },
+  {
+    "name": "page_content",
+    "description": "被检视的具体页面或主页内容，用于核验联系人职业身份和关系真实性",
+    "type": "object",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebFetch"
+    },
+    "pool_id": "task_verify_ref_lead:input:page_content:3",
+    "consumer_task_id": "task_verify_ref_lead",
+    "task_name": "帮我核实这些内推线索和人脉信息靠不靠谱",
+    "iteration": 1,
+    "semantic_key": "page_content"
+  },
+  {
+    "name": "user_contact_rules",
+    "description": "用户对联系方式的限制和风险容忍度，以及哪些渠道被明确排除",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_verify_ref_lead:input:user_contact_rules:4",
+    "consumer_task_id": "task_verify_ref_lead",
+    "task_name": "帮我核实这些内推线索和人脉信息靠不靠谱",
+    "iteration": 1,
+    "semantic_key": "user_contact_rules"
+  },
+  {
+    "name": "contact_context",
+    "description": "对方称呼、关系类型、真实共同点或交集、公开联系方式以及拟使用的场合说明",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_draft_contact_message:input:contact_context:1",
+    "consumer_task_id": "task_draft_contact_message",
+    "task_name": "帮我写一段自然、克制的联系消息",
+    "iteration": 1,
+    "semantic_key": "contact_context"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "用户已经确认的真实机会清单，用于在消息中准确说明申请目标",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_draft_contact_message:input:verified_opportunity_list:2",
+    "consumer_task_id": "task_draft_contact_message",
+    "task_name": "帮我写一段自然、克制的联系消息",
+    "iteration": 1,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "tailored_application_packages",
+    "description": "用户已准备好的投递材料，用于在消息中引用真实材料而不是虚构经历",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "tailored_application_packages",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_draft_contact_message:input:tailored_application_packages:3",
+    "consumer_task_id": "task_draft_contact_message",
+    "task_name": "帮我写一段自然、克制的联系消息",
+    "iteration": 1,
+    "semantic_key": "tailored_application_packages"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户已有的画像信息，用于保证消息中对自身的描述真实一致",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_draft_contact_message:input:user_profile:4",
+    "consumer_task_id": "task_draft_contact_message",
+    "task_name": "帮我写一段自然、克制的联系消息",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "message_preferences",
+    "description": "用户对语气、长度、渠道语言风格、称谓以及希望避免的措辞的偏好",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_draft_contact_message:input:message_preferences:5",
+    "consumer_task_id": "task_draft_contact_message",
+    "task_name": "帮我写一段自然、克制的联系消息",
+    "iteration": 1,
+    "semantic_key": "message_preferences"
+  },
+  {
+    "name": "status_update_events",
+    "description": "用户口述或粘贴的投递、回复、面试、跟进、关闭事件，时间和来源由用户提供",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_record_tracking_status:input:status_update_events:1",
+    "consumer_task_id": "task_record_tracking_status",
+    "task_name": "帮我记录投递、回复和跟进状态",
+    "iteration": 1,
+    "semantic_key": "status_update_events"
+  },
+  {
+    "name": "current_tracking_records",
+    "description": "用户已有的追踪记录，可为空，用于增量更新而不是覆盖",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_record_tracking_status:input:current_tracking_records:2",
+    "consumer_task_id": "task_record_tracking_status",
+    "task_name": "帮我记录投递、回复和跟进状态",
+    "iteration": 1,
+    "semantic_key": "current_tracking_records"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "用户已经确认的真实机会清单，用于关联每一条状态记录到正确机会",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_record_tracking_status:input:verified_opportunity_list:3",
+    "consumer_task_id": "task_record_tracking_status",
+    "task_name": "帮我记录投递、回复和跟进状态",
+    "iteration": 1,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "user_followup_cadence",
+    "description": "用户希望多久跟进一次、用什么方式跟进，具体节奏由用户提供",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_record_tracking_status:input:user_followup_cadence:4",
+    "consumer_task_id": "task_record_tracking_status",
+    "task_name": "帮我记录投递、回复和跟进状态",
+    "iteration": 1,
+    "semantic_key": "user_followup_cadence"
+  },
+  {
+    "name": "application_tracking_ledger",
+    "description": "用户的追踪记录，由用户直接提供当前版本，包含各机会的状态和下一步动作",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_next_followup_actions:input:application_tracking_ledger:1",
+    "consumer_task_id": "task_next_followup_actions",
+    "task_name": "帮我整理投递情况，告诉下一步该跟进谁",
+    "iteration": 1,
+    "semantic_key": "application_tracking_ledger"
+  },
+  {
+    "name": "opportunity_pursuit_ranking",
+    "description": "用户已确认的机会投递优先顺序，用于计算跟进价值",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "opportunity_pursuit_ranking",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_next_followup_actions:input:opportunity_pursuit_ranking:2",
+    "consumer_task_id": "task_next_followup_actions",
+    "task_name": "帮我整理投递情况，告诉下一步该跟进谁",
+    "iteration": 1,
+    "semantic_key": "opportunity_pursuit_ranking"
+  },
+  {
+    "name": "user_followup_preferences",
+    "description": "用户偏好的联系渠道、时间段、频率和不想反复打扰的对象",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_next_followup_actions:input:user_followup_preferences:3",
+    "consumer_task_id": "task_next_followup_actions",
+    "task_name": "帮我整理投递情况，告诉下一步该跟进谁",
+    "iteration": 1,
+    "semantic_key": "user_followup_preferences"
+  },
+  {
+    "name": "user_available_time",
+    "description": "用户可投入跟进的时间窗口或总体时间上限，具体数值由用户提供",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_next_followup_actions:input:user_available_time:4",
+    "consumer_task_id": "task_next_followup_actions",
+    "task_name": "帮我整理投递情况，告诉下一步该跟进谁",
+    "iteration": 1,
+    "semantic_key": "user_available_time"
+  },
+  {
+    "name": "candidate_options",
+    "description": "用户指定的待比较机会或人脉渠道标识，可以引用已有清单中的对象",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_compare_pursuit_targets:input:candidate_options:1",
+    "consumer_task_id": "task_compare_pursuit_targets",
+    "task_name": "帮我比较这几个机会或人脉渠道，选一个先重点投入",
+    "iteration": 1,
+    "semantic_key": "candidate_options"
+  },
+  {
+    "name": "opportunity_pursuit_ranking",
+    "description": "用户已确认的机会投递优先顺序，作为比较的参考依据",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "opportunity_pursuit_ranking",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_compare_pursuit_targets:input:opportunity_pursuit_ranking:2",
+    "consumer_task_id": "task_compare_pursuit_targets",
+    "task_name": "帮我比较这几个机会或人脉渠道，选一个先重点投入",
+    "iteration": 1,
+    "semantic_key": "opportunity_pursuit_ranking"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户已有的画像信息，用于判断候选对象与用户的匹配程度",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_compare_pursuit_targets:input:user_profile:3",
+    "consumer_task_id": "task_compare_pursuit_targets",
+    "task_name": "帮我比较这几个机会或人脉渠道，选一个先重点投入",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "comparison_criteria",
+    "description": "用户重视的维度，例如接触难度、回复可能、长期价值、时间成本等",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_compare_pursuit_targets:input:comparison_criteria:4",
+    "consumer_task_id": "task_compare_pursuit_targets",
+    "task_name": "帮我比较这几个机会或人脉渠道，选一个先重点投入",
+    "iteration": 1,
+    "semantic_key": "comparison_criteria"
+  },
+  {
+    "name": "target_opportunities",
+    "description": "用户已经确认的真实机会清单，用于确定要了解的对象",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_role_context_brief:input:target_opportunities:1",
+    "consumer_task_id": "task_role_context_brief",
+    "task_name": "帮我了解待联系的人平时做什么、团队怎么协作、看重什么",
+    "iteration": 1,
+    "semantic_key": "target_opportunities"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户已有的画像信息，用于把工作情境与用户已有经历联系起来",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_role_context_brief:input:user_profile:2",
+    "consumer_task_id": "task_role_context_brief",
+    "task_name": "帮我了解待联系的人平时做什么、团队怎么协作、看重什么",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "search_result_web",
+    "description": "公开网络检索到的岗位职责、团队信息、行业讨论和公司公开资料",
+    "type": "array",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebSearch"
+    },
+    "pool_id": "task_role_context_brief:input:search_result_web:3",
+    "consumer_task_id": "task_role_context_brief",
+    "task_name": "帮我了解待联系的人平时做什么、团队怎么协作、看重什么",
+    "iteration": 1,
+    "semantic_key": "search_result_web"
+  },
+  {
+    "name": "page_content",
+    "description": "被检视的具体页面内容，用于确认岗位要求、团队构成和工作方式",
+    "type": "object",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebFetch"
+    },
+    "pool_id": "task_role_context_brief:input:page_content:4",
+    "consumer_task_id": "task_role_context_brief",
+    "task_name": "帮我了解待联系的人平时做什么、团队怎么协作、看重什么",
+    "iteration": 1,
+    "semantic_key": "page_content"
+  },
+  {
+    "name": "research_focus",
+    "description": "用户想了解的方面，例如日常工作、团队协作、考核要求、入口路径等",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_role_context_brief:input:research_focus:5",
+    "consumer_task_id": "task_role_context_brief",
+    "task_name": "帮我了解待联系的人平时做什么、团队怎么协作、看重什么",
+    "iteration": 1,
+    "semantic_key": "research_focus"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户已有的画像信息，包含真实经历和能力证据",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_gap_evidence_plan:input:user_profile:1",
+    "consumer_task_id": "task_gap_evidence_plan",
+    "task_name": "帮我对照这些机会的要求，看看我还有哪些差距、补什么证据",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "用户已经确认的真实机会清单，作为要求对照的目标",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_gap_evidence_plan:input:verified_opportunity_list:2",
+    "consumer_task_id": "task_gap_evidence_plan",
+    "task_name": "帮我对照这些机会的要求，看看我还有哪些差距、补什么证据",
+    "iteration": 1,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "material_quality_report",
+    "description": "用户已有投递材料的质量检查结果，用于判断哪些材料可以作为现有证据",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "material_quality_report",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_gap_evidence_plan:input:material_quality_report:3",
+    "consumer_task_id": "task_gap_evidence_plan",
+    "task_name": "帮我对照这些机会的要求，看看我还有哪些差距、补什么证据",
+    "iteration": 1,
+    "semantic_key": "material_quality_report"
+  },
+  {
+    "name": "user_evidence_input",
+    "description": "用户愿意提供的额外真实经历、课程、项目、成果、评价或其他证明材料",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_gap_evidence_plan:input:user_evidence_input:4",
+    "consumer_task_id": "task_gap_evidence_plan",
+    "task_name": "帮我对照这些机会的要求，看看我还有哪些差距、补什么证据",
+    "iteration": 1,
+    "semantic_key": "user_evidence_input"
+  },
+  {
+    "name": "current_situation_snapshot",
+    "description": "用户当前的进展、已投递清单、已有联系人、待核验线索等现状信息，由用户直接提供",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_network_action_plan:input:current_situation_snapshot:1",
+    "consumer_task_id": "task_network_action_plan",
+    "task_name": "帮我制定接下来一段时间的跟进和拓展行动计划",
+    "iteration": 1,
+    "semantic_key": "current_situation_snapshot"
+  },
+  {
+    "name": "opportunity_pursuit_ranking",
+    "description": "用户已确认的机会投递优先顺序，用于安排行动计划中的先后",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "opportunity_pursuit_ranking",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_network_action_plan:input:opportunity_pursuit_ranking:2",
+    "consumer_task_id": "task_network_action_plan",
+    "task_name": "帮我制定接下来一段时间的跟进和拓展行动计划",
+    "iteration": 1,
+    "semantic_key": "opportunity_pursuit_ranking"
+  },
+  {
+    "name": "user_time_and_rules",
+    "description": "用户可投入的周期、每周时间、联系方式上限、偏好渠道和不能打扰的时间",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_network_action_plan:input:user_time_and_rules:3",
+    "consumer_task_id": "task_network_action_plan",
+    "task_name": "帮我制定接下来一段时间的跟进和拓展行动计划",
+    "iteration": 1,
+    "semantic_key": "user_time_and_rules"
+  },
+  {
+    "name": "user_profile",
+    "description": "用户已有的画像信息，用于确保计划符合用户真实条件和偏好",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_network_action_plan:input:user_profile:4",
+    "consumer_task_id": "task_network_action_plan",
+    "task_name": "帮我制定接下来一段时间的跟进和拓展行动计划",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "referral_entry_lead_list",
+    "description": "用户已有产物，是按机会整理的公开入口、渠道和联系人线索清单",
+    "type": "array",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "task_find_referral_entry_points:output:referral_entry_lead_list:1",
+    "available": true,
+    "from_task": "task_find_referral_entry_points",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "task_find_referral_entry_points"
+    },
+    "pool_id": "task_sequence_outreach_leads:input:referral_entry_lead_list:1",
+    "consumer_task_id": "task_sequence_outreach_leads",
+    "task_name": "帮我排一下接下来先联系谁、后联系谁",
+    "iteration": 2,
+    "semantic_key": "referral_entry_lead_list"
+  },
+  {
+    "name": "matched_network_lead_list",
+    "description": "用户已有产物，是从现有联系人中筛出的可接触内推线索清单",
+    "type": "array",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "task_find_contacts_from_network:output:matched_network_lead_list:1",
+    "available": true,
+    "from_task": "task_find_contacts_from_network",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "task_find_contacts_from_network"
+    },
+    "pool_id": "task_sequence_outreach_leads:input:matched_network_lead_list:2",
+    "consumer_task_id": "task_sequence_outreach_leads",
+    "task_name": "帮我排一下接下来先联系谁、后联系谁",
+    "iteration": 2,
+    "semantic_key": "matched_network_lead_list"
+  },
+  {
+    "name": "opportunity_pursuit_ranking",
+    "description": "场景已有产物，是用户已确认的机会投递优先顺序，用于决定先围绕哪个机会接触人",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "opportunity_pursuit_ranking",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_sequence_outreach_leads:input:opportunity_pursuit_ranking:3",
+    "consumer_task_id": "task_sequence_outreach_leads",
+    "task_name": "帮我排一下接下来先联系谁、后联系谁",
+    "iteration": 2,
+    "semantic_key": "opportunity_pursuit_ranking"
+  },
+  {
+    "name": "user_contact_rules",
+    "description": "用户对接触方式的限制、不想打扰的人、渠道排除项和频率上限",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_sequence_outreach_leads:input:user_contact_rules:4",
+    "consumer_task_id": "task_sequence_outreach_leads",
+    "task_name": "帮我排一下接下来先联系谁、后联系谁",
+    "iteration": 2,
+    "semantic_key": "user_contact_rules"
+  },
+  {
+    "name": "user_time_budget",
+    "description": "用户最近一段可投入的总时间和希望分批接触的节奏",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_sequence_outreach_leads:input:user_time_budget:5",
+    "consumer_task_id": "task_sequence_outreach_leads",
+    "task_name": "帮我排一下接下来先联系谁、后联系谁",
+    "iteration": 2,
+    "semantic_key": "user_time_budget"
+  },
+  {
+    "name": "contact_message_drafts",
+    "description": "用户已有产物，是针对不同联系场景生成的待发送消息草稿",
+    "type": "array",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "task_draft_contact_message:output:contact_message_drafts:1",
+    "available": true,
+    "from_task": "task_draft_contact_message",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "task_draft_contact_message"
+    },
+    "pool_id": "task_review_outreach_drafts:input:contact_message_drafts:1",
+    "consumer_task_id": "task_review_outreach_drafts",
+    "task_name": "帮我把要发出去的消息再过一遍，标出不合适的地方",
+    "iteration": 2,
+    "semantic_key": "contact_message_drafts"
+  },
+  {
+    "name": "user_contact_rules",
+    "description": "用户对隐私、可透露信息、称呼方式和不想越过的界限的说明",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_review_outreach_drafts:input:user_contact_rules:2",
+    "consumer_task_id": "task_review_outreach_drafts",
+    "task_name": "帮我把要发出去的消息再过一遍，标出不合适的地方",
+    "iteration": 2,
+    "semantic_key": "user_contact_rules"
+  },
+  {
+    "name": "message_preferences",
+    "description": "用户偏好的语气、长度、用词习惯和希望避免的表达",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_review_outreach_drafts:input:message_preferences:3",
+    "consumer_task_id": "task_review_outreach_drafts",
+    "task_name": "帮我把要发出去的消息再过一遍，标出不合适的地方",
+    "iteration": 2,
+    "semantic_key": "message_preferences"
+  },
+  {
+    "name": "network_lead_verification_report",
+    "description": "用户已有产物，是待联系对象与渠道的事实核实结果，用于检查消息里有没有与事实不符的说法",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "task_verify_ref_lead:output:network_lead_verification_report:1",
+    "available": true,
+    "from_task": "task_verify_ref_lead",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "task_verify_ref_lead"
+    },
+    "pool_id": "task_review_outreach_drafts:input:network_lead_verification_report:4",
+    "consumer_task_id": "task_review_outreach_drafts",
+    "task_name": "帮我把要发出去的消息再过一遍，标出不合适的地方",
+    "iteration": 2,
+    "semantic_key": "network_lead_verification_report"
+  },
+  {
+    "name": "application_tracking_ledger",
+    "description": "用户已有产物，是按机会记录的投递、回复、面试、跟进和关闭状态台账",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "task_record_tracking_status:output:application_tracking_ledger:1",
+    "available": true,
+    "from_task": "task_record_tracking_status",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "task_record_tracking_status"
+    },
+    "pool_id": "task_synthesize_response_digest:input:application_tracking_ledger:1",
+    "consumer_task_id": "task_synthesize_response_digest",
+    "task_name": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+    "iteration": 2,
+    "semantic_key": "application_tracking_ledger"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "场景已有产物，是用户确认过的真实机会清单，用于把回复对应到具体机会",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_synthesize_response_digest:input:verified_opportunity_list:2",
+    "consumer_task_id": "task_synthesize_response_digest",
+    "task_name": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+    "iteration": 2,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "tailored_application_packages",
+    "description": "场景已有产物，是用户准备过的投递材料，用于判断回复中提到的材料是否满足要求",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "tailored_application_packages",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_synthesize_response_digest:input:tailored_application_packages:3",
+    "consumer_task_id": "task_synthesize_response_digest",
+    "task_name": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+    "iteration": 2,
+    "semantic_key": "tailored_application_packages"
+  },
+  {
+    "name": "reply_handling_preferences",
+    "description": "用户希望以什么方式处理不同回复、多少天内响应、以及哪些回复想先看不想直接处理",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_synthesize_response_digest:input:reply_handling_preferences:4",
+    "consumer_task_id": "task_synthesize_response_digest",
+    "task_name": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+    "iteration": 2,
+    "semantic_key": "reply_handling_preferences"
+  },
+  {
+    "name": "role_conversation_context_brief",
+    "description": "用户已有产物，是按机会整理的对方日常工作、团队协作和可聊话题简报",
+    "type": "array",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "task_role_context_brief:output:role_conversation_context_brief:1",
+    "available": true,
+    "from_task": "task_role_context_brief",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "task_role_context_brief"
+    },
+    "pool_id": "task_prepare_info_conversation:input:role_conversation_context_brief:1",
+    "consumer_task_id": "task_prepare_info_conversation",
+    "task_name": "帮我准备一下和这个人见面聊什么、怎么开口",
+    "iteration": 2,
+    "semantic_key": "role_conversation_context_brief"
+  },
+  {
+    "name": "network_lead_verification_report",
+    "description": "用户已有产物，是待联系对象的公开信息核实结果，用于保证谈话内容有理有据",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "task_verify_ref_lead:output:network_lead_verification_report:1",
+    "available": true,
+    "from_task": "task_verify_ref_lead",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "task_verify_ref_lead"
+    },
+    "pool_id": "task_prepare_info_conversation:input:network_lead_verification_report:2",
+    "consumer_task_id": "task_prepare_info_conversation",
+    "task_name": "帮我准备一下和这个人见面聊什么、怎么开口",
+    "iteration": 2,
+    "semantic_key": "network_lead_verification_report"
+  },
+  {
+    "name": "user_profile",
+    "description": "场景已有产物，是用户的真实经历和能力画像，用于准备符合本人情况的介绍和提问",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_prepare_info_conversation:input:user_profile:3",
+    "consumer_task_id": "task_prepare_info_conversation",
+    "task_name": "帮我准备一下和这个人见面聊什么、怎么开口",
+    "iteration": 2,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "conversation_focus",
+    "description": "用户想在这次交流中达成的目标，例如了解团队、询问申请建议、确认投递时机或单纯建立联系",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_prepare_info_conversation:input:conversation_focus:4",
+    "consumer_task_id": "task_prepare_info_conversation",
+    "task_name": "帮我准备一下和这个人见面聊什么、怎么开口",
+    "iteration": 2,
+    "semantic_key": "conversation_focus"
+  },
+  {
+    "name": "networking_action_plan",
+    "description": "用户已有产物，是接下来一段时间的接触、联系、投递、跟进和检查点计划",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "task_network_action_plan:output:networking_action_plan:1",
+    "available": true,
+    "from_task": "task_network_action_plan",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "task_network_action_plan"
+    },
+    "pool_id": "task_build_weekly_checklist:input:networking_action_plan:1",
+    "consumer_task_id": "task_build_weekly_checklist",
+    "task_name": "帮我把接下来的计划拆成这一周能做的事",
+    "iteration": 2,
+    "semantic_key": "networking_action_plan"
+  },
+  {
+    "name": "current_week_label",
+    "description": "用户指明的当前周或起止日期，用于确定本周在计划中的位置",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_build_weekly_checklist:input:current_week_label:2",
+    "consumer_task_id": "task_build_weekly_checklist",
+    "task_name": "帮我把接下来的计划拆成这一周能做的事",
+    "iteration": 2,
+    "semantic_key": "current_week_label"
+  },
+  {
+    "name": "weekly_time_budget",
+    "description": "用户这周可投入的总时长和可用的时间段",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_build_weekly_checklist:input:weekly_time_budget:3",
+    "consumer_task_id": "task_build_weekly_checklist",
+    "task_name": "帮我把接下来的计划拆成这一周能做的事",
+    "iteration": 2,
+    "semantic_key": "weekly_time_budget"
+  },
+  {
+    "name": "current_tracking_records",
+    "description": "用户已有的最新追踪记录，可为空，用于判断哪些计划事项已经完成或需要顺延",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_build_weekly_checklist:input:current_tracking_records:4",
+    "consumer_task_id": "task_build_weekly_checklist",
+    "task_name": "帮我把接下来的计划拆成这一周能做的事",
+    "iteration": 2,
+    "semantic_key": "current_tracking_records"
+  },
+  {
+    "name": "meeting_notes",
+    "description": "用户口述或粘贴的交流内容，例如对方提到的事、自己的回应、被问到的问题和口头承诺",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_record_meeting_outcomes:input:meeting_notes:1",
+    "consumer_task_id": "task_record_meeting_outcomes",
+    "task_name": "帮我记一下这次聊的结果和要答应对方的事",
+    "iteration": 2,
+    "semantic_key": "meeting_notes"
+  },
+  {
+    "name": "application_tracking_ledger",
+    "description": "用户已有产物，是与该沟通相关机会的当前追踪状态，用于把新记录接进去",
+    "type": "object",
+    "input_origin": "prior_task_output",
+    "source": "prior_output",
+    "source_ref": "task_record_tracking_status:output:application_tracking_ledger:1",
+    "available": true,
+    "from_task": "task_record_tracking_status",
+    "acquisition": {
+      "mode": "prior_task",
+      "provider": "task_record_tracking_status"
+    },
+    "pool_id": "task_record_meeting_outcomes:input:application_tracking_ledger:2",
+    "consumer_task_id": "task_record_meeting_outcomes",
+    "task_name": "帮我记一下这次聊的结果和要答应对方的事",
+    "iteration": 2,
+    "semantic_key": "application_tracking_ledger"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "场景已有产物，是用户确认过的真实机会清单，用于把本次沟通绑定到对应机会",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_record_meeting_outcomes:input:verified_opportunity_list:3",
+    "consumer_task_id": "task_record_meeting_outcomes",
+    "task_name": "帮我记一下这次聊的结果和要答应对方的事",
+    "iteration": 2,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "followup_rules",
+    "description": "用户对自己要履行的承诺、跟进方式和不希望再接触的对象的说明",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_record_meeting_outcomes:input:followup_rules:4",
+    "consumer_task_id": "task_record_meeting_outcomes",
+    "task_name": "帮我记一下这次聊的结果和要答应对方的事",
+    "iteration": 2,
+    "semantic_key": "followup_rules"
+  }
+]

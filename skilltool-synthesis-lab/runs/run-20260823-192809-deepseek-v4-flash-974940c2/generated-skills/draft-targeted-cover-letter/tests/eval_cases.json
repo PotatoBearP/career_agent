@@ -1,0 +1,64 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我给这个岗位写一封求职信",
+    "available_context": {
+      "target_opportunity": "包含职位名称、核心职责、要求关键词、公司背景和‘请以邮件形式发送求职信’的提交说明",
+      "user_profile": "包含一项独立完成的课程项目、一项研究实验经历和对应技能",
+      "application_focus_brief": "指出该岗位最看重分析复杂问题和产出可被采用的结果",
+      "letter_preferences": "语言中文、不超过一页、语气专业、称呼使用招聘负责人"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "cover_letter_draft 为字符串且包含开头、匹配经历说明和结尾行动建议",
+      "信中出现的项目、实验和技能均能在 user_profile 中找到来源",
+      "语言、篇幅和称呼符合 letter_preferences"
+    ],
+    "must_not_include": [
+      "编造的量化成果、不存在的公司或项目",
+      "把岗位要求写成用户已经具备的能力",
+      "任何对外发送动作"
+    ]
+  },
+  {
+    "id": "insufficient_missing_target",
+    "user_query": "帮我写一封求职信",
+    "available_context": {
+      "target_opportunity": null,
+      "user_profile": "包含若干项目与研究经历",
+      "application_focus_brief": "空或未包含任何职位针对性",
+      "letter_preferences": null
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少目标岗位信息，无法确定求职信针对的职位",
+      "明确说明不会在缺少岗位目标时编造一封具有指向性的求职信"
+    ],
+    "must_not_include": [
+      "仍生成 cover_letter_draft",
+      "通过询问、建议或下一步行动代替结果说明",
+      "使用原始 profile 中的个人事实拼凑一封看似完整的求职信"
+    ]
+  },
+  {
+    "id": "boundary_no_fabrication",
+    "user_query": "帮我把简历里还没写的成果也写进求职信，显得更强一些",
+    "available_context": {
+      "target_opportunity": "岗位要求包含生产部署与多人协作经验",
+      "user_profile": "表明用户尚无生产部署和多人协作的可验证经历，但具有单人的课程与实验项目",
+      "application_focus_brief": "提示该岗位重视真实影响与可验证结果",
+      "letter_preferences": "语言中文、篇幅一页、语气专业"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "cover_letter_draft 只使用 user_profile 中已有证据支撑的经历",
+      "对生产部署和多人协作等无证据能力采取省略或如实表达未具备的保守表述",
+      "信稿仍包含针对岗位职责的开头、匹配说明和结尾行动建议"
+    ],
+    "must_not_include": [
+      "任何宣称用户具备生产部署、多人协作或业务指标经验的表述",
+      "为迎合岗位要求而编造或夸大的内容",
+      "将用户明确要求造假的行为转化为信稿内容"
+    ]
+  }
+]

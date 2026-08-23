@@ -1,0 +1,316 @@
+{
+  "tasks": [
+    {
+      "task_id": "task_check_missing_application_documents",
+      "name": "检查还缺哪些申请材料",
+      "scene": "岗位材料准备",
+      "business_goal": "把目标岗位要求的材料文件与用户已准备的材料逐项比对，列出还缺哪几份、每份的格式要求和补齐优先级，全部基于用户提供和已验证的信息，不编造缺项。",
+      "user_request_examples": [
+        "帮我看申请这个岗位还差哪几份材料",
+        "对照岗位要求，把我手头已经有的材料和还缺的材料对一遍",
+        "这个岗位要求交的材料里，我还没有准备哪些文件",
+        "帮我列出准备投递还缺的材料和每份的格式要求"
+      ],
+      "evolution_direction": "decomposition",
+      "source_task_ids": [
+        "task_assess_material_readiness"
+      ],
+      "invocation_mode": "standalone",
+      "parallel_group": "材料缺口检查",
+      "synthesis_decision": "skilltool",
+      "decision_reason": "需要把岗位材料要求与用户已备文件做逐项核对，判断缺项、格式约束和补齐优先级，属于可复用的检查判断，不是简单的文件写入或检索。",
+      "execution_provider": null,
+      "need_ids": [
+        "missing_application_documents_check"
+      ],
+      "inputs": [
+        {
+          "name": "prepared_materials",
+          "description": "用户已准备的材料清单，每项包含文档名称、格式状态和是否完成",
+          "type": "array",
+          "input_origin": "user_provided",
+          "source": "user_input",
+          "source_ref": null,
+          "available": true,
+          "from_task": null,
+          "acquisition": {
+            "mode": "request_user",
+            "provider": null
+          }
+        },
+        {
+          "name": "target_opportunity",
+          "description": "目标岗位描述或材料要求说明，用于确定要交哪些文件和格式约束；与已验证岗位信息一致时可只提供岗位标识",
+          "type": "object",
+          "input_origin": "user_provided",
+          "source": "user_input",
+          "source_ref": null,
+          "available": true,
+          "from_task": null,
+          "acquisition": {
+            "mode": "request_user",
+            "provider": null
+          }
+        },
+        {
+          "name": "material_requirements",
+          "description": "可选：已梳理出的岗位材料要求清单，存在时优先作为比对基准",
+          "type": "object",
+          "input_origin": "prior_task_output",
+          "source": "prior_output",
+          "source_ref": "task_extract_application_requirements:output:material_requirements:1",
+          "available": true,
+          "from_task": "task_extract_application_requirements",
+          "acquisition": {
+            "mode": "prior_task",
+            "provider": "task_extract_application_requirements"
+          }
+        },
+        {
+          "name": "application_focus_brief",
+          "description": "投递材料准备要点，用于判断缺失材料的优先顺序",
+          "type": "object",
+          "input_origin": "existing_artifact",
+          "source": "upstream_artifact",
+          "source_ref": "application_focus_brief",
+          "available": true,
+          "from_task": null,
+          "acquisition": {
+            "mode": "provided",
+            "provider": null
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "missing_documents_report",
+          "display_name": "缺失申请材料清单",
+          "description": "缺失材料清单，包含缺失文件、对应格式要求、当前状态、补齐优先级和信息来源",
+          "type": "object",
+          "output_origin": "task_generated",
+          "dedupe_key": "missing_application_documents_identified_against_requirements",
+          "inferred": true,
+          "consumer_tasks": [],
+          "final_consumer": "user"
+        }
+      ],
+      "dependencies": [],
+      "estimated_steps": 3,
+      "fresh_data_required": false
+    },
+    {
+      "task_id": "task_list_unverified_facts_for_supplement",
+      "name": "列出需要补充或确认的事实",
+      "scene": "岗位材料准备",
+      "business_goal": "对照岗位要求和已有证据，找出申请材料里缺少、不清晰或还没有证据支撑的事实，逐条列成需要用户补充或确认的清单，不编造任何经历、数字或成果。",
+      "user_request_examples": [
+        "帮我把材料里需要我自己补充的事实列出来",
+        "看看这版简历和项目描述里有哪些细节需要我去确认",
+        "申请这个岗位我还需要补充哪些事实或证明材料",
+        "把材料里还没有证据支撑的地方列出来，我自己补"
+      ],
+      "evolution_direction": "decomposition",
+      "source_task_ids": [
+        "task_assess_material_readiness"
+      ],
+      "invocation_mode": "standalone",
+      "parallel_group": "材料缺口检查",
+      "synthesis_decision": "skilltool",
+      "decision_reason": "需要把岗位要求、已有证据和材料表述交叉比对，识别哪些事实缺失或证据不足，并守住事实边界，属于可复用的缺口判断。",
+      "execution_provider": null,
+      "need_ids": [
+        "unverified_facts_supplement_list"
+      ],
+      "inputs": [
+        {
+          "name": "evidence_gap_analysis",
+          "description": "经历与要求对照结果，用于确认哪些能力或事实已有证据、哪些仍待补充",
+          "type": "object",
+          "input_origin": "existing_artifact",
+          "source": "upstream_artifact",
+          "source_ref": "evidence_gap_analysis",
+          "available": true,
+          "from_task": null,
+          "acquisition": {
+            "mode": "provided",
+            "provider": null
+          }
+        },
+        {
+          "name": "user_profile",
+          "description": "已确认的用户画像，作为判断事实缺失的基准",
+          "type": "object",
+          "input_origin": "existing_artifact",
+          "source": "upstream_artifact",
+          "source_ref": "user_profile",
+          "available": true,
+          "from_task": null,
+          "acquisition": {
+            "mode": "provided",
+            "provider": null
+          }
+        },
+        {
+          "name": "draft_materials",
+          "description": "用户已起草的申请材料文本，按文档名组织；未提供时直接基于画像和岗位要求列出待确认事实",
+          "type": "object",
+          "input_origin": "user_provided",
+          "source": "user_input",
+          "source_ref": null,
+          "available": true,
+          "from_task": null,
+          "acquisition": {
+            "mode": "request_user",
+            "provider": null
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "facts_to_supplement",
+          "display_name": "需要补充或确认的事实清单",
+          "description": "需要用户补充或确认的事实清单，每条包含相关材料位置、缺失内容、当前证据状态和补充提示",
+          "type": "object",
+          "output_origin": "task_generated",
+          "dedupe_key": "facts_needing_user_supplement_or_confirmation_identified",
+          "inferred": true,
+          "consumer_tasks": [],
+          "final_consumer": "user"
+        }
+      ],
+      "dependencies": [],
+      "estimated_steps": 3,
+      "fresh_data_required": false
+    },
+    {
+      "task_id": "task_check_material_format_compliance",
+      "name": "检查材料格式是否合规",
+      "scene": "岗位材料准备",
+      "business_goal": "对照岗位要求的文件格式、篇幅、命名和语言约束，逐项检查用户准备的材料，标出不合规项并说明需要怎么改，方便用户直接调整后提交。",
+      "user_request_examples": [
+        "帮我校对一下这些材料的格式和文件名是否符合岗位要求",
+        "检查我的简历页数、语言和命名有没有问题",
+        "我快提交了，帮我核对每份文件是不是满足格式约束",
+        "按岗位要求看看这些附件的格式和篇幅合不合规"
+      ],
+      "evolution_direction": "decomposition",
+      "source_task_ids": [
+        "task_assess_material_readiness"
+      ],
+      "invocation_mode": "standalone",
+      "parallel_group": "材料缺口检查",
+      "synthesis_decision": "skilltool",
+      "decision_reason": "需要解析岗位的格式约束并与用户文件的名称、格式、篇幅等信息逐项比对，判断合规性并给出可执行修改建议，属于可复用的核验判断，不是简单格式化。",
+      "execution_provider": null,
+      "need_ids": [
+        "material_format_compliance_check"
+      ],
+      "inputs": [
+        {
+          "name": "prepared_materials",
+          "description": "用户准备的材料清单，每项包含文档名称、文件格式、页数、语言和命名方式",
+          "type": "array",
+          "input_origin": "user_provided",
+          "source": "user_input",
+          "source_ref": null,
+          "available": true,
+          "from_task": null,
+          "acquisition": {
+            "mode": "request_user",
+            "provider": null
+          }
+        },
+        {
+          "name": "target_opportunity",
+          "description": "目标岗位描述中的格式、篇幅、命名和语言要求",
+          "type": "object",
+          "input_origin": "user_provided",
+          "source": "user_input",
+          "source_ref": null,
+          "available": true,
+          "from_task": null,
+          "acquisition": {
+            "mode": "request_user",
+            "provider": null
+          }
+        },
+        {
+          "name": "material_requirements",
+          "description": "可选：已梳理出的岗位材料要求清单，存在时优先作为格式核对基准",
+          "type": "object",
+          "input_origin": "prior_task_output",
+          "source": "prior_output",
+          "source_ref": "task_extract_application_requirements:output:material_requirements:1",
+          "available": true,
+          "from_task": "task_extract_application_requirements",
+          "acquisition": {
+            "mode": "prior_task",
+            "provider": "task_extract_application_requirements"
+          }
+        },
+        {
+          "name": "submission_context",
+          "description": "可选：投递平台和提交方式，用于补充额外的格式规则；未提供时按通用格式规则检查",
+          "type": "object",
+          "input_origin": "user_provided",
+          "source": "user_input",
+          "source_ref": null,
+          "available": true,
+          "from_task": null,
+          "acquisition": {
+            "mode": "request_user",
+            "provider": null
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "format_compliance_report",
+          "display_name": "材料格式核验报告",
+          "description": "每份材料的格式核验结果，包含合规状态、问题说明、岗位要求和具体修改建议",
+          "type": "object",
+          "output_origin": "task_generated",
+          "dedupe_key": "application_material_format_compliance_report",
+          "inferred": true,
+          "consumer_tasks": [],
+          "final_consumer": "user"
+        }
+      ],
+      "dependencies": [],
+      "estimated_steps": 3,
+      "fresh_data_required": false
+    }
+  ],
+  "coverage": [
+    {
+      "required_output": "material_gap_report_for_target_opportunity",
+      "covered_by": [
+        "task_check_missing_application_documents",
+        "task_list_unverified_facts_for_supplement",
+        "task_check_material_format_compliance"
+      ]
+    },
+    {
+      "required_output": "missing_application_documents_identified_against_requirements",
+      "covered_by": [
+        "task_check_missing_application_documents"
+      ]
+    },
+    {
+      "required_output": "facts_needing_user_supplement_or_confirmation_identified",
+      "covered_by": [
+        "task_list_unverified_facts_for_supplement"
+      ]
+    },
+    {
+      "required_output": "application_material_format_compliance_report",
+      "covered_by": [
+        "task_check_material_format_compliance"
+      ]
+    }
+  ],
+  "iteration_control": {
+    "continue": true,
+    "reason": "本轮通过分解把范围过宽的检查申请材料还缺什么替换为缺材料、缺事实、格式合规三个独立可调用的任务；后续仍可对基础简历整理、材料准备规划等较宽任务做同类收敛，或按新方向继续扩展。"
+  }
+}

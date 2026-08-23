@@ -1,0 +1,31 @@
+{
+  "tool_name": "CheckMaterialFormatCompliance",
+  "user_facing_name": "检查材料格式是否合规",
+  "search_hint": "check whether prepared application materials comply with the job posting format requirements",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "prepared_materials": {
+      "type": "json",
+      "required": true,
+      "description": "用户准备的材料清单，每项包含文档名称、文件格式、页数、语言和命名方式"
+    },
+    "target_opportunity": {
+      "type": "json",
+      "required": true,
+      "description": "目标岗位描述中的格式、篇幅、命名和语言要求"
+    },
+    "material_requirements": {
+      "type": "json",
+      "required": true,
+      "description": "可选：已梳理出的岗位材料要求清单，存在时优先作为格式核对基准"
+    },
+    "submission_context": {
+      "type": "json",
+      "required": true,
+      "description": "可选：投递平台和提交方式，用于补充额外的格式规则；未提供时按通用格式规则检查"
+    }
+  }
+}

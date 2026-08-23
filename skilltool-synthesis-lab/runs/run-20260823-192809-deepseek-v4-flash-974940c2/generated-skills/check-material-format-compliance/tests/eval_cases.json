@@ -1,0 +1,101 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我校对一下这些材料的格式和文件名是否符合岗位要求",
+    "available_context": {
+      "prepared_materials": [
+        {
+          "document_name": "简历",
+          "file_format": "PDF",
+          "page_count": 2,
+          "language": "中文",
+          "file_name": "张三_简历.pdf"
+        },
+        {
+          "document_name": "成绩单",
+          "file_format": "JPG",
+          "page_count": "未知",
+          "language": "中文",
+          "file_name": "成绩单_扫描件.jpg"
+        }
+      ],
+      "target_opportunity": {
+        "title": "某岗位",
+        "material_constraints": {
+          "简历": {
+            "file_format": "pdf",
+            "max_pages": 5,
+            "language": "中文",
+            "file_name_pattern": "姓名_简历"
+          }
+        }
+      }
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "简历条目各维度状态为 compliant 或 non_compliant 且来源可回溯",
+      "成绩单条目因页数未知而被标记为 unverifiable 而不是 non_compliant",
+      "报告包含 requirement_sources_used"
+    ],
+    "must_not_include": [
+      "读取本地文件或扫描实际文件内容",
+      "为未提供的维度编造要求或结论"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_materials",
+    "user_query": "我快提交了，帮我核对每份文件是不是满足格式约束",
+    "available_context": {
+      "prepared_materials": [],
+      "target_opportunity": null,
+      "material_requirements": null,
+      "submission_context": null
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "说明缺少材料清单",
+      "说明缺少岗位格式要求来源",
+      "只描述输入不足，不给出下一步行动或提问"
+    ],
+    "must_not_include": [
+      "生成任何虚假的合规或违规结论",
+      "调用工具去查找材料或岗位要求"
+    ]
+  },
+  {
+    "id": "boundary_case_missing_metadata",
+    "user_query": "检查我的简历页数、语言和命名有没有问题",
+    "available_context": {
+      "prepared_materials": [
+        {
+          "document_name": "简历",
+          "file_format": "docx",
+          "page_count": null,
+          "language": "中文",
+          "file_name": "resume_final.docx"
+        }
+      ],
+      "target_opportunity": {
+        "title": "某岗位",
+        "material_constraints": {
+          "简历": {
+            "file_format": "pdf",
+            "max_pages": 2,
+            "language": "中文",
+            "file_name_pattern": "姓名_简历"
+          }
+        }
+      }
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "文件格式 docx 与要求的 pdf 不一致被标记 non_compliant",
+      "页数因缺失被标记 unverifiable 并列出需要用户补充页数",
+      "命名不匹配给出 corrective_action"
+    ],
+    "must_not_include": [
+      "把缺失页数直接判定为不合规",
+      "修改或导出用户材料"
+    ]
+  }
+]

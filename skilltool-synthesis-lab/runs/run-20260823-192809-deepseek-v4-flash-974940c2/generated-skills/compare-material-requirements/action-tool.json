@@ -1,0 +1,26 @@
+{
+  "tool_name": "CompareMaterialRequirements",
+  "user_facing_name": "对比两个岗位的材料要求",
+  "search_hint": "compare application material requirements between two opportunities",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "opportunity_pair": {
+      "type": "json",
+      "required": true,
+      "description": "用户选择对比的两个岗位标识或岗位描述，包含各自材料要求"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "已验证的真实岗位机会清单，用于补充岗位的准确信息"
+    },
+    "application_focus_brief": {
+      "type": "json",
+      "required": true,
+      "description": "投递材料准备要点，用于判断各岗位的材料重点差异"
+    }
+  }
+}

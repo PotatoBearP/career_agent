@@ -1,0 +1,62 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把这版简历翻译成英文",
+    "available_context": {
+      "tailored_resume": "包含教育、项目、技能章节的已定稿简历对象",
+      "target_language": "English",
+      "translation_preferences": "{\"term_policy\": \"keep_profile_confirmed\", \"with_notes\": true, \"audience\": \"hiring team\"}",
+      "user_profile": "包含姓名和学校固定英文写法的用户画像对象"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "translated_text 使用英文且保留全部原章节",
+      "preserved_facts_manifest 列出的日期、数字、项目名与译文一致",
+      "term_confirmation_notes 仅包含 user_profile 未提供固定写法的项"
+    ],
+    "must_not_include": [
+      "新增的技能或成果",
+      "对 profile 已确认固定写法的名称给出第二个译法",
+      "对事实值的改动"
+    ]
+  },
+  {
+    "id": "insufficient_missing_target_language",
+    "user_query": "帮我把材料翻译一下",
+    "available_context": {
+      "tailored_resume": "已定稿简历对象",
+      "target_language": "",
+      "translation_preferences": "{}",
+      "user_profile": "用户画像对象"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可解析的目标语言",
+      "不产出任何译文文本或待确认清单"
+    ],
+    "must_not_include": [
+      "默认假设为某一种语言并继续翻译",
+      "生成部分译稿"
+    ]
+  },
+  {
+    "id": "boundary_unknown_institution_name",
+    "user_query": "帮我把求职信翻成英语，机构名直接保留",
+    "available_context": {
+      "tailored_resume": "含某机构/项目名称且 user_profile 未提供其英文官方写法的简历对象",
+      "target_language": "English",
+      "translation_preferences": "{\"term_policy\": \"keep_original\", \"with_notes\": true}",
+      "user_profile": "姓名和学校有固定写法，但该机构名无固定英文写法"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "该机构名在译文中保留原文",
+      "term_confirmation_notes 中登记该机构名、出现位置与“无固定官方写法”的原因",
+      "其余 profile 已确认的姓名与学校使用固定写法"
+    ],
+    "must_not_include": [
+      "擅自为该机构名编造一个官方英文名称",
+      "静默改写该机构名而不做任何确认"
+    ]
+  }
+]

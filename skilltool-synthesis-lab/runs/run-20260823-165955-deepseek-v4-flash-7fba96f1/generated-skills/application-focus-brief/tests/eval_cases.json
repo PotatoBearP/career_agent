@@ -1,0 +1,60 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "针对我要投的方向，帮我列一份材料准备要点。",
+    "available_context": {
+      "evidence_gap_analysis": "包含 direct_evidence、partial_evidence、gap 多条对照记录",
+      "target_direction": "目标岗位类型",
+      "user_profile": "包含与部分直接证据对应的真实项目经历"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "application_focus_brief 对象",
+      "suggested_highlights 只包含有 user_profile 佐证的经历",
+      "evidence_to_supplement 覆盖所有 gap",
+      "source_basis 记录每个结论的来源"
+    ],
+    "must_not_include": [
+      "新增个人事实",
+      "对用户是否适合岗位的断言",
+      "Web 或文件工具调用"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_gap_analysis",
+    "user_query": "我该在材料里突出什么？",
+    "available_context": {
+      "evidence_gap_analysis": null,
+      "target_direction": "目标岗位类型",
+      "user_profile": "用户画像对象"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可消费的 evidence_gap_analysis"
+    ],
+    "must_not_include": [
+      "临时补做经历与要求对照",
+      "凭空生成投递重点"
+    ]
+  },
+  {
+    "id": "boundary_no_direct_evidence",
+    "user_query": "投这个方向时，我该突出哪些东西、弱化哪些？",
+    "available_context": {
+      "evidence_gap_analysis": "所有条目均为 gap 或 unknown",
+      "target_direction": "目标岗位类型",
+      "user_profile": "只有与该方向无直接匹配的一般背景"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "suggested_highlights 为空或仅保留有限背景项",
+      "suggested_avoid 列出未被证据支持的表述",
+      "evidence_to_supplement 覆盖全部 gap",
+      "uncertainty_notes 标注 low confidence"
+    ],
+    "must_not_include": [
+      "将 gap 写成本已具备的能力",
+      "建议用户夸大或模糊化缺失经历"
+    ]
+  }
+]

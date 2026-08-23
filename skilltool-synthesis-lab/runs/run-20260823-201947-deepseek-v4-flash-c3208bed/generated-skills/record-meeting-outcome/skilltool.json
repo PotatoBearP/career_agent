@@ -1,0 +1,332 @@
+{
+  "skill_id": "record_meeting_outcome",
+  "skill_name": "record-meeting-outcome",
+  "tool_name": "RecordMeetingOutcome",
+  "title": "沟通结果与承诺事项记录",
+  "business_goal": "把一次信息交流、电话或面试的口头内容整理成一条可追踪的结构化记录，包含沟通要点、对方反馈、自己的承诺、涉及机会、下一步待办和截止时间，供用户后续跟进并可直接被回复汇总能力消费。",
+  "invocation_mode": "aggregate",
+  "composition": {
+    "required_prior_outputs": [
+      "application_tracking_ledger"
+    ],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "用户在沟通后提出“帮我记一下这次聊的结果”“这次面试约了下次时间，帮我记下来”“把这次交流的内容和答应的事整理成记录”时使用。不用于生成或发送联系消息、不修改投递台账、不代替用户做岗位决策、不猜测未提供的联系人或共同经历。",
+  "reference_pattern": "借鉴 baseline-assessment 的冻结证据边界与 insufficient_input/error 区分，以及 learning-progress-assessment 的字段级映射、来源引用和确定性状态判定结构；不搬运其学习领域业务内容。",
+  "task_ids": [
+    "task_record_meeting_outcomes"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "从 meeting_notes 中提取沟通要点、对方反馈、自己的承诺和下一步待办",
+      "将沟通绑定到 verified_opportunity_list 中明确提及的机会",
+      "按 followup_rules 为待办给出渠道、状态和截止时间（仅依据用户陈述）",
+      "保留每条结论的来源引用、更新时间和处理状态",
+      "输出 meeting_outcome_record 对象供用户直接使用或被回复汇总消费"
+    ],
+    "excludes": [
+      "实际发送、投递、撤回或修改任何外部系统状态",
+      "修改 application_tracking_ledger 台账本身",
+      "猜测私人联系方式、联系人身份或共同经历",
+      "在没有明确信息时虚构截止时间、对方承诺或机会关联",
+      "读取用户画像、简历、网页或其他外部证据来补充沟通内容"
+    ]
+  },
+  "input_schema": {
+    "meeting_notes": {
+      "type": "object",
+      "required": true,
+      "description": "用户口述或粘贴的交流内容，例如对方提到的事、自己的回应、被问到的问题和口头承诺",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "application_tracking_ledger": {
+      "type": "object",
+      "required": true,
+      "description": "用户已有产物，是与该沟通相关机会的当前追踪状态，用于把新记录接进去",
+      "source": "prior_skill_output",
+      "source_ref": "application_tracking_ledger",
+      "available": true,
+      "acquisition": {
+        "mode": "prior_skill",
+        "provider": "task_record_tracking_status",
+        "fallback": null
+      }
+    },
+    "verified_opportunity_list": {
+      "type": "array",
+      "required": true,
+      "description": "场景已有产物，是用户确认过的真实机会清单，用于把本次沟通绑定到对应机会",
+      "source": "upstream_artifact",
+      "source_ref": "verified_opportunity_list",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "followup_rules": {
+      "type": "object",
+      "required": true,
+      "description": "用户对自己要履行的承诺、跟进方式和不希望再接触的对象的说明",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "meeting_outcome_record": {
+      "type": "object",
+      "description": "按沟通事件整理的要点、对方反馈、自己的承诺、涉及机会和下一步待办，含时间和处理状态"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "record meeting communication outcomes, commitments, and follow-up items",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": true
+  },
+  "operating_model": {
+    "role": "沟通记录整理者：只依据本次调用提供的 meeting_notes、application_tracking_ledger、verified_opportunity_list 和 followup_rules，把一次沟通转成结构化、可追溯、忠于用户叙述的沟通结果与待办记录。",
+    "hard_boundaries": [
+      "不得调用任何外部工具、网页、文件系统或用户画像来补充沟通内容；只使用本次输入。",
+      "不得实际发送、投递、撤回或修改任何外部系统状态。",
+      "不得修改 application_tracking_ledger 对象，它只是参照上下文。",
+      "不得虚构 contact_id、meeting_date、对方承诺、机会关联或截止时间；缺失时用显式占位符或 null，而不是猜测。",
+      "不得在未确认的情况下把记录写入台账或假设其已被处理。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "冻结输入与校验",
+        "instructions": [
+          "确认 meeting_notes 是非空 object，且包含至少一条实质性沟通信息，而不只是问候语。",
+          "确认 application_tracking_ledger 是 object（允许空对象）、verified_opportunity_list 是 array、followup_rules 是 object。",
+          "若类型不符，直接进入 error 结果；若 meeting_notes 无实质内容，进入 insufficient_input 结果。"
+        ],
+        "success_criteria": [
+          "四类输入已按声明的类型和来源就位。",
+          "未读取任何输入之外的外部资料。"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "绑定相关机会",
+        "instructions": [
+          "遍历 verified_opportunity_list，仅当 meeting_notes 明确提到或可无歧义对应某机会的 id、名称或标题时，才把该机会 id 加入 related_opportunity_ids。",
+          "含混提及、公司简称与多个机会都可能匹配时，不加入任何 id。",
+          "若机会清单为空，related_opportunity_ids 输出为空数组。"
+        ],
+        "success_criteria": [
+          "related_opportunity_ids 中的每一项都能在 meeting_notes 中找到显式依据。",
+          "歧义项没有被强行纳入。"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "提取结构化要点与待办",
+        "instructions": [
+          "从 meeting_notes 生成 outcome_summary（2-5 句、忠于叙述的中性概括）。",
+          "提取 counterpart_feedback；没有对方明确反馈时置 null。",
+          "提取 user_commitments，只包含用户明确答应要做的事。",
+          "为每条 followup_items 生成 action、due_time、channel、status、source_ref；due_time 只来自用户明确时间表达，channel 只来自 followup_rules 或用户明确表述，status 默认 open，仅在用户明确说已完成时置 done。",
+          "contact_id 使用用户给出的明确标识，否则用 \"unidentified\"；meeting_date 使用明确日期，否则用 \"unstated\"。"
+        ],
+        "success_criteria": [
+          "每条承诺和待办都能在 meeting_notes 中找到对应原文引用。",
+          "没有任何字段来自推测或外部资料。"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "组装记录并核验契约",
+        "instructions": [
+          "组装 meeting_outcome_record，包含 contact_id、meeting_date、outcome_summary、counterpart_feedback、user_commitments、related_opportunity_ids、followup_items、status、source_refs、updated_at。",
+          "确认 dedupe_key 所需的 contact_id、meeting_date、outcome_summary、followup_item、due_time 字段均已存在且类型一致。",
+          "确认 status 取值为 open、done、blocked_on_other 或 needs_confirmation 之一。",
+          "调用 ReturnSkillResult 恰好一次，返回 success 与 record。"
+        ],
+        "success_criteria": [
+          "输出对象结构可与输出 schema 一一对应。",
+          "来源引用完整，且没有越界行为发生。"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "meeting_notes 描述多次相互独立的沟通事件时，不合并，返回 error MULTIPLE_EVENTS。",
+      "只有显式出现的机会引用才进入 related_opportunity_ids；歧义即丢弃。",
+      "due_time 只能来自用户时间表达（如‘下周三’），不能从台账或日历推算。",
+      "followup_items 的 status 默认 open；用户明确说明已完成或已回复时置 done；用户说在等对方时置 blocked_on_other；时间或方式缺失影响执行时置 needs_confirmation。",
+      "contact_id 缺失用 \"unidentified\"、meeting_date 缺失用 \"unstated\"，不得构造虚构身份或日期。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "meeting_notes 含实质性沟通内容。",
+        "meeting_outcome_record 组装完成并通过字段核验。"
+      ],
+      "insufficient_input": [
+        "meeting_notes 为空、只有问候语或无任何结果、反馈、承诺或待办可提取。",
+        "application_tracking_ledger、verified_opportunity_list 或 followup_rules 中任一声明的输入缺失。"
+      ],
+      "error": [
+        "meeting_notes、application_tracking_ledger 或 followup_rules 类型不是 object，或 verified_opportunity_list 类型不是 array。",
+        "meeting_notes 明显包含多个相互独立的沟通事件。"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "所有声明的输入名、类型和来源语义与任务定义一致。",
+      "meeting_outcome_record 中没有任何从资料外推断的事实。",
+      "related_opportunity_ids 只含显式匹配项。",
+      "dedupe_key 五个字段已存在且值可序列化。",
+      "in insufficient_input 或 error 场景，未构造或返回任何 record。"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 4,
+    "rationale": "需要把非结构化的口头沟通、已有台账和用户跟进规则映射到受控字段并判定状态与来源，是一次有判断的转换；又不涉及外部动作或多轮流程，因此不应再拆分。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "只依赖 meeting_notes、application_tracking_ledger、verified_opportunity_list、followup_rules 四类输入契约。",
+      "不依赖具体应用、数据库、路由或 UI 状态。",
+      "不需要任何普通工具或外部数据源。"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我记一下刚才这次聊的结果和我要答应对方的事",
+      "available_context": {
+        "meeting_notes": "和张三聊了目标岗位，对方说会看看我的材料，我答应周三前把简历发过去，还约了下周一面试",
+        "application_tracking_ledger": {
+          "opportunity_x": {
+            "latest_status": "waiting_reply"
+          }
+        },
+        "verified_opportunity_list": [
+          {
+            "id": "opportunity_x",
+            "name": "目标公司 XX 岗位"
+          }
+        ],
+        "followup_rules": {
+          "channels": [
+            "email"
+          ],
+          "unwanted_contacts": []
+        }
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "meeting_outcome_record.related_opportunity_ids 包含 opportunity_x",
+        "meeting_outcome_record.user_commitments 包含周三前发简历",
+        "followup_items 包含下周一面试待办且 status 为 open",
+        "source_refs 标注来源为 meeting_notes"
+      ],
+      "must_not_include": [
+        "未在笔记中出现的联系人身份",
+        "未在笔记中出现的截止时间",
+        "任何发送或修改外部系统的动作"
+      ]
+    },
+    {
+      "id": "insufficient_input_no_content",
+      "user_query": "帮我记一下这次聊的结果",
+      "available_context": {
+        "meeting_notes": {
+          "content": "就打了个招呼，没有聊具体内容"
+        },
+        "application_tracking_ledger": {},
+        "verified_opportunity_list": [],
+        "followup_rules": {}
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明无法从会议记录提取沟通结果、承诺或待办",
+        "不返回会议记录对象"
+      ],
+      "must_not_include": [
+        "编造的沟通摘要",
+        "编造的待办项"
+      ]
+    },
+    {
+      "id": "boundary_missing_contact_and_date",
+      "user_query": "把这次交流的内容和答应的事整理成记录",
+      "available_context": {
+        "meeting_notes": {
+          "content": "聊了团队分工，我说会把项目链接整理后发过去"
+        },
+        "application_tracking_ledger": {},
+        "verified_opportunity_list": [],
+        "followup_rules": {}
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "contact_id 为 unidentified",
+        "meeting_date 为 unstated",
+        "user_commitments 包含整理项目链接",
+        "related_opportunity_ids 为空数组"
+      ],
+      "must_not_include": [
+        "猜测的联系人身份或日期",
+        "编造的公司或机会关联",
+        "编造的截止时间"
+      ]
+    },
+    {
+      "id": "error_multiple_events",
+      "user_query": "帮我把这周两次沟通都记下来",
+      "available_context": {
+        "meeting_notes": {
+          "content": "周一和甲聊了岗位一，周三和乙聊了岗位二"
+        },
+        "application_tracking_ledger": {},
+        "verified_opportunity_list": [],
+        "followup_rules": {}
+      },
+      "expected_outcome": "error",
+      "must_include": [
+        "MULTIPLE_EVENTS",
+        "不合并两个事件"
+      ],
+      "must_not_include": [
+        "合并后的单条记录"
+      ]
+    }
+  ]
+}

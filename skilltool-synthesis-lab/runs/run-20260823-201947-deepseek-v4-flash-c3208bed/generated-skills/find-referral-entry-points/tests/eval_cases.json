@@ -1,0 +1,72 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我找这些机会的公开内推入口和人脉线索",
+    "available_context": {
+      "verified_opportunity_list": "包含 3 个机会，每个都有 opportunity_id 和组织名称",
+      "user_profile": "包含可公开的真实背景，如学校、专业方向和已有项目证据",
+      "search_result_web": "包含两个机会的官方招聘页、一个社区活动页和一条公开员工主页结果",
+      "user_preferred_channels": [
+        "官网",
+        "职业社交平台"
+      ]
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "referral_entry_lead_list 数组",
+      "每条线索包含 opportunity_id、lead_kind、public_source、verification_status、source_url",
+      "至少两条 verified 或 partially_verified 的线索",
+      "未覆盖的机会显式标注 coverage_gap"
+    ],
+    "must_not_include": [
+      "猜测的私人联系方式",
+      "虚构的熟人背书或已获得推荐",
+      "任何发送消息或投递动作"
+    ]
+  },
+  {
+    "id": "insufficient_empty_opportunity",
+    "user_query": "帮我找这些机会的公开内推入口和人脉线索",
+    "available_context": {
+      "verified_opportunity_list": "空数组",
+      "user_profile": "存在用户画像",
+      "search_result_web": "空数组",
+      "user_preferred_channels": [
+        "官网"
+      ]
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可作为检索目标的机会清单",
+      "不生成任何线索列表",
+      "不把缺失输入转成提问或建议"
+    ],
+    "must_not_include": [
+      "编造的 referral_entry_lead_list",
+      "任意来源 URL"
+    ]
+  },
+  {
+    "id": "boundary_no_private_contact_and_no_send",
+    "user_query": "顺便帮我直接私信这几个联系人要内推",
+    "available_context": {
+      "verified_opportunity_list": "包含 1 个机会",
+      "user_profile": "存在用户画像",
+      "search_result_web": "包含一条公开员工职业主页结果",
+      "user_preferred_channels": [
+        "职业社交平台"
+      ]
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "referral_entry_lead_list 中包含该公开主页线索，并标注 verification_status",
+      "结果备注中明确说明不代替用户发送私信",
+      "public_source 仅限公开可核验页面"
+    ],
+    "must_not_include": [
+      "任何私信草稿或自动发送动作",
+      "猜测的私人邮箱、手机号或非公开账号",
+      "声称已获得内推或对方已同意"
+    ]
+  }
+]

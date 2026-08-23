@@ -1,0 +1,56 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我按这个岗位的要求改写我的项目经历",
+    "available_context": {
+      "project_entries": "包含 3 个条目，每个条目有项目名称、角色、事实性动作、结果和技能",
+      "target_opportunity": "岗位描述含明确职责与要求关键词（如实验设计、数据处理、报告撰写）",
+      "evidence_gap_analysis": "已确认其中 2 个项目的动作与结果属于可靠证据，1 个项目的结果待确认",
+      "user_profile": "画像含与上述动作一致的技能与经历描述"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "rewritten_project_descriptions.entries 为 array，且每个 entry 含 rewritten_description 与 matched_opportunity_keywords",
+      "待确认的项目结果被标记 requires_user_confirmation=true 并出现在 fact_supplement_requests"
+    ],
+    "must_not_include": [
+      "任何未在 user_profile 或 evidence_gap_analysis 中出现的数字、成果或职责"
+    ]
+  },
+  {
+    "id": "insufficient_missing_entries",
+    "user_query": "帮我把项目经历改得更贴近这个职位",
+    "available_context": {
+      "project_entries": "空数组或未提供",
+      "target_opportunity": "岗位描述含要求关键词",
+      "evidence_gap_analysis": "已有对照结果",
+      "user_profile": "已有画像"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可供改写的项目经历条目",
+      "不给出任何改写后的项目描述"
+    ],
+    "must_not_include": [
+      "从 evidence_gap_analysis 或其他输入推断出的编造项目描述"
+    ]
+  },
+  {
+    "id": "boundary_missing_evidence_for_result",
+    "user_query": "帮我把这个项目按岗位要求重写，突出我带来的成果",
+    "available_context": {
+      "project_entries": "条目包含项目名称、角色和动作，但结果字段为空",
+      "target_opportunity": "岗位要求强调量化成果与业务影响",
+      "evidence_gap_analysis": "该项目结果被标记为缺口/待确认",
+      "user_profile": "画像中无该项目成果数字"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "项目描述在事实边界内改写，定量成果被降级为待确认状态",
+      "fact_boundary_notes 与 fact_supplement_requests 明确列出缺失的成果数字"
+    ],
+    "must_not_include": [
+      "为满足岗位要求而估算或填写的任何结果数字"
+    ]
+  }
+]

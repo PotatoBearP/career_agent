@@ -1,0 +1,309 @@
+{
+  "skill_id": "prepare_application_focus_brief",
+  "skill_name": "application-focus-brief",
+  "tool_name": "ApplicationFocusBrief",
+  "title": "投递材料准备要点",
+  "business_goal": "基于已有的经历与要求对照结果，产出一份面向目标方向的投递材料准备要点，明确定位应当如实突出的已有证据、应当弱化或避免的表达、需要补充的证据以及各处的不确定性。",
+  "invocation_mode": "aggregate",
+  "composition": {
+    "required_prior_outputs": [
+      "evidence_gap_analysis"
+    ],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "用户准备向某个目标方向或岗位类型投递或展示自己，并已有可用的 evidence_gap_analysis 对照结果时使用。不应在缺少对照结果、缺少用户画像或用户要求重新生成完整简历、求职信或虚构经历时使用。",
+  "reference_pattern": "参考 learning-plan 对上游 artifact 的消费与边界冻结做法（只消费不改写上游结论），并参考 baseline-assessment 的证据边界判定与 outcome rules；业务内容完全适配本候选，不照搬其学习计划内容。",
+  "task_ids": [
+    "prepare_application_focus_brief"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "从 evidence_gap_analysis 中读取逐项匹配状态、证据、差距、不确定性和建议验证",
+      "从 user_profile 中读取可如实突出的已有事实、证据与偏好",
+      "给出建议突出、建议弱化或避免、需要补充证据和不确定性说明",
+      "保证所有结论可追溯到输入证据"
+    ],
+    "excludes": [
+      "重新生成或修改用户画像",
+      "撰写完整简历、求职信或作品集内容",
+      "向用户断言其适合某个岗位",
+      "调用 Web 搜索或抓取外部岗位信息重做对照",
+      "为缺失证据虚构个人事实"
+    ]
+  },
+  "input_schema": {
+    "evidence_gap_analysis": {
+      "type": "object",
+      "required": true,
+      "description": "已有经历与目标方向要求的逐项对照结果，作为生成投递重点的基础",
+      "source": "prior_skill_output",
+      "source_ref": "evidence_gap_analysis",
+      "available": true,
+      "acquisition": {
+        "mode": "prior_skill",
+        "provider": "compare_profile_with_requirements",
+        "fallback": null
+      }
+    },
+    "target_direction": {
+      "type": "string",
+      "required": true,
+      "description": "要准备投递或展示的目标方向或岗位类型",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "用户画像中的已有证据与偏好，用于确认哪些经历可以如实突出",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "application_focus_brief": {
+      "type": "object",
+      "description": "针对目标方向的材料重点，包括建议突出的经历、建议弱化或避免的表达、待补充证据和不确定性说明"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "prepare application material focus from requirement gap analysis",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": true
+  },
+  "operating_model": {
+    "role": "投递材料要点的证据裁判与表述策略顾问：只把已有证据映射为突出、弱化、避免和待补充四类结论，不新增个人事实。",
+    "hard_boundaries": [
+      "不得读取或调用 WebSearch、WebFetch 或其他外部数据源重新收集岗位要求或用户经历",
+      "不得新增 user_profile 中不存在的个人经历、技能、成果或指标",
+      "不得断言用户适合某岗位，只能陈述证据与差距",
+      "不得改写 evidence_gap_analysis 中已给出的匹配状态或不确定性",
+      "不得输出完整简历、求职信、作品集文案或套话模板"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "校验输入并界定证据边界",
+        "instructions": [
+          "确认 evidence_gap_analysis、target_direction、user_profile 均非空且可解析",
+          "确认 evidence_gap_analysis 中至少存在一条可识别的逐项匹配记录；否则按 insufficient_input 返回",
+          "冻结输入为本次调用的唯一证据来源"
+        ],
+        "success_criteria": [
+          "三个输入都存在且可读",
+          "evidence_gap_analysis 可被拆解为逐项条目",
+          "未调用任何外部工具"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "解析逐项匹配状态",
+        "instructions": [
+          "逐项读取匹配状态、直接证据、部分证据、差距、不确定性和建议补充的验证",
+          "将每条要求归入 direct_evidence、partial_evidence、gap、unknown 四类",
+          "保存每条结论对应的 evidence source 标识，用于 source_basis"
+        ],
+        "success_criteria": [
+          "所有条目都被归入四类之一",
+          "每条结论都保留可追溯来源",
+          "没有丢弃 evidence_gap_analysis 中的不确定性字段"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "生成建议突出项",
+        "instructions": [
+          "仅从 user_profile 中已有证据中挑选与 direct_evidence 匹配的经历作为 suggest_highlights",
+          "对于 partial_evidence，只能以限定范围的方式列入，并在描述中注明证据边界",
+          "若某条直接证据在 user_profile 中找不到对应事实，则不得列入突出项"
+        ],
+        "success_criteria": [
+          "每个突出项都能在 user_profile 中找到原始事实",
+          "每个 partial 突出项都附带范围限定",
+          "没有来自 gap 或 unknown 条目的突出项"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "生成建议弱化与避免项",
+        "instructions": [
+          "将 partial_evidence 中容易产生过度解读的内容列入 suggested_deemphasis，并说明应限制到什么程度",
+          "将 user_profile 中无证据支持的能力主张、与 direct_evidence 矛盾的表述、以及暗示生产部署、多人协作、真实用户、业务指标或正式流程的未经证实说法列入 suggested_avoid",
+          "为每项避免项写明对应的缺失证据"
+        ],
+        "success_criteria": [
+          "每个 deemphasis 和 avoid 项都对应明确的证据状态",
+          "没有把尚无可靠证据的维度写成已有能力",
+          "没有输出绝对化或夸大性措辞建议"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "整理待补充证据与不确定性",
+        "instructions": [
+          "把 gap 和 partial_evidence 条目转化为 evidence_to_supplement，每项给出可验证的补证方向（如短期项目、可展示实验、信息访谈确认）而非虚构结果",
+          "把证据不足、来源单一或相互矛盾的条目写入 uncertainty_notes",
+          "保持 evidence_gap_analysis 中的原不确定性表述，不自行降低或消除不确定性"
+        ],
+        "success_criteria": [
+          "每个 gap 都被列为待补充证据或不确定性",
+          "每个 uncertainty_notes 条目都有据可查",
+          "没有把待补充事项表述为已完成事实"
+        ]
+      },
+      {
+        "step": 6,
+        "name": "组装并返回结果",
+        "instructions": [
+          "按 output_schema 组装 application_focus_brief 对象",
+          "写入 source_basis，说明每个突出、弱化、避免、待补充结论分别来自 evidence_gap_analysis 的哪类信息与 user_profile 的哪些事实",
+          "调用 ReturnSkillResult 返回对象并结束"
+        ],
+        "success_criteria": [
+          "输出对象包含 target_direction、suggested_highlights、suggested_deemphasis、suggested_avoid、evidence_to_supplement、uncertainty_notes、source_basis",
+          "无多余个人事实",
+          "已调用并且只调用一次 ReturnSkillResult"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "匹配状态 direct_evidence 且证据存在于 user_profile → 可列入 suggested_highlights",
+      "匹配状态 partial_evidence → 仅以限定范围列入 suggested_highlights，同时进入 suggested_deemphasis 说明限制方式",
+      "匹配状态 gap 或 unknown → 不得列入 suggested_highlights，进入 evidence_to_supplement 或 uncertainty_notes",
+      "user_profile 中没有可靠证据的任何生产部署、多人协作、真实用户、业务指标或正式开发流程表述 → 列入 suggested_avoid",
+      "evidence_gap_analysis 与 user_profile 对同一能力的表述冲突 → 采用更保守的解读并写入 uncertainty_notes",
+      "当 evidence_gap_analysis 中某条证据只来自单一来源或来源时效不明 → 在 uncertainty_notes 中标注 low confidence，不改变匹配状态"
+    ],
+    "outcome_rules": {
+      "success": [
+        "evidence_gap_analysis、target_direction、user_profile 均存在且可解析",
+        "evidence_gap_analysis 中至少存在一条可归类的匹配记录",
+        "输出 application_focus_brief 对象且包含全部必需字段",
+        "所有结论均可追溯到 user_profile 或 evidence_gap_analysis"
+      ],
+      "insufficient_input": [
+        "target_direction 为空或缺失",
+        "evidence_gap_analysis 缺失、为空或无法解析出任何逐项匹配记录",
+        "user_profile 缺失或其中没有任何可用于支撑突出项的事实"
+      ],
+      "error": [
+        "证据输入格式损坏导致无法稳定解析",
+        "输出序列化失败或 ReturnSkillResult 调用失败"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "检查输出的每个 highlighted 项都有 user_profile 中的原始事实支撑",
+      "检查每个 deemphasis/avoid 项都对应明确的证据缺口或匹配状态",
+      "检查没有出现 user_profile 中不存在的经历、成果或指标",
+      "检查 gap 条目都已进入 evidence_to_supplement 或 uncertainty_notes",
+      "检查未调用任何 Web 或文件工具",
+      "检查 ReturnSkillResult 只被调用一次"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 6,
+    "rationale": "需要将已存在的对照结果与个人画像映射为四类投递表述策略并保持证据可追溯，属于有判断的转化；不涉及外部检索，也不应拆分得更细。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖 evidence_gap_analysis、target_direction、user_profile 三个输入",
+      "不依赖任何数据库、路由、UI 状态或内部服务",
+      "只通过 ReturnSkillResult 返回结果，不写入文件"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "针对我要投的方向，帮我列一份材料准备要点。",
+      "available_context": {
+        "evidence_gap_analysis": "包含 direct_evidence、partial_evidence、gap 多条对照记录",
+        "target_direction": "目标岗位类型",
+        "user_profile": "包含与部分直接证据对应的真实项目经历"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "application_focus_brief 对象",
+        "suggested_highlights 只包含有 user_profile 佐证的经历",
+        "evidence_to_supplement 覆盖所有 gap",
+        "source_basis 记录每个结论的来源"
+      ],
+      "must_not_include": [
+        "新增个人事实",
+        "对用户是否适合岗位的断言",
+        "Web 或文件工具调用"
+      ]
+    },
+    {
+      "id": "insufficient_input_missing_gap_analysis",
+      "user_query": "我该在材料里突出什么？",
+      "available_context": {
+        "evidence_gap_analysis": null,
+        "target_direction": "目标岗位类型",
+        "user_profile": "用户画像对象"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明缺少可消费的 evidence_gap_analysis"
+      ],
+      "must_not_include": [
+        "临时补做经历与要求对照",
+        "凭空生成投递重点"
+      ]
+    },
+    {
+      "id": "boundary_no_direct_evidence",
+      "user_query": "投这个方向时，我该突出哪些东西、弱化哪些？",
+      "available_context": {
+        "evidence_gap_analysis": "所有条目均为 gap 或 unknown",
+        "target_direction": "目标岗位类型",
+        "user_profile": "只有与该方向无直接匹配的一般背景"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "suggested_highlights 为空或仅保留有限背景项",
+        "suggested_avoid 列出未被证据支持的表述",
+        "evidence_to_supplement 覆盖全部 gap",
+        "uncertainty_notes 标注 low confidence"
+      ],
+      "must_not_include": [
+        "将 gap 写成本已具备的能力",
+        "建议用户夸大或模糊化缺失经历"
+      ]
+    }
+  ]
+}

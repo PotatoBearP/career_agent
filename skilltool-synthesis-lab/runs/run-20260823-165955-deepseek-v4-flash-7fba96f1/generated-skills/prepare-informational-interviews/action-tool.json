@@ -1,0 +1,26 @@
+{
+  "tool_name": "PrepareInformationalInterviews",
+  "user_facing_name": "准备信息访谈与提问清单",
+  "search_hint": "prepare informational interview goals and question list for a target direction",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "conversation_goal": {
+      "type": "string",
+      "required": true,
+      "description": "用户想通过这次交流弄清的核心问题"
+    },
+    "target_direction": {
+      "type": "string",
+      "required": true,
+      "description": "信息访谈涉及的目标方向或岗位类型"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户画像中的已有证据和待验证疑点，用于生成针对性问题"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "tool_name": "DraftCoverLetter",
+  "user_facing_name": "写一封有针对性的求职信",
+  "search_hint": "write an evidence-bound, opportunity-specific cover letter draft",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "target_opportunity": {
+      "type": "json",
+      "required": true,
+      "description": "目标岗位的职责、要求、公司或组织背景以及材料提交说明"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "已确认的用户画像，用于选取真实、相关的经历作为求职信支撑"
+    },
+    "application_focus_brief": {
+      "type": "json",
+      "required": true,
+      "description": "投递材料准备要点，用于确认求职信应突出的重点"
+    },
+    "letter_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户对求职信语言、篇幅、语气、称呼和希望突出经历的要求"
+    }
+  }
+}

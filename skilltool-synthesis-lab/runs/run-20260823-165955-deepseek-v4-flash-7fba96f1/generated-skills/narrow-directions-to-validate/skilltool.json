@@ -1,0 +1,277 @@
+{
+  "skill_id": "narrow_directions_to_validate",
+  "skill_name": "narrow-directions-to-validate",
+  "tool_name": "NarrowDirectionsToValidate",
+  "title": "缩小值得优先验证的方向",
+  "business_goal": "基于用户提供的候选方向、用户画像中的证据与偏好以及调用时给出的取舍权重，输出少量值得优先验证的方向短名单；每个方向给出贴合度、证据充分度、不确定性、取舍理由和下一步验证建议，并保留暂时搁置的方向及其原因。",
+  "invocation_mode": "standalone",
+  "composition": {
+    "required_prior_outputs": [],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "用户已经有一组候选方向，并希望从中缩小到少量值得优先投入验证的方向时使用。不用于从零生成候选方向，不用于比较具体岗位细节，不用于判断用户适合某一职位，也不在缺少候选方向或用户画像时猜测生成。",
+  "reference_pattern": "借鉴 baseline-assessment 的“证据裁判”角色、证据边界冻结和成功/insufficient_input 判定，以及 learning-plan 的确定性优先级排序结构；只借鉴结构，不沿用学习领域内容。",
+  "task_ids": [
+    "narrow_directions_to_validate"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "读取用户提供的 candidate_directions 列表",
+      "根据 decision_weights 或默认维度计算贴合度排序",
+      "结合 user_profile 中的证据、偏好和现实约束评估每个方向",
+      "将方向分为保留、条件保留和搁置，并给出取舍理由",
+      "为保留方向给出下一步验证建议"
+    ],
+    "excludes": [
+      "生成新的候选方向",
+      "对比岗位工作内容细节",
+      "对用户是否适合某个岗位下最终结论",
+      "访问互联网或调用其他下游任务产出"
+    ]
+  },
+  "input_schema": {
+    "candidate_directions": {
+      "type": "array",
+      "required": true,
+      "description": "用户已有的候选方向列表，各项含名称、了解程度与来源",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "decision_weights": {
+      "type": "object",
+      "required": true,
+      "description": "用户在取舍时看重的因素及相对权重；为空时按默认维度排序",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "用户画像中的证据、偏好与现实约束，用于判断候选方向的贴合度",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "prioritized_direction_shortlist": {
+      "type": "object",
+      "description": "保留或搁置的方向列表，每项给出贴合度、证据充分度、不确定性、取舍理由和下一步验证建议"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "narrow and rank candidate career directions for validation based on personal evidence, preferences, and constraints",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": true
+  },
+  "operating_model": {
+    "role": "方向筛选评估员：把候选方向与用户画像证据做贴合度判断，并按用户给出的或默认的权重排出优先验证顺序。",
+    "hard_boundaries": [
+      "不得新增候选方向，只能对 candidate_directions 中已有的方向排序。",
+      "不得越过 user_profile 推断个人事实；user_profile 未覆盖的信息记为不确定性。",
+      "不得修改、重述或伪造 user_profile 内容，只引用其中与方向取舍相关的证据、偏好和约束。",
+      "不得将缺失证据当成用户具备相应条件；不得给某方向下“适合/不适合你”的绝对断言。",
+      "不得调用 WebSearch、WebFetch 或任何其他普通工具和后续任务输出。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "校验并冻结输入边界",
+        "instructions": [
+          "检查 candidate_directions 是非空数组，且每个元素有可识别的名称或描述。",
+          "检查 user_profile 是对象。",
+          "归一化 decision_weights：若提供则记录各维度权重，否则准备使用默认等权维度。"
+        ],
+        "success_criteria": [
+          "确认 candidate_directions 非空；每个候选项可被唯一指认。",
+          "记录将使用哪些评估维度及其权重来源。"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "提取个人侧评估依据",
+        "instructions": [
+          "从 user_profile 中抽取与方向取舍相关的事实：已有证据、偏好、现实约束如可投入时间、地域、期限等。",
+          "为每项依据记录出处标签（profile evidence）。",
+          "不读取或解释与方向无关的个人细节。"
+        ],
+        "success_criteria": [
+          "得到 profile_evidence 列表、preference 列表、constraint 列表，每个条目能对应到 user_profile 的原始内容。"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "逐方向评估四维信号",
+        "instructions": [
+          "对每个候选方向分别计算 evidence_fit（个人证据与该方向的关联：直接/部分/无证据）、preference_fit（偏好匹配：高/中/低）、constraint_fit（约束适配：适配/部分适配/不适配）、uncertainty（信息不确定性：低/中/高）。",
+          "当某项无法判断时标记为 unknown 而不是猜测。",
+          "记录支撑每个信号的具体 user_profile 引用或 candidate_directions 自带来源字段。"
+        ],
+        "success_criteria": [
+          "每个方向都有四个维度的评估值和依据说明；未知项被标记并进入不确定性汇总。"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "计算贴合度排序并按规则分类",
+        "instructions": [
+          "若提供 decision_weights，按权重加权；否则按默认等权。",
+          "将每个方向归入 retained、conditional 或 postponed：evidence_fit 为 direct 或 preference_fit 为 high 且 constraint_fit 为适配时优先 retained；evidence_fit 为 none 或 constraint_fit 为不适配时归 postponed；其余归 conditional。",
+          "在 retained 内先按加权分降序，再按信息不确定性升序；conditional 紧随其后；postponed 附原因。",
+          "若 decision_weights 为空，在输出中注明使用默认等权维度。"
+        ],
+        "success_criteria": [
+          "得到有序的方向集合、每个方向的分类和可解释的排序理由。"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "组装短名单并检查可追溯性",
+        "instructions": [
+          "为每个保留方向写下一步验证建议（例如信息访谈、真实岗位检索、短期试做、证据补齐），建议必须对应其证据或不确定性缺口。",
+          "将最终结果整理为 prioritized_direction_shortlist 对象，包含 retained_directions、conditional_directions、postponed_directions、summary。",
+          "检查所有排序决定都能从输入维度反推，不能反推的降为 uncertainty 并在理由中说明。"
+        ],
+        "success_criteria": [
+          "输出字段完整，排序决定可追溯，不确定性被显式表达。"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "默认维度及权重：在 decision_weights 为空时，按 evidence_fit、preference_fit、constraint_fit 等权排序；uncertainty 只作次级排序。",
+      "分类判定：evidence_fit 为 direct 或 preference_fit 为 high 且 constraint_fit 为适配则为 retained；evidence_fit 为 none 或 constraint_fit 为不适配则为 postponed；其余为 conditional。",
+      "排序：retained 按加权贴合度降序，再按 uncertainty 升序；conditional 排在 retained 后；postponed 最后并附搁置原因。",
+      "冲突处理：user_profile 内证据相互冲突时保留两个证据并在 uncertainty 中说明，不自行判定哪个真实。",
+      "缺失处理：方向缺少来源或了解程度时不作猜测，直接提高 uncertainty 并在理由中说明。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "candidate_directions 是非空数组且每项可指认",
+        "user_profile 可用",
+        "至少一个方向能给出四维评估或标记 unknown 并完成排序"
+      ],
+      "insufficient_input": [
+        "candidate_directions 缺失或为空",
+        "candidate_directions 的项无法识别（无名称或无描述）",
+        "user_profile 缺失"
+      ],
+      "error": [
+        "输入类型与 schema 不符（例如 candidate_directions 不是数组、user_profile 不是对象）",
+        "结果无法按本 Skill 规则生成（例如序列化失败）"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "candidate_directions 中的所有方向都出现在 retained、conditional 或 postponed 集合中，未新增方向。",
+      "每个保留方向的下一步验证建议都对应其 evidence_fit 或 uncertainty 缺口，而非泛泛而谈。",
+      "decision_weights 为空时已在 summary 中声明使用默认等权维度。",
+      "所有个人事实判断都能回溯到 user_profile 或标记为 unknown，没有凭空假设。",
+      "输出中出现来源或证据引用时仅引用 user_profile 与 candidate_directions 自带字段。"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 5,
+    "rationale": "任务只做已有方向的筛选排序与取舍说明，输入固定为候选列表、权重和画像，不涉及外部检索或多任务编排，因而是一个 bounded 的决策支持能力。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "只依赖候选方向列表、用户画像、可选权重这三个输入契约",
+      "不依赖任何应用状态、数据库或下游 SkillTool 输出"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "从这几个方向里帮我选出最值得先验证的几个，并说明为什么保留、哪些先放一放。",
+      "available_context": {
+        "candidate_directions": "包含名称、了解程度、来源的三至五个方向",
+        "decision_weights": "用户明确给出证据贴合度权重高",
+        "user_profile": "包含已有证据、偏好与时间约束"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "retained_directions 中每个方向有贴合度、证据充分度、取舍理由和下一步验证建议",
+        "postponed_directions 有搁置原因",
+        "排序能由权重与画像证据反推"
+      ],
+      "must_not_include": [
+        "新增候选方向",
+        "互联网检索结论",
+        "对用户适合某岗位的绝对断言"
+      ]
+    },
+    {
+      "id": "insufficient_input_empty_candidates",
+      "user_query": "帮我缩小值得优先验证的方向。",
+      "available_context": {
+        "candidate_directions": "空数组或未提供",
+        "user_profile": "可用"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明缺少候选方向列表导致无法排序"
+      ],
+      "must_not_include": [
+        "自造候选方向并继续产出排序"
+      ]
+    },
+    {
+      "id": "boundary_vague_direction_and_missing_profile_fact",
+      "user_query": "帮我从这些方向里挑重点，但我说不清楚每个方向具体做什么。",
+      "available_context": {
+        "candidate_directions": "某项只有模糊名称且无来源，其余有名称与来源",
+        "decision_weights": "未提供",
+        "user_profile": "部分维度无对应证据"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "模糊项被标注高不确定性且排序依据说明缺失",
+        "summary 声明使用默认等权维度",
+        "缺失个人证据被标记为 unknown"
+      ],
+      "must_not_include": [
+        "根据模糊名称臆测方向内容并以此为排序依据",
+        "将缺证据项默认为用户本就具备相关条件"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我看一下这个岗位到底要交哪些材料",
+    "available_context": {
+      "job_posting_text": "申请者需提交简历、求职信和成绩单；简历不超过两页，PDF 格式；材料需在 6 月 30 日前发送至指定邮箱。",
+      "verified_opportunity_list": "包含与该岗位公司、职位匹配的一条已验证机会记录"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "materials 数组包含简历、求职信、成绩单三项并标注 required",
+      "简历条目包含两页限制、PDF 格式及对应来源片段",
+      "deadlines 包含 6 月 30 日并标注来源"
+    ],
+    "must_not_include": [
+      "来源中未出现的格式或截止时间被当作事实",
+      "对用户是否满足岗位要求进行任何评估"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_posting",
+    "user_query": "帮我把这个岗位要交的材料列出来",
+    "available_context": {
+      "job_posting_text": null,
+      "job_posting_url": null,
+      "job_posting_content": null,
+      "verified_opportunity_list": "空列表或不包含用户所指岗位"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可用的岗位材料来源",
+      "请求用户在调用时补充岗位文本或链接"
+    ],
+    "must_not_include": [
+      "凭空生成材料清单"
+    ]
+  },
+  {
+    "id": "boundary_conflicting_sources",
+    "user_query": "从岗位页面里提取材料格式要求",
+    "available_context": {
+      "job_posting_text": "简历需在 7 月 15 日前提交",
+      "job_posting_content": "页面正文显示简历需在 6 月 30 日前提交",
+      "verified_opportunity_list": "包含匹配岗位但截止时间不同的记录"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "conflicts 数组同时保留 6 月 30 日与 7 月 15 日两个截止时间及各来源",
+      "未对冲突做单方裁决"
+    ],
+    "must_not_include": [
+      "静默选择其中一个截止时间作为唯一事实"
+    ]
+  }
+]

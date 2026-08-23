@@ -1,0 +1,276 @@
+{
+  "skill_id": "prepare_informational_interviews",
+  "skill_name": "prepare-informational-interviews",
+  "tool_name": "PrepareInformationalInterviews",
+  "title": "准备信息访谈与提问清单",
+  "business_goal": "基于用户明确的交流目标、目标方向和用户画像中的既有证据，产出一份可直接用于真实交流的信息访谈准备材料，包括访谈目标、建议接触的人选类型、分主题提问清单、证据缺口探询点和交流注意事项。",
+  "invocation_mode": "standalone",
+  "composition": {
+    "required_prior_outputs": [],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "用户想与某个方向或岗位类型的从业者、相关人员进行信息交流，并需要提前准备访谈目标、提问重点和要验证的疑点。不用于寻找联系人、撰写约聊消息、安排访谈时间，或代替用户做方向适合性判断。",
+  "reference_pattern": "采用 baseline-assessment 的证据边界与角色定位做法：子模型只作为证据组织者而非调研员，冻结调用时刻的输入；沿用其 outcome_rules 结构把 success、insufficient_input、error 分开；并参考 learning-plan 对上游产物只读消费、不重新生成的做法，把 user_profile 视为只读个人证据输入。",
+  "task_ids": [
+    "prepare_informational_interviews"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "把 conversation_goal 提炼为 1-3 条明确访谈目标",
+      "针对 target_direction 建议适合接触的从业者或相关人员类型",
+      "按真实工作、交付物、协作对象、进入要求、与自身证据匹配等主题设计提问清单",
+      "把 user_profile 中已表达的证据缺口转成访谈中的探询点",
+      "给出交流注意事项与不确定性说明"
+    ],
+    "excludes": [
+      "寻找或核实具体联系人",
+      "起草联系从业者的约聊消息",
+      "安排访谈日程或后续跟进",
+      "断言用户适合或不适合某个方向",
+      "补检索外部市场信息、薪酬或就业前景数据"
+    ]
+  },
+  "input_schema": {
+    "conversation_goal": {
+      "type": "string",
+      "required": true,
+      "description": "用户想通过这次交流弄清的核心问题",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "target_direction": {
+      "type": "string",
+      "required": true,
+      "description": "信息访谈涉及的目标方向或岗位类型",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "用户画像中的已有证据和待验证疑点，用于生成针对性问题",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "interview_prep_kit": {
+      "type": "object",
+      "description": "访谈目标、建议接触的人选类型、分主题提问清单、证据缺口探询点与交流注意事项"
+    }
+  },
+  "output_consumers": [
+    "draft_informational_interview_outreach",
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "prepare informational interview goals and question list for a target direction",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": true
+  },
+  "operating_model": {
+    "role": "访谈准备与证据缺口设计者：把用户明确的交流目标、目标方向和既有画像证据组织成可执行的访谈材料，不做调研员、联络人或方向评判者。",
+    "hard_boundaries": [
+      "只使用 conversation_goal、target_direction、user_profile 三个输入；不读取其他文件、不搜索外部资料、不调用其他工具。",
+      "user_profile 只作为只读证据来源，不得修改、重建或新增任何个人经历事实。",
+      "不得断言目标方向的薪酬、岗位数量、行业前景等未被提供的外部事实；必要的不确定项只能以“待访谈验证”呈现。",
+      "不得生成联系消息、安排访谈时间、替用户承诺行为或输出投递建议。",
+      "不得把提问清单写成知识测试；每个问题必须服务于理解真实工作或验证用户画像中的疑点。",
+      "一次调用只输出 interview_prep_kit，不追加后续规划或额外产物。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "校验并冻结输入",
+        "instructions": [
+          "确认 conversation_goal 是非空字符串，target_direction 是非空字符串，user_profile 是包含证据、偏好或约束的对象。",
+          "冻结三个输入；只记录这三个字段中的内容，不补充其他上下文。",
+          "任一必需输入缺失或不可解析时，不继续生成，直接进入 insufficient_input 结果。"
+        ],
+        "success_criteria": [
+          "三个输入均确认存在且语义可理解",
+          "已确定不会引入输入之外的个人事实或外部数据"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "提炼访谈目标",
+        "instructions": [
+          "从 conversation_goal 中提取核心问题，将其转化为 1-3 条能在一次交流中验证的目标，例如理解真实工作任务、了解交付物、弄清协作对象、确认进入路径或对照自身证据。",
+          "若 conversation_goal 较窄，只保留与之直接相关的目标。",
+          "仅为目标标注其来自用户输入，不得补充用户未表达的意图。"
+        ],
+        "success_criteria": [
+          "每条访谈目标都可直接追溯到 conversation_goal 或 target_direction",
+          "没有凭空添加用户未表达的访谈目的"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "设计人选类型与分主题问题",
+        "instructions": [
+          "基于 target_direction 建议 2-4 类适合接触的人选类型，例如一线从业者、团队负责人、相近领域转型者或招聘相关角色，并说明各自能提供的独特信息。",
+          "设计 3-5 个主题，默认顺序为真实工作任务与交付物、协作对象与流程、进入要求与成长路径、与自身证据的匹配、待验证疑点；若 conversation_goal 明确聚焦某主题，则把该主题提前。",
+          "每个主题写 2-4 个事实性或判断性问题，优先开放性问题，避免只依赖二选一的是非题。",
+          "把 user_profile 中已存在的证据不足或明确未知项映射为 evidence_probe_points。"
+        ],
+        "success_criteria": [
+          "问题清单覆盖对真实工作理解有直接帮助的主题",
+          "探询点全部由 user_profile 中已声明的证据或缺失项推导得出"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "组装并自检 interview_prep_kit",
+        "instructions": [
+          "把 interview_goal、target_person_types、question_outline、evidence_probe_points、communication_notes 组装为 interview_prep_kit。",
+          "逐项检查每个字段都存在且类型正确。",
+          "检查没有新增个人事实、没有未经验证的市场断言、没有越界内容。",
+          "准备完成后调用 ReturnSkillResult 恰好一次。"
+        ],
+        "success_criteria": [
+          "interview_prep_kit 五个字段齐全",
+          "全部问题都与 target_direction 或 user_profile 直接相关",
+          "未产生任何约聊消息、时间安排、评价结论或额外产物"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "主题默认优先级：真实工作任务与交付物 > 协作对象与流程 > 进入要求与成长路径 > 与自身证据匹配 > 待验证疑点；conversation_goal 明确要求某个主题时，以用户目标为准调整顺序。",
+      "问题分类：事实性问题询问“实际做什么、交付什么、如何协作”，判断性问题询问“为什么这样设计、怎么看这项要求”；两类问题都不得要求用户画像之外的个人信息才能回答。",
+      "证据缺口探询点只能来自 user_profile 中已表达的缺失项、未验证项或矛盾点；user_profile 未提供的领域不得设为探询点。",
+      "当 user_profile 对某能力只有部分证据时，把该能力放进 evidence_probe_points，而不是在结果中替用户下结论。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "conversation_goal、target_direction、user_profile 均存在且有效",
+        "interview_prep_kit 包含 interview_goal、target_person_types、question_outline、evidence_probe_points、communication_notes",
+        "所有内容均在输入证据范围内"
+      ],
+      "insufficient_input": [
+        "conversation_goal 缺失或为空",
+        "target_direction 缺失或为空",
+        "user_profile 缺失或不是对象",
+        "输入不足时不得编造访谈目标、问题或探询点"
+      ],
+      "error": [
+        "输出无法按 schema 序列化",
+        "最终自检发现越界内容且无法修正"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "三个输入字段仍为调用时冻结的原值，没有新增个人事实。",
+      "interview_prep_kit 包含 interview_goal、target_person_types、question_outline、evidence_probe_points、communication_notes 五个字段。",
+      "所有问题都围绕 target_direction 或 user_profile 证据展开，不包含未经提供的市场断言。",
+      "未生成任何约聊消息、时间安排、投递建议或适合性结论。",
+      "ReturnSkillResult 被调用且只调用一次。"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 4,
+    "rationale": "不是简单检索或格式整理：需要把用户目标、方向知识和画像证据组织成可执行的访谈策略并做缺口探测，但范围受三个输入约束，不需要继续拆分。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖调用时提供的 conversation_goal、target_direction、user_profile 三个输入",
+      "不依赖数据库、应用状态、内部服务或文件系统",
+      "由 Harness 通过 ReturnSkillResult 消费结构化结果"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "我要和这个领域的人聊一聊，帮我准备一份访谈提纲。",
+      "available_context": {
+        "conversation_goal": "想弄清这个方向真实做什么、有哪些交付物，以及我现在的经历够不够。",
+        "target_direction": "目标岗位类型",
+        "user_profile": "包含已完成的课程实验和项目原型证据，并声明没有生产环境经验。"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "interview_goal 中有针对真实工作与自身证据对照的目标",
+        "question_outline 覆盖任务、交付物、协作和进入要求",
+        "evidence_probe_points 中包含对生产环境经验缺失的探询",
+        "communication_notes 包含交流注意事项"
+      ],
+      "must_not_include": [
+        "约聊消息",
+        "访谈时间安排",
+        "薪资或行业前景断言"
+      ]
+    },
+    {
+      "id": "insufficient_input_missing_goal",
+      "user_query": "帮我准备一份信息访谈材料。",
+      "available_context": {
+        "conversation_goal": null,
+        "target_direction": "目标岗位类型",
+        "user_profile": "存在完整用户画像对象"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "说明 conversation_goal 缺失导致无法确定访谈目标"
+      ],
+      "must_not_include": [
+        "编造的访谈目标",
+        "未经确认的提问清单"
+      ]
+    },
+    {
+      "id": "boundary_no_personal_invention",
+      "user_query": "帮我准备几个用于了解这个方向真实工作的提问。",
+      "available_context": {
+        "conversation_goal": "想了解目标方向的实际日常工作和交付成果。",
+        "target_direction": "目标岗位类型",
+        "user_profile": "用户画像中只明确提到课程项目经历，未提及任何实习或生产经历。"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "以开放问题了解日常任务和交付物",
+        "把未验证的经验差异列为探询点"
+      ],
+      "must_not_include": [
+        "把用户画像未提供的经历当成事实写入材料",
+        "断言该方向适合或不适合用户"
+      ]
+    }
+  ]
+}

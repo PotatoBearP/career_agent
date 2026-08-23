@@ -1,0 +1,57 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把这几个方向放在一起比一比。",
+    "available_context": {
+      "options_to_compare": "两个方向，各自包含名称、描述和来源链接",
+      "comparison_dimensions": "[]",
+      "user_profile": "包含用户证据、偏好与约束的用户画像"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "option_comparison_report 为 object",
+      "comparison_matrix 覆盖全部选项和默认维度",
+      "key_tradeoffs、pending_questions、validation_hints 均存在",
+      "每项结论带有证据来源标识或 unknown"
+    ],
+    "must_not_include": [
+      "外部检索调用",
+      "对某个选项的绝对推荐"
+    ]
+  },
+  {
+    "id": "insufficient_input_single_option",
+    "user_query": "帮我比较一下这个方向怎么样。",
+    "available_context": {
+      "options_to_compare": "只有一个方向，包含名称和描述",
+      "comparison_dimensions": "[]",
+      "user_profile": "用户画像已提供"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明需要至少两个可比较的选项"
+    ],
+    "must_not_include": [
+      "假装比较并生成完整报告",
+      "把单个选项的优缺点当作对比结果"
+    ]
+  },
+  {
+    "id": "boundary_no_matching_evidence",
+    "user_query": "帮我比较这两个岗位和我的匹配度。",
+    "available_context": {
+      "options_to_compare": "两个岗位，均只有职责描述，无任何与用户证据相关的字段",
+      "comparison_dimensions": "[\"与自身证据的匹配度\"]",
+      "user_profile": "用户画像包含若干个人证据"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "匹配度维度标记为 unknown 或列出无法建立对应关系的说明",
+      "报告中不出现未经证据支持的匹配断言"
+    ],
+    "must_not_include": [
+      "基于用户画像推断出选项描述中不存在的岗位内容",
+      "给出\"更适合/更不适合\"的绝对结论"
+    ]
+  }
+]

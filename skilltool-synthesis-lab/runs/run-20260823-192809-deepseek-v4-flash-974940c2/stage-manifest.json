@@ -1,0 +1,75 @@
+{
+  "stages": [
+    {
+      "stage": "input_validation",
+      "status": "completed",
+      "duration_ms": 0,
+      "operation": "deterministic_input_validation_with_task_reconciliation",
+      "directory": "stages/01-input-validation",
+      "output": "intermediate-results/01-input-validation.json",
+      "files": [
+        "input.json",
+        "parsed-output.json",
+        "stage.json"
+      ]
+    },
+    {
+      "stage": "task_synthesis",
+      "status": "completed",
+      "duration_ms": 493730,
+      "operation": null,
+      "directory": "stages/02-task-synthesis",
+      "output": "intermediate-results/02-task-synthesis.json",
+      "files": [
+        "input.json",
+        "parsed-output.json",
+        "stage.json"
+      ]
+    },
+    {
+      "stage": "candidate_synthesis",
+      "status": "completed",
+      "duration_ms": 942312,
+      "operation": null,
+      "directory": "stages/03-candidate-synthesis",
+      "output": "intermediate-results/03-candidate-synthesis.json",
+      "files": [
+        "input.json",
+        "parsed-output.json",
+        "stage.json"
+      ]
+    }
+  ],
+  "task_iteration_checkpoints": [
+    {
+      "iteration": 1,
+      "direction": "initialization",
+      "status": "completed",
+      "directory": "stages/02-task-synthesis/iterations/01",
+      "proposed_tasks": 10,
+      "accepted_tasks": 10,
+      "removed_tasks": 0,
+      "retained_tasks": 10
+    },
+    {
+      "iteration": 2,
+      "direction": "extension",
+      "status": "completed",
+      "directory": "stages/02-task-synthesis/iterations/02",
+      "proposed_tasks": 6,
+      "accepted_tasks": 6,
+      "removed_tasks": 0,
+      "retained_tasks": 16
+    },
+    {
+      "iteration": 3,
+      "direction": "decomposition",
+      "status": "completed",
+      "directory": "stages/02-task-synthesis/iterations/03",
+      "proposed_tasks": 3,
+      "accepted_tasks": 3,
+      "removed_tasks": 1,
+      "retained_tasks": 18
+    }
+  ]
+}

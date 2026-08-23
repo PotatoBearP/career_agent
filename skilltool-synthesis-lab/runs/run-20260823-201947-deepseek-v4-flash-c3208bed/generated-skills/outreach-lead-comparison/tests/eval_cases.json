@@ -1,0 +1,72 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我比较这几个内推渠道和人，看先重点经营哪个",
+    "available_context": {
+      "candidate_lead_ids": [
+        "L1",
+        "L2"
+      ],
+      "referral_entry_lead_list": "L1 为某公司公开内推入口，verification_status=verified",
+      "matched_network_lead_list": "L2 为直接熟人，relationship_source=曾同组合作，matched_opportunity_ids=[O1]",
+      "user_profile": "用户背景与 O1 相关",
+      "user_contact_rules": "无排除项，偏好私信",
+      "comparison_criteria": "contact_difficulty 高优先，reply_likelihood 高优先"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "recommendation",
+      "per_candidate_ratings",
+      "criteria_version",
+      "L2 的推荐理由引用 relationship_source"
+    ],
+    "must_not_include": [
+      "对外部来源的重新搜索",
+      "排除 L1 却无证据支持"
+    ]
+  },
+  {
+    "id": "insufficient_input_too_few_candidates",
+    "user_query": "帮我比较这几个内推渠道和人，看先重点经营哪个",
+    "available_context": {
+      "candidate_lead_ids": [
+        "L1"
+      ],
+      "referral_entry_lead_list": "仅 L1",
+      "matched_network_lead_list": "空"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "少于两个可比较候选",
+      "不输出推荐结论"
+    ],
+    "must_not_include": [
+      "recommendation",
+      "尝试自行补充候选"
+    ]
+  },
+  {
+    "id": "boundary_excluded_lead",
+    "user_query": "帮我比较这几个内推渠道和人，看先重点经营哪个",
+    "available_context": {
+      "candidate_lead_ids": [
+        "L1",
+        "L2"
+      ],
+      "referral_entry_lead_list": "L1 已核验且匹配机会最多",
+      "matched_network_lead_list": "L2 为普通熟人",
+      "user_contact_rules": "do_not_contact 包含 L1",
+      "comparison_criteria": "长期价值高优先"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "rule_exclusions 标注 L1 被排除",
+      "recommendation 指向 L2",
+      "排除理由引用 user_contact_rules"
+    ],
+    "must_not_include": [
+      "L1 作为推荐对象",
+      "无视排除规则对 L1 排序"
+    ]
+  }
+]

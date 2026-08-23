@@ -1,0 +1,59 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我看看这几个招聘链接还能不能打开，岗位是不是还在招。",
+    "available_context": {
+      "opportunities_to_check": "包含 2 个岗位，均有标题、组织与链接",
+      "status_page_extracts": "包含对应链接的页面原文，一个显示可申请岗位，一个返回 404",
+      "status_search_results": "包含两个岗位名称的最新检索结果"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "每个机会都有 link_accessibility 与 posting_status 判定",
+      "活跃岗位标记为 active，404 页面标记为 inaccessible 且发布状态为 expired_or_removed 或 likely_closed",
+      "每个判定带 evidence_refs 和 last_verified_at"
+    ],
+    "must_not_include": [
+      "无证据来源的结论",
+      "对组织可信度或用户适合度的评判"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_pages",
+    "user_query": "请确认这些岗位是否仍然有效。",
+    "available_context": {
+      "opportunities_to_check": "包含 3 个岗位，各有链接",
+      "status_page_extracts": "空数组",
+      "status_search_results": "仅有一条与某岗位名称宽泛相关的新闻页摘要，无招聘页原文"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少页面原文无法判定链接可访问性",
+      "指出检索结果不足以支撑任何发布状态判定",
+      "返回 insufficient_input，不臆断机会有效性"
+    ],
+    "must_not_include": [
+      "把机会标记为 active 或 expired 的确定结论",
+      "向用户索要个人经历或画像信息"
+    ]
+  },
+  {
+    "id": "boundary_active_page_with_dismissed_input",
+    "user_query": "帮我确认这几个岗位有没有下架。",
+    "available_context": {
+      "opportunities_to_check": "包含 1 个岗位，链接指向登录墙页面",
+      "status_page_extracts": "返回登录墙页面，无岗位详情",
+      "status_search_results": "检索结果中同岗位在另一个平台仍显示在招"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "link_accessibility 标记为 accessible_with_restriction",
+      "posting_status 标记为 unclear，而不是 active",
+      "记录页面原文与检索结果之间的冲突与不确定性"
+    ],
+    "must_not_include": [
+      "将登录墙视为完整岗位页面",
+      "把补充检索结果直接等同于页面原文状态"
+    ]
+  }
+]

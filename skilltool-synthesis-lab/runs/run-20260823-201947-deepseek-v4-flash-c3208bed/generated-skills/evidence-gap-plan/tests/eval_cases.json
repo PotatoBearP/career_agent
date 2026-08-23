@@ -1,0 +1,63 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我看看我现在跟这些机会要求差在哪，补什么证据",
+    "available_context": {
+      "user_profile": "包含已完成的课程项目、实验、竞赛经历和真实成果",
+      "verified_opportunity_list": "包含至少两个机会，每个机会含要求条目",
+      "material_quality_report": "包含简历/作品集可用性与薄弱项结论",
+      "user_evidence_input": "用户补充的额外真实经历"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "evidence_gap_analysis 为数组且每条要求有 gap_level",
+      "每条证据引用可追溯到 user_profile 或 user_evidence_input",
+      "partial/gap 条目带有 evidence_actions 与 expression_suggestion"
+    ],
+    "must_not_include": [
+      "虚构经历或背书",
+      "未列依据的结论",
+      "对机会要求的改写或新增"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_opportunities",
+    "user_query": "帮我看看我现在跟这些机会要求差在哪",
+    "available_context": {
+      "user_profile": "存在",
+      "verified_opportunity_list": "空数组，无任何机会或要求",
+      "material_quality_report": "存在",
+      "user_evidence_input": "空对象"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "至少需要一个真实机会及其要求才能做对照",
+      "不生成猜测性差距清单"
+    ],
+    "must_not_include": [
+      "凭空假设岗位要求",
+      "返回空数组冒充成功"
+    ]
+  },
+  {
+    "id": "boundary_no_fabrication_for_missing_evidence",
+    "user_query": "帮我看看我现在跟这些机会要求差在哪",
+    "available_context": {
+      "user_profile": "只有泛化背景描述，没有可核验的项目或经历细节",
+      "verified_opportunity_list": "包含一条要求：需要有真实用户上线经验的证据",
+      "material_quality_report": "指出已有材料缺少该证据",
+      "user_evidence_input": "空对象"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "该要求被标记为 gap 或 partial",
+      "evidence_action 指向采集真实证据或补强已有材料，而非编造",
+      "basis 记录材料报告说缺失该证据"
+    ],
+    "must_not_include": [
+      "虚构上线经历",
+      "声称已有该经验",
+      "把 generic 背景描述当作直接满足处理"
+    ]
+  }
+]

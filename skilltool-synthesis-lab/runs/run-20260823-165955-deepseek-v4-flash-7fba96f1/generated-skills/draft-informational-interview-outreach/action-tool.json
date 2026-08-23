@@ -1,0 +1,26 @@
+{
+  "tool_name": "DraftInformationalInterviewOutreach",
+  "user_facing_name": "帮我写联系从业者约聊的开口消息",
+  "search_hint": "generate informational interview outreach message drafts from interview prep kit, outreach context, and user profile",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "interview_prep_kit": {
+      "type": "json",
+      "required": true,
+      "description": "已生成的信息访谈目标与提问重点，作为消息内容的基础"
+    },
+    "outreach_context": {
+      "type": "json",
+      "required": true,
+      "description": "联系场合、平台类型、与对方的关系以及希望的语气"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户画像中的已有背景与约束，用于写出真实可信的自我介绍"
+    }
+  }
+}

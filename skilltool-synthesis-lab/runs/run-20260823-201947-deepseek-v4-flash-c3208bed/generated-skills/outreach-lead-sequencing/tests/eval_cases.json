@@ -1,0 +1,62 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我排一下接下来先联系谁、后联系谁",
+    "available_context": {
+      "referral_entry_lead_list": "包含两条公开线索，各含 opportunity_id、verification_status、contact_channel 和公开来源",
+      "matched_network_lead_list": "包含一条熟人线索，含 contact_id、matched_opportunity_ids 和关系来源",
+      "opportunity_pursuit_ranking": "opportunity_a 排第 1，opportunity_b 排第 2",
+      "user_contact_rules": "排除渠道 X，每周最多联系 2 人",
+      "user_time_budget": "本周可投入 2 小时，分两批接触"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "outreach_sequence_plan 按 sequence_rank 升序",
+      "每条可行动线索包含 lead_id、contact_channel、suggested_time 和 reason"
+    ],
+    "must_not_include": [
+      "实际发送动作",
+      "被排除渠道 X 的线索获得正数 sequence_rank"
+    ]
+  },
+  {
+    "id": "insufficient_missing_prior_lists",
+    "user_query": "帮我排一下接下来先联系谁、后联系谁",
+    "available_context": {
+      "referral_entry_lead_list": "空数组",
+      "matched_network_lead_list": "空数组",
+      "opportunity_pursuit_ranking": "opportunity_a 排第 1",
+      "user_contact_rules": "无特殊限制",
+      "user_time_budget": "本周 2 小时"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "返回 insufficient_input",
+      "说明缺少可排入顺序的线索清单"
+    ],
+    "must_not_include": [
+      "构造出任意假线索",
+      "请求发送消息"
+    ]
+  },
+  {
+    "id": "boundary_contact_rule_exclusion",
+    "user_query": "帮我排一下接下来先联系谁、后联系谁",
+    "available_context": {
+      "referral_entry_lead_list": "包含一条 contact_channel 为渠道 X 的公开线索",
+      "matched_network_lead_list": "包含一条允许的熟人线索",
+      "opportunity_pursuit_ranking": "两条线索关联到同一个机会",
+      "user_contact_rules": "明确排除渠道 X",
+      "user_time_budget": "本周可联系 3 人"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "渠道 X 的线索标记为 status=excluded 且 sequence_rank 为空",
+      "允许的熟人线索获得正数 sequence_rank"
+    ],
+    "must_not_include": [
+      "渠道 X 的线索出现在可行动队列中",
+      "对用户边界规则的任何绕过或猜测性放行"
+    ]
+  }
+]

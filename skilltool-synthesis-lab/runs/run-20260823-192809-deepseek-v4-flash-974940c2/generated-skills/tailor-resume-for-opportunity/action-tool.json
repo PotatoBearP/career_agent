@@ -1,0 +1,36 @@
+{
+  "tool_name": "TailorResumeForOpportunity",
+  "user_facing_name": "按岗位要求调整简历重点",
+  "search_hint": "按岗位要求调整简历重点并保留事实边界",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "resume_draft": {
+      "type": "string",
+      "required": true,
+      "description": "用户提供的现有简历草稿文本，可包含工作经历、项目、技能和教育信息"
+    },
+    "target_opportunity": {
+      "type": "json",
+      "required": true,
+      "description": "目标岗位的描述，包括职责、要求关键词、投递说明和招聘方关注点"
+    },
+    "application_focus_brief": {
+      "type": "json",
+      "required": true,
+      "description": "上一阶段形成的投递材料准备要点"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "已确认的用户画像，用于校验简历内容是否在事实范围内"
+    },
+    "format_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户对简历语言、篇幅、版式和命名规则的要求"
+    }
+  }
+}

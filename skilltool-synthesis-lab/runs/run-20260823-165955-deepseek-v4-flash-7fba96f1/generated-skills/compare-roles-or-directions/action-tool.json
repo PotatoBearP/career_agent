@@ -1,0 +1,26 @@
+{
+  "tool_name": "CompareRolesOrDirections",
+  "user_facing_name": "比较几个方向或岗位",
+  "search_hint": "compare user-supplied career directions or roles across chosen dimensions without fetching external data",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "options_to_compare": {
+      "type": "json",
+      "required": true,
+      "description": "用户希望比较的方向或岗位列表，每项包含名称、描述、来源链接等"
+    },
+    "comparison_dimensions": {
+      "type": "json",
+      "required": true,
+      "description": "用户关心的比较维度，如工作内容、进入门槛、发展空间、与自身证据的匹配度等；为空时使用默认维度"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户画像中的证据与偏好，用于判断各选项与用户的契合度"
+    }
+  }
+}

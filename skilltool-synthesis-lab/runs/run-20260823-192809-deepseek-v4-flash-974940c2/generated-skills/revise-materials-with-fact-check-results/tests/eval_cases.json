@@ -1,0 +1,52 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "检查出来的问题帮我都改掉，出一版修订稿",
+    "available_context": {
+      "fact_check_report": "包含两条问题：简历中某项目量化结果无证据支撑、求职信中项目名称与画像不一致，且每条含修改建议",
+      "draft_materials": "含 resume 和 cover_letter 两个文档，文本与 report 定位匹配",
+      "user_profile": "包含该项目真实角色、真实结果范围和正确项目名称"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "revised_materials 中两个文档均有修订后文本",
+      "每个变化条目都能指向报告中的对应问题并获得事实依据"
+    ],
+    "must_not_include": [
+      "未在报告或画像中出现的新数字或新职责"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_report",
+    "user_query": "既然发现了几处不一致，那就请帮我改好再给我",
+    "available_context": {
+      "fact_check_report": "未提供或为空",
+      "draft_materials": "提供了简历和求职信草稿",
+      "user_profile": "已提供"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "说明缺少可应用的核验结论，无法执行修订"
+    ],
+    "must_not_include": [
+      "基于猜测自行修改材料"
+    ]
+  },
+  {
+    "id": "boundary_unresolvable_claim",
+    "user_query": "报告说我的项目经历夸大了，帮我在求取信里修好",
+    "available_context": {
+      "fact_check_report": "标记“主导了两个项目”为无证据支撑",
+      "draft_materials": "cover_letter 中存在该表述",
+      "user_profile": "没有可证明项目主导角色的任何信息"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "该表述被删除或标记 pending_confirmation 并说明缺少证据",
+      "change 记录中明确写出缺失事实内容"
+    ],
+    "must_not_include": [
+      "自创如“负责了一个项目”之类的替代事实"
+    ]
+  }
+]

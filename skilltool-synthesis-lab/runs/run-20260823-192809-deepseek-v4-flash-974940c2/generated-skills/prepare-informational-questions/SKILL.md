@@ -1,0 +1,161 @@
+---
+name: prepare-informational-questions
+description: "当用户需要在准备或提交申请材料前，向招聘方、内部员工或校友确认岗位的材料要求、格式约束、评审重点或流程细节时使用。不要用于起草实际发送的消息、不要代替用户回答这些材料问题、不要评估用户是否符合岗位、也不要生成完整的外联消息。"
+model-entry: action-tool
+allowed-tools:
+  - ReturnSkillResult
+---
+
+# 整理需要向相关人员确认的材料问题
+
+沟通准备者：把已确认的证据缺口和目标岗位信息转化为面向真实沟通对象、可逐条用于确认材料要求的问题清单。
+
+## Goal
+
+按主题生成一份可交给招聘方、内部员工或校友确认材料要求、格式和评审重点的问题清单，明确每个问题想确认什么、在哪个场景使用、用于什么判断，且只基于已有证据与用户提供的岗位信息和沟通场景，不编造任何岗位事实或用户经历。
+
+## Hard boundary
+
+- 只使用 evidence_gap_analysis、target_opportunity、conversation_context 三个输入；不读取用户画像原文、不联网检索、不调用其他工具或技能。
+- 不得编造或推断岗位的材料要求、格式约束、截止时间、评审标准或用户经历；任何输入中不存在的具体事实都不能进入问题表述。
+- 不得把问题写成可直接发送的消息、邮件正文或外联稿件；本能力只产出问题清单。
+- 不得替用户回答这些材料问题，也不得评估用户与岗位要求之间的匹配程度。
+- 当目标岗位或沟通对象缺失时返回 insufficient_input，而不是凭假设生成问题。
+
+In scope:
+
+- 从 evidence_gap_analysis 中提取尚无可靠证据、最需要向外部确认的材料要求事项
+- 从 target_opportunity 中提取与材料、格式、篇幅、语言、截止时间和评审重点相关的待确认点
+- 根据 conversation_context 中的沟通对象、渠道和可接受时长，裁剪问题的范围与措辞
+- 按主题组织问题清单，并逐条标注想确认的信息、使用场景和预期用途
+
+The scenario alone defines the domain (`explicit`). Treat profile facts only as evidence and constraints; never use them to silently redefine the target domain.
+
+## Invocation inputs
+
+Read `<skill-action-input>` and resolve these inputs only through the declared paths:
+
+- `evidence_gap_analysis` (object, required; source `upstream_artifact`, asset `evidence_gap_analysis`, acquisition `provided`): 经历与要求对照结果，用于确定哪些材料要求最需要向外部确认
+- `target_opportunity` (object, required; source `user_input`, acquisition `request_user`): 目标岗位的描述、材料要求和用户已经了解到的信息
+- `conversation_context` (object, required; source `user_input`, acquisition `request_user`): 用户打算通过什么渠道确认，例如招聘方、内部员工、校友，以及对方可接受的沟通方式和时长
+
+If a required input cannot be resolved under its declared acquisition and fallback policy, use the `insufficient_input` outcome.
+
+## Tool policy
+
+Allowed non-lifecycle tools: none.
+
+- None.
+
+Never discover or invoke another Skill. `ReturnSkillResult` is supplied by the Harness and is the only lifecycle tool.
+
+## Workflow
+
+### 1. 冻结并校验输入
+
+- 读取 evidence_gap_analysis 对象、target_opportunity 对象和 conversation_context 对象。
+- 确认三个输入均已提供且可解析；target_opportunity 至少包含岗位标识、材料要求描述或用户已知信息中的一项。
+- 把 conversation_context 中的沟通对象角色提取为 recruiter、insider、alumni 或用户给的其他角色。
+
+Success criteria:
+
+- 三个输入字段均已确认存在并可用于生成问题
+- 沟通对象角色已被识别或明确标记为未知
+
+### 2. 提取待确认主题
+
+- 从 evidence_gap_analysis 中找出被标记为证据不足、待确认或仍无可靠证据支撑的项，作为外部确认的候选主题。
+- 从 target_opportunity 中提取用户已了解到的材料种类、格式约束、篇幅、语言、截止时间和评审重点描述。
+- 合并去重后形成主题清单，每个主题记录：需要确认的具体信息、该信息来自哪个输入、当前证据状态。
+
+Success criteria:
+
+- 每个候选主题都能追溯到 evidence_gap_analysis 或 target_opportunity 的具体字段
+- 没有凭空新增主题
+
+### 3. 按沟通对象筛选
+
+- 根据 conversation_context 中对象角色决定问题范围：招聘方侧重材料要求与格式；内部员工或校友可补充评审重点、材料侧重点与实际被看重的内容。
+- 对不适合向该对象提出的问题（如向招聘方询问内部评审偏好）进行调整或移出。
+- 若沟通对象角色未知，保留通用问题并在结果中标注对象适用性为 general。
+
+Success criteria:
+
+- 清单中的问题与该对象的角色和可接受沟通方式相容
+- 不适配候选问题被剔除或显式标注
+
+### 4. 排序并措辞
+
+- 按主题重要性排序：直接影响能否提交的材料种类与格式问题在前，评审重点与流程问题在后。
+- 每个问题写明想确认的信息、使用场景和预期用途，例如确认某项格式后才能定稿简历。
+- 对输入中尚不明确的部分使用开放式问题，不使用特定数字或结论，除非该数字或结论已出现在输入中。
+
+Success criteria:
+
+- 每条问题包含 expected_confirmation、use_scenario、intended_use 三要素
+- 问题表述不包含任何未经输入支持的具体事实
+
+### 5. 汇总并自检
+
+- 把问题按主题聚合为最终 question_list 数组。
+- 逐条核对：信息是否来自输入、对象是否匹配、是否遗漏关键待确认项。
+- 调用 ReturnSkillResult 一次返回结果，结果为成功或 insufficient_input。
+
+Success criteria:
+
+- question_list 可被用户直接读取并用于后续沟通
+- 已通过事实边界与对象适配检查
+
+## Decision rules
+
+- evidence_gap_analysis 中已经明确为有证据支持的项不进入问题清单，除非 target_opportunity 中存在与之冲突或模糊的内容。
+- 沟通对象为招聘方时，问题范围限定在官方要求、材料清单、格式约束、提交方式和截止时间；对象为内部员工或校友时，可扩展到评审重点与实际侧重点。
+- 若 conversation_context 未提供对象角色、渠道或可用时长，默认生成通用清单，并在 questions 中标记适用范围为 general。
+- 当同一待确认点既影响格式又影响评审重点时，归入格式或材料要求主题并按影响提交的紧迫度优先排序。
+
+## Outcome rules
+
+### Success
+
+- 三个输入均存在且可解析
+- question_list 至少包含一条主题明确、可追溯的问题
+- 所有问题表述均不包含输入之外的事实
+
+### Insufficient input
+
+- target_opportunity 缺失或无法确定用户要确认哪个岗位
+- conversation_context 缺失且无法判断沟通对象与渠道
+- evidence_gap_analysis 与 target_opportunity 中均无任何需要外部确认的材料相关事项
+
+### Error
+
+- 任一输入为不可解析的类型或结构
+- 无法序列化 question_list 结果
+
+
+## Return contract
+
+Pass a JSON object matching this schema-like contract as `result`:
+
+```json
+{
+  "question_list": {
+    "type": "array",
+    "description": "按主题组织的问题清单，每个问题标明想确认的信息、使用场景和预期用途"
+  }
+}
+```
+
+Declared consumers:
+- task_draft_outreach_message
+- user_decision
+
+Use English JSON keys and concise values in the user's language. Call `ReturnSkillResult` exactly once with the Harness-provided `skill_call_id` and `skill_name`, the selected outcome, a concise summary, and the structured result. Do not add post-Skill guidance after the call is accepted.
+
+## Final check before returning
+
+- 每个问题都能追溯到 evidence_gap_analysis 或 target_opportunity 的具体内容
+- 没有出现编造的岗位事实、格式约束、截止时间、评审标准或用户经历
+- 问题范围与 conversation_context 中的沟通对象和渠道相容
+- 输出只包含 question_list，未包含可发送消息、评估结论或材料修改建议
+- 仅调用一次 ReturnSkillResult

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "从这几个方向里帮我选出最值得先验证的几个，并说明为什么保留、哪些先放一放。",
+    "available_context": {
+      "candidate_directions": "包含名称、了解程度、来源的三至五个方向",
+      "decision_weights": "用户明确给出证据贴合度权重高",
+      "user_profile": "包含已有证据、偏好与时间约束"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "retained_directions 中每个方向有贴合度、证据充分度、取舍理由和下一步验证建议",
+      "postponed_directions 有搁置原因",
+      "排序能由权重与画像证据反推"
+    ],
+    "must_not_include": [
+      "新增候选方向",
+      "互联网检索结论",
+      "对用户适合某岗位的绝对断言"
+    ]
+  },
+  {
+    "id": "insufficient_input_empty_candidates",
+    "user_query": "帮我缩小值得优先验证的方向。",
+    "available_context": {
+      "candidate_directions": "空数组或未提供",
+      "user_profile": "可用"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少候选方向列表导致无法排序"
+    ],
+    "must_not_include": [
+      "自造候选方向并继续产出排序"
+    ]
+  },
+  {
+    "id": "boundary_vague_direction_and_missing_profile_fact",
+    "user_query": "帮我从这些方向里挑重点，但我说不清楚每个方向具体做什么。",
+    "available_context": {
+      "candidate_directions": "某项只有模糊名称且无来源，其余有名称与来源",
+      "decision_weights": "未提供",
+      "user_profile": "部分维度无对应证据"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "模糊项被标注高不确定性且排序依据说明缺失",
+      "summary 声明使用默认等权维度",
+      "缺失个人证据被标记为 unknown"
+    ],
+    "must_not_include": [
+      "根据模糊名称臆测方向内容并以此为排序依据",
+      "将缺证据项默认为用户本就具备相关条件"
+    ]
+  }
+]

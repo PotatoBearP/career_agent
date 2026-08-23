@@ -1,0 +1,287 @@
+{
+  "skill_id": "build_base_resume_bank",
+  "skill_name": "build-base-resume-bank",
+  "tool_name": "BuildBaseResumeBank",
+  "title": "整理一版基础简历",
+  "business_goal": "把已确认的用户画像与用户补充素材整合成一份按用户偏好组织、且每条内容都标注事实来源或待确认状态的基础简历草稿，供后续按不同岗位要求继续改写。",
+  "invocation_mode": "standalone",
+  "composition": {
+    "required_prior_outputs": [],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "当用户要求把已有经历、项目、技能和成果整理成一版可复用的基础简历底稿时使用。本能力只负责整合和标注来源，不收集新证据、不面向具体岗位改写、不判断岗位匹配度、不作为求职信或项目作品附件的生成器。",
+  "reference_pattern": "baseline-assessment：冻结证据边界，只使用调用时已经可见的输入，并为每一条判断保留来源与依据；adapt to learning-plan 的产物消费模式：把 user_profile 与 user_supplied_material 当作已确认的上游输入直接消费，不重新询问、不搜索、不扩展证据。",
+  "task_ids": [
+    "task_build_base_resume_bank"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "从 user_profile 提取可写入简历的教育、经历、项目、技能与成果信息",
+      "从 user_supplied_material 补全画像中未覆盖的事实",
+      "按 material_preferences 中的语言、篇幅、章节顺序和教育细节要求组织草稿",
+      "为每个条目标注来源（user_profile 或 user_supplied_material）",
+      "将缺少日期、机构、量化结果或证据支撑的内容列入待确认状态"
+    ],
+    "excludes": [
+      "面向具体岗位的定向改写、关键词匹配或岗位要求比对",
+      "编造或补充任何用户画像与补充材料中没有的事实",
+      "生成求职信、项目作品清单、邮件正文等其它申请材料",
+      "收集新证据、搜索网络、读取本地文件或访问其它 Skill",
+      "修改、覆盖或重新生成 user_profile 等已有产物"
+    ]
+  },
+  "input_schema": {
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "已确认的用户画像，包含可验证的教育、经历、技能、偏好与约束",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_supplied_material": {
+      "type": "string",
+      "required": true,
+      "description": "用户补充的原始经历、项目、技能或成果文本，用于补全画像中未覆盖的事实",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "material_preferences": {
+      "type": "object",
+      "required": true,
+      "description": "用户对基础简历的语言、篇幅、章节顺序和是否包含教育细节等要求",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "base_resume_draft": {
+      "type": "object",
+      "description": "结构化基础简历草稿，包含教育、经历、项目、技能等章节，每个条目标注事实来源或待确认状态"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "把用户已有经历整理成一版可编辑的基础简历底稿",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": false
+  },
+  "operating_model": {
+    "role": "简历素材整合者：把调用时可见的用户画像与用户补充素材组织成结构化基础简历，只做整合、排序、来源标注和待确认识别，不做岗位定向改写，也不充当证据收集者。",
+    "hard_boundaries": [
+      "只使用 user_profile、user_supplied_material、material_preferences 三个输入；不调用任何外部工具、不读取文件、不搜索网络、不访问其它 Skill。",
+      "不得编造经历、数字、职责、成果或技能；输入中不存在的任何事实性内容只能放入 pending_confirmations，不能出现在正式条目正文。",
+      "不得按任何推断的目标行业、岗位或赛道修改内容，用户画像只作为个人证据来源。",
+      "不得生成岗位定向简历、求职信或其它材料类型；只输出基础简历草稿对象。",
+      "不得修改、覆盖或重新生成 user_profile 等上游已有产物。",
+      "不得把结果写入文件、发送给外部系统或代替用户提交简历。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "校验输入与解析偏好",
+        "instructions": [
+          "确认 user_profile 为非空 object；缺失或为空时返回 insufficient_input。",
+          "解析 material_preferences：language、max_pages_or_length、section_order、include_education_details；缺失字段使用默认值：language 沿用输入原语言，section_order 默认 ['education','experience','projects','skills']，include_education_details 默认 false。",
+          "读取 user_supplied_material 原始文本；为空字符串时跳过补全步骤。"
+        ],
+        "success_criteria": [
+          "已明确语言、章节顺序与教育细节策略",
+          "user_profile 存在且至少包含一个可评估的简历相关章节"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "抽取可验证事实条目",
+        "instructions": [
+          "从 user_profile 的 education、experience、projects、skills 等字段逐条抽取事实，并记录每条来源为 user_profile。",
+          "从 user_supplied_material 中抽取输入文本明确描述的教育、经历、项目、技能与成果，并记录来源为 user_supplied_material。",
+          "对每一条记录拆分 fact_text、time_range、organization、role、outcome、evidence_source；任何字段缺失都不得用默认值或推测值填充。",
+          "若同一事实在两个来源同时出现，优先采用 user_profile 的表述并去重，同时记录 duplicate_source。"
+        ],
+        "success_criteria": [
+          "每个条目都有 evidence_source 且值只能是 user_profile 或 user_supplied_material",
+          "没有为缺失字段生成推测值"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "判定待确认状态",
+        "instructions": [
+          "对每个条目检查事实完整性：时间区间、机构或项目归属、承担角色、可量化的结果。",
+          "字段缺失或只有主观描述而无证据支撑时，将该缺失项写入 pending_confirmations，包含 material_location、missing_fact、current_evidence_status。",
+          "用户画像中明确标注为偏好或约束的内容（例如地点偏好、每周可投入时间）不放入简历正文章节。"
+        ],
+        "success_criteria": [
+          "pending_confirmations 中每条都对应一个真实缺失字段",
+          "没有把偏好、约束或推测内容写入正文章节"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "按偏好组织章节",
+        "instructions": [
+          "按 material_preferences.section_order 排列章节；未出现的章节不强制加入。",
+          "按 include_education_details 决定教育章节保留哪些字段；默认只保留学位、学校、专业与时间。",
+          "语言按 material_preferences.language；若未指定则保持来源语言，不做翻译。"
+        ],
+        "success_criteria": [
+          "输出章节顺序与 material_preferences.section_order 一致或与其默认值一致",
+          "教育细节字段与 include_education_details 一致"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "组装并校验输出",
+        "instructions": [
+          "组装 base_resume_draft：header（姓名或联系方式，仅当输入存在）、sections、provenance_map（source->entries）、pending_confirmations、notes。",
+          "逐条核对输出条目与输入文本是否一一对应，防止错置、拼凑或新增内容。",
+          "调用 ReturnSkillResult 且只调用一次，返回 success 和结构化结果。"
+        ],
+        "success_criteria": [
+          "base_resume_draft 是结构完整的 object",
+          "所有正式条目都有证据来源，pending_confirmations 非空时清楚列出缺失事实"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "来源优先级：同一事实同时出现在 user_profile 与 user_supplied_material 时，采用 user_profile 并去重。",
+      "事实边界：只有能逐字或近义对应到输入文本的内容可进入正文章节；无法对应的内容进入 pending_confirmations。",
+      "数值规则：没有出现在输入中的数字、百分比或规模不得写入结果；缺失时标记为待确认。",
+      "章节规则：未提供 section_order 时固定使用 education, experience, projects, skills；不额外发明章节。",
+      "语言规则：material_preferences.language 缺失时不翻译、不改写语体。",
+      "排除规则：偏好、时间预算、地点限制等非简历事实不进入正文章节。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "user_profile 非空且至少存在一个可用的事实条目",
+        "已生成包含 sections 与 provenance_map 的 base_resume_draft",
+        "所有事实都有证据来源，缺失字段已进入 pending_confirmations"
+      ],
+      "insufficient_input": [
+        "user_profile 缺失或为空对象",
+        "user_profile 不包含任何简历相关章节且 user_supplied_material 为空",
+        "material_preferences 与输入来源语言矛盾且无法确定使用语言时，如实说明需要用户明确偏好"
+      ],
+      "error": [
+        "输出无法序列化为合法 object",
+        "章节字段缺失导致结果不可消费",
+        "校验发现正式条目包含输入中不存在的事实"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "base_resume_draft 为 object 且包含 header、sections、pending_confirmations。",
+      "每个正式条目均含 evidence_source，且值只能是 user_profile 或 user_supplied_material。",
+      "不存在输入中未出现的数字、成果或职责表述。",
+      "pending_confirmations 与缺失字段一一对应且没有占位内容。",
+      "没有出现岗位定向语言、推荐结论或外部动作承诺。",
+      "未调用任何外部工具，返回前仅调用一次 ReturnSkillResult。"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 5,
+    "rationale": "需要跨多个上游字段做抽取、去重、来源标注与待确认分类，且要守住不编造事实的边界；但输入明确、输出固定，不需要拆分为多个 Skill。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖调用时提供的 user_profile、user_supplied_material、material_preferences 三个输入",
+      "不依赖主程序导入、数据库、UI 状态或内部服务",
+      "不需要外部工具即可完成证据整合与结构化输出"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我把我的经历整理成一版基础简历",
+      "available_context": {
+        "user_profile": "包含教育、一段研究实验经历、一个课程项目、若干技能字段",
+        "user_supplied_material": "补充了一个项目的时间与产出描述",
+        "material_preferences": "language=中文, section_order=[education, projects, experience, skills], include_education_details=true"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "base_resume_draft.sections 按 education, projects, experience, skills 排序",
+        "每个正式条目含 evidence_source 且指向 user_profile 或 user_supplied_material",
+        "补充材料中的时间与产出出现在对应项目条目"
+      ],
+      "must_not_include": [
+        "输入中不存在的数字或成果",
+        "岗位定向表述或推荐结论"
+      ]
+    },
+    {
+      "id": "insufficient_missing_profile",
+      "user_query": "帮我把我的经历整理成一版基础简历",
+      "available_context": {
+        "user_profile": "空对象",
+        "user_supplied_material": "",
+        "material_preferences": "{}"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明缺少可用的用户画像事实来源",
+        "描述缺少的是用户画像或补充材料中的教育、经历、项目与技能条目"
+      ],
+      "must_not_include": [
+        "凭空生成简历条目",
+        "以问题形式向主 Agent 索要证据"
+      ]
+    },
+    {
+      "id": "boundary_no_fabricated_numbers",
+      "user_query": "帮我整理基础简历，把项目效果写成准确率提升30%",
+      "available_context": {
+        "user_profile": "项目条目中只有任务描述，没有任何数字或效果数据",
+        "user_supplied_material": "未提及准确率",
+        "material_preferences": "language=中文"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "正式项目条目中不包含准确率30%的表述",
+        "pending_confirmations 中列出缺失的量化结果字段及当前证据状态"
+      ],
+      "must_not_include": [
+        "30% 或任何输入中不存在的数值写入正式条目"
+      ]
+    }
+  ]
+}

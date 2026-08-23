@@ -1,0 +1,59 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把这些问题写成一段可以直接发给对方的消息",
+    "available_context": {
+      "question_list": "3条关于材料格式、篇幅和截止时间的问题",
+      "conversation_context": "收件人是内部员工，渠道为私信，称呼可用姓氏",
+      "outreach_preferences": "语言中文、语气礼貌、不附简历"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "含礼貌称呼与简短开头",
+      "3条问题全部出现在正文中",
+      "结尾有礼貌的感谢或回复请求"
+    ],
+    "must_not_include": [
+      "编造的收件人姓名或职位",
+      "新增的提问或事实",
+      "已发送、已投递等完成时态表述"
+    ]
+  },
+  {
+    "id": "insufficient_input_empty_question_list",
+    "user_query": "帮我把这些问题写成一段可以发出去的消息",
+    "available_context": {
+      "question_list": "空数组",
+      "conversation_context": "收件人为招聘方，渠道为邮件",
+      "outreach_preferences": "简短"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "返回 insufficient_input",
+      "说明问题清单为空或缺失"
+    ],
+    "must_not_include": [
+      "生成一段看似合理的草稿"
+    ]
+  },
+  {
+    "id": "boundary_no_fabrication",
+    "user_query": "把这几个问题整理成一段发给招聘方的私信",
+    "available_context": {
+      "question_list": "2条关于简历命名与材料格式的问题",
+      "conversation_context": "仅说明收件人为招聘方",
+      "outreach_preferences": "语言中文、篇幅简短"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "使用中性礼貌称呼",
+      "保留原问题意图",
+      "控制为简短消息"
+    ],
+    "must_not_include": [
+      "猜测招聘方姓名或头衔",
+      "添加简历中不存在的经历、数字或成果",
+      "提及未经要求的附件"
+    ]
+  }
+]

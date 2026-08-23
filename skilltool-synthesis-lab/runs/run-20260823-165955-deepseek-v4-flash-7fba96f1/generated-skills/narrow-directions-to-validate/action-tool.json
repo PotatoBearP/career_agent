@@ -1,0 +1,26 @@
+{
+  "tool_name": "NarrowDirectionsToValidate",
+  "user_facing_name": "缩小值得优先验证的方向",
+  "search_hint": "narrow and rank candidate career directions for validation based on personal evidence, preferences, and constraints",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "candidate_directions": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的候选方向列表，各项含名称、了解程度与来源"
+    },
+    "decision_weights": {
+      "type": "json",
+      "required": true,
+      "description": "用户在取舍时看重的因素及相对权重；为空时按默认维度排序"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户画像中的证据、偏好与现实约束，用于判断候选方向的贴合度"
+    }
+  }
+}

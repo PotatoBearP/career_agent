@@ -1,0 +1,39 @@
+{
+  "tool_name": "RoleContextBrief",
+  "user_facing_name": "目标角色联系背景简报",
+  "search_hint": "按目标机会的角色团队查日常工作、协作方式、能力要求和入门路径的公开资料",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [
+    "WebSearch",
+    "WebFetch"
+  ],
+  "input": {
+    "target_opportunities": {
+      "type": "json",
+      "required": true,
+      "description": "用户已经确认的真实机会清单，用于确定要了解的对象"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的画像信息，用于把工作情境与用户已有经历联系起来"
+    },
+    "search_result_web": {
+      "type": "json",
+      "required": true,
+      "description": "公开网络检索到的岗位职责、团队信息、行业讨论和公司公开资料"
+    },
+    "page_content": {
+      "type": "json",
+      "required": true,
+      "description": "被检视的具体页面内容，用于确认岗位要求、团队构成和工作方式"
+    },
+    "research_focus": {
+      "type": "json",
+      "required": true,
+      "description": "用户想了解的方面，例如日常工作、团队协作、考核要求、入口路径等"
+    }
+  }
+}

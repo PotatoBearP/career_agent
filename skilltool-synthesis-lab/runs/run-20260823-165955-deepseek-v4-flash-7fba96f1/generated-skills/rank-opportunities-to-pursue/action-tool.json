@@ -1,0 +1,31 @@
+{
+  "tool_name": "RankOpportunitiesToPursue",
+  "user_facing_name": "帮我排一下这些岗位先投哪些",
+  "search_hint": "rank verified job opportunities by user evidence and stated preferences",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "已核验的真实岗位机会清单，作为待排序的候选机会"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户画像中的证据、偏好与现实约束，用于判断各岗位的贴合度与优先级"
+    },
+    "ranking_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户关心的排序因素，如地理位置、组织类型、机会类型、时间紧迫性和准备成本"
+    },
+    "evidence_gap_analysis": {
+      "type": "json",
+      "required": true,
+      "description": "已有经历与目标方向要求的对照结果，作为排序时的匹配度补充参考；没有时忽略"
+    }
+  }
+}

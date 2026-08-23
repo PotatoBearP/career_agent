@@ -1,0 +1,59 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把这两个岗位要交的材料比较一下，哪些可以共用",
+    "available_context": {
+      "opportunity_pair": "包含岗位 A 和岗位 B 的完整描述，两者的材料种类和格式要求均明确",
+      "verified_opportunity_list": "含岗位 A 和岗位 B 的已验证记录，与用户描述一致",
+      "application_focus_brief": "说明岗位 A 侧重项目经历，岗位 B 侧重技能认证材料"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "alignment_matrix 覆盖 material_kinds、format_constraints、material_focus、deadlines 四个维度",
+      "reusable_materials 给出可直接共用的材料及格式一致依据",
+      "separately_prepared_materials 给出需单独准备或调整的材料及原因",
+      "所有单元格标注来源"
+    ],
+    "must_not_include": [
+      "编造的格式或截止时间",
+      "对两个岗位的优劣排序结论"
+    ]
+  },
+  {
+    "id": "insufficient_single_opportunity",
+    "user_query": "帮我看看这个岗位要交哪些材料，跟另一个岗位比较一下",
+    "available_context": {
+      "opportunity_pair": "只包含一个清晰的岗位描述，另一个岗位无任何可识别信息",
+      "verified_opportunity_list": "存在多个岗位但无法确定用户想对比哪一个",
+      "application_focus_brief": "存在"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "返回原因：第二个岗位无法识别",
+      "不生成任何部分对比表"
+    ],
+    "must_not_include": [
+      "猜测第二个岗位后继续生成对比表",
+      "把第一个岗位与不相关岗位强行比较"
+    ]
+  },
+  {
+    "id": "boundary_conflict_between_sources",
+    "user_query": "对照已验证岗位信息，帮我比较这两个岗位的材料要求差异",
+    "available_context": {
+      "opportunity_pair": "岗位 A 和岗位 B 的用户描述齐全",
+      "verified_opportunity_list": "岗位 A 的材料格式或截止时间与用户描述不一致",
+      "application_focus_brief": "存在"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "冲突字段同时保留两个来源的值",
+      "unresolved_conflicts 中标明需要用户确认的冲突点",
+      "其他未冲突维度照常完成对比"
+    ],
+    "must_not_include": [
+      "静默采用其中一个来源而丢弃另一方",
+      "把冲突字段当作已确认事实写入 reusable 判断"
+    ]
+  }
+]

@@ -1,0 +1,63 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "结合我的情况和偏好，帮我排一下这些岗位先投哪些。",
+    "available_context": {
+      "verified_opportunity_list": "包含 3 个已核验岗位，字段齐全：标识、标题、组织、地点、发布时间、核验状态",
+      "user_profile": "包含用户偏好、证据项与现实约束",
+      "ranking_preferences": "包含目标地区、组织类型、机会类型、时间紧迫性和准备成本",
+      "evidence_gap_analysis": "包含逐项匹配状态与证据缺口"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "有序的岗位列表",
+      "每个岗位的排序理由",
+      "与用户证据的匹配点",
+      "不确定性",
+      "待核实事项",
+      "档位划分"
+    ],
+    "must_not_include": [
+      "调用 WebSearch 或 WebFetch",
+      "对岗位有效性或组织可信度作出输入中不存在的新断言"
+    ]
+  },
+  {
+    "id": "insufficient_missing_list",
+    "user_query": "帮我排一下这些岗位先投哪些。",
+    "available_context": {
+      "verified_opportunity_list": "空数组",
+      "ranking_preferences": "存在",
+      "user_profile": "存在"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "insufficient_input",
+      "缺少已核验岗位清单"
+    ],
+    "must_not_include": [
+      "排序结果",
+      "建议投递顺序"
+    ]
+  },
+  {
+    "id": "boundary_no_evidence_gap_and_unknown_status",
+    "user_query": "这些岗位先投哪些？",
+    "available_context": {
+      "verified_opportunity_list": "存在但部分岗位核验状态为未知",
+      "ranking_preferences": "存在",
+      "user_profile": "存在",
+      "evidence_gap_analysis": "缺失"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "证据匹配被标记为未知或低置信",
+      "匹配度按缺失 evidence_gap_analysis 的降级规则处理",
+      "对状态未知的机会在待核实事项中说明"
+    ],
+    "must_not_include": [
+      "把未知核验状态表述为已验证",
+      "把缺失的证据匹配当作确定匹配"
+    ]
+  }
+]

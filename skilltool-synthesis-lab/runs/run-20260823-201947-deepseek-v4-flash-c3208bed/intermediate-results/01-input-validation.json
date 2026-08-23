@@ -1,0 +1,159 @@
+{
+  "passed": true,
+  "status": "passed",
+  "input_inventory": [
+    {
+      "asset_id": "user_profile",
+      "name": "用户画像",
+      "type": "object",
+      "source": "upstream_artifact",
+      "availability": "available",
+      "producer": {
+        "kind": "previous_scenario",
+        "name": "previous_scenario",
+        "stage": "upstream"
+      },
+      "derived_from": [],
+      "description": "自然语言场景声明的已有产物 user_profile"
+    },
+    {
+      "asset_id": "verified_opportunity_list",
+      "name": "verified_opportunity_list",
+      "type": "array",
+      "source": "upstream_artifact",
+      "availability": "available",
+      "producer": {
+        "kind": "previous_scenario",
+        "name": "previous_scenario",
+        "stage": "upstream"
+      },
+      "derived_from": [],
+      "description": "自然语言场景声明的已有产物 verified_opportunity_list"
+    },
+    {
+      "asset_id": "opportunity_pursuit_ranking",
+      "name": "opportunity_pursuit_ranking",
+      "type": "array",
+      "source": "upstream_artifact",
+      "availability": "available",
+      "producer": {
+        "kind": "previous_scenario",
+        "name": "previous_scenario",
+        "stage": "upstream"
+      },
+      "derived_from": [],
+      "description": "自然语言场景声明的已有产物 opportunity_pursuit_ranking"
+    },
+    {
+      "asset_id": "tailored_application_packages",
+      "name": "tailored_application_packages",
+      "type": "array",
+      "source": "upstream_artifact",
+      "availability": "available",
+      "producer": {
+        "kind": "previous_scenario",
+        "name": "previous_scenario",
+        "stage": "upstream"
+      },
+      "derived_from": [],
+      "description": "自然语言场景声明的已有产物 tailored_application_packages"
+    },
+    {
+      "asset_id": "material_quality_report",
+      "name": "material_quality_report",
+      "type": "object",
+      "source": "upstream_artifact",
+      "availability": "available",
+      "producer": {
+        "kind": "previous_scenario",
+        "name": "previous_scenario",
+        "stage": "upstream"
+      },
+      "derived_from": [],
+      "description": "自然语言场景声明的已有产物 material_quality_report"
+    },
+    {
+      "asset_id": "profile_input",
+      "name": "用户画像输入",
+      "type": "string",
+      "source": "profile",
+      "availability": "available",
+      "producer": {
+        "kind": "initial_input",
+        "name": "profile",
+        "stage": "run_input"
+      },
+      "derived_from": [],
+      "description": "用户画像、能力证据、偏好与约束",
+      "bound_input": "profile"
+    },
+    {
+      "asset_id": "scenario_input",
+      "name": "业务场景定义",
+      "type": "string",
+      "source": "scenario",
+      "availability": "available",
+      "producer": {
+        "kind": "initial_input",
+        "name": "scenario",
+        "stage": "run_input"
+      },
+      "derived_from": [],
+      "description": "本轮合成的业务目标、范围、约束与必需输出",
+      "bound_input": "scenario"
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "contract_complete",
+      "label": "输入契约完整",
+      "status": "pass",
+      "summary": "符合要求",
+      "issues": []
+    },
+    {
+      "check_id": "description_complete",
+      "label": "输入解释完整",
+      "status": "pass",
+      "summary": "符合要求",
+      "issues": []
+    },
+    {
+      "check_id": "source_valid",
+      "label": "输入来源合法",
+      "status": "pass",
+      "summary": "符合要求",
+      "issues": []
+    },
+    {
+      "check_id": "availability_truthful",
+      "label": "可用状态可信",
+      "status": "pass",
+      "summary": "符合要求",
+      "issues": []
+    },
+    {
+      "check_id": "derivation_valid",
+      "label": "派生关系有效",
+      "status": "pass",
+      "summary": "符合要求",
+      "issues": []
+    },
+    {
+      "check_id": "acquisition_ready",
+      "label": "缺失输入可获取",
+      "status": "pass",
+      "summary": "符合要求",
+      "issues": []
+    }
+  ],
+  "issues": [],
+  "summary": {
+    "total": 7,
+    "available": 7,
+    "acquirable": 0,
+    "missing": 0
+  },
+  "validation_pass": "post_task_reconciliation",
+  "additional_assets": []
+}

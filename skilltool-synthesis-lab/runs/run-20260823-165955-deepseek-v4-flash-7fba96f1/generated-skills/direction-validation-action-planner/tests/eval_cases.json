@@ -1,0 +1,60 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "根据我每周可投入的时间和期限，帮我排一个方向验证计划。",
+    "available_context": {
+      "validation_period": "start_date=2026-06-01, end_date=2026-06-28, weekly_hours=10",
+      "directions_to_validate": "包含三个方向：方向A（已有资料链接）、方向B（已联系一位从业者）、方向C（未开始了解）",
+      "user_profile": "包含每周可投入时间、偏好通过访谈获取反馈、每两周复盘一次"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "按阶段排列的行动步骤",
+      "逐周投入安排且每周不超过 10 小时",
+      "每个方向有可观察的成功标准",
+      "反馈获取方式和复盘时间点",
+      "assumptions_uncertainties 记录未核实信息"
+    ],
+    "must_not_include": [
+      "断言某方向适合用户",
+      "使用画像之外的新增城市、岗位或行业结论",
+      "调用外部搜索工具"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_time",
+    "user_query": "帮我制定方向验证行动计划。",
+    "available_context": {
+      "validation_period": "只有 start_date，缺少 end_date 和 weekly_hours",
+      "directions_to_validate": "包含两个方向，均有名称",
+      "user_profile": "存在但不应被用来补全用户本次未提供的周期"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确指出缺少结束日期和每周可投入时间",
+      "不生成包含虚构时间投入的计划"
+    ],
+    "must_not_include": [
+      "替用户假设每周小时数或周期长度",
+      "错误地返回 success"
+    ]
+  },
+  {
+    "id": "boundary_empty_direction_list",
+    "user_query": "根据我的时间帮我排验证计划。",
+    "available_context": {
+      "validation_period": "start_date=2026-06-01, end_date=2026-06-28, weekly_hours=8",
+      "directions_to_validate": "[]",
+      "user_profile": "存在"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "说明待验证方向列表为空",
+      "说明需要有名称的方向或机会条目才能安排行动"
+    ],
+    "must_not_include": [
+      "凭空生成候选方向",
+      "为未提供的方向排定行动"
+    ]
+  }
+]

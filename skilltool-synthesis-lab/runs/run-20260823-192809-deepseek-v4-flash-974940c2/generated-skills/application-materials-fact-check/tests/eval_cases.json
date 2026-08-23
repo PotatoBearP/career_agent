@@ -1,0 +1,108 @@
+[
+  {
+    "id": "success_mixed_claims",
+    "user_query": "帮我校对一下这版材料，看有没有和事实不符的地方",
+    "available_context": {
+      "draft_materials": {
+        "resume.md": "2023 年独立完成校园知识库问答原型；参与图像分类课程项目并将准确率提升至 99.9%",
+        "cover_letter.md": "曾用 Python 和 PyTorch 完成课程与研究实验"
+      },
+      "user_profile": {
+        "education": "计算机科学与技术硕士研究生",
+        "skills": [
+          "Python",
+          "PyTorch"
+        ],
+        "projects": [
+          "校园知识库问答原型（独立完成）",
+          "图像分类课程项目"
+        ],
+        "evidence": "无生产部署、真实用户或业务指标证据"
+      },
+      "evidence_gap_analysis": {
+        "capabilities": [
+          {
+            "name": "图像分类课程项目",
+            "evidence_status": "已有证据",
+            "description": "完成过课程项目但未记录量化准确率"
+          },
+          {
+            "name": "问答原型",
+            "evidence_status": "已有证据",
+            "description": "原型独立完成，无量化指标"
+          }
+        ]
+      }
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "report_items 中至少包含一个 contradictory 或 unsupported 条目，指向 99.9% 无事实依据的量化指标",
+      "Python、PyTorch 与校园知识库问答原型相关断言被标记为 consistent",
+      "needs_user_supplement 中包含需要用户确认的量化指标来源"
+    ],
+    "must_not_include": [
+      "任何被改写后的材料文本",
+      "任何声称已把材料和事实不符的地方直接修好的语句"
+    ]
+  },
+  {
+    "id": "insufficient_input_no_materials",
+    "user_query": "帮我查一下材料里有没有夸大或前后矛盾的内容",
+    "available_context": {
+      "draft_materials": {},
+      "user_profile": {
+        "skills": [
+          "Python",
+          "PyTorch"
+        ]
+      },
+      "evidence_gap_analysis": {
+        "capabilities": []
+      }
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可核验的申请材料文本",
+      "不输出完整核验报告，也不编造任何问题条目"
+    ],
+    "must_not_include": [
+      "基于空输入构造的 report_items",
+      "要求用户补充事实之外的额外调研动作"
+    ]
+  },
+  {
+    "id": "boundary_consistent_materials",
+    "user_query": "帮我校对一下这版材料有没有和事实不符的地方",
+    "available_context": {
+      "draft_materials": {
+        "resume.md": "用 Python 和 PyTorch 完成课程及研究实验；独立完成校园知识库问答原型"
+      },
+      "user_profile": {
+        "skills": [
+          "Python",
+          "PyTorch"
+        ],
+        "projects": [
+          "校园知识库问答原型（独立完成）"
+        ]
+      },
+      "evidence_gap_analysis": {
+        "capabilities": [
+          {
+            "name": "校园知识库问答原型",
+            "evidence_status": "已有证据"
+          }
+        ]
+      }
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "总体状态为 verified",
+      "report_items 中所有条目均为 consistent，或为空数组且明确说明无问题"
+    ],
+    "must_not_include": [
+      "为一致的材料编造 unsupported 或 exaggerated 问题",
+      "将核验成功误报为 error 或 insufficient_input"
+    ]
+  }
+]

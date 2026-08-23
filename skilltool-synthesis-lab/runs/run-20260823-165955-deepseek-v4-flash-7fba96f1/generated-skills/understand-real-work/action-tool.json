@@ -1,0 +1,34 @@
+{
+  "tool_name": "UnderstandRealWorkProfile",
+  "user_facing_name": "了解一个方向的实际日常工作",
+  "search_hint": "真实岗位日常工作任务、交付物、协作对象的公开来源信息",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [
+    "WebSearch",
+    "WebFetch"
+  ],
+  "input": {
+    "target_direction": {
+      "type": "string",
+      "required": true,
+      "description": "用户要了解工作内容的具体方向或岗位类型"
+    },
+    "work_context": {
+      "type": "json",
+      "required": true,
+      "description": "用户指定的行业、组织类型或地区等背景，用于限定工作内容描述"
+    },
+    "real_work_search_results": {
+      "type": "json",
+      "required": true,
+      "description": "公开来源中关于该方向日常工作、项目和交付物的检索结果，用于提炼真实工作活动"
+    },
+    "real_work_page_extracts": {
+      "type": "json",
+      "required": true,
+      "description": "从检索结果中筛选出的原文页面内容，用于提炼真实工作活动"
+    }
+  }
+}

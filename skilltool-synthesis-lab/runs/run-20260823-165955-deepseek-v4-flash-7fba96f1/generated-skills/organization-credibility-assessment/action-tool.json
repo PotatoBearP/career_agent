@@ -1,0 +1,29 @@
+{
+  "tool_name": "OrganizationCredibilityAssessment",
+  "user_facing_name": "核实招聘方组织身份与可信度",
+  "search_hint": "核实招聘方组织身份与可信度，检索该组织官网、企业注册信息、经营动态、投诉记录和诈骗相关报道",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [
+    "WebSearch",
+    "WebFetch"
+  ],
+  "input": {
+    "organizations_to_verify": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供的待核实组织清单，每项含组织名称、招聘上下文与相关链接"
+    },
+    "credibility_search_results": {
+      "type": "json",
+      "required": true,
+      "description": "关于组织身份、注册信息、经营动态和投诉记录的公开检索结果"
+    },
+    "credibility_page_extracts": {
+      "type": "json",
+      "required": true,
+      "description": "官网、企业信息页等原文内容，用于核对组织身份与风险信号"
+    }
+  }
+}

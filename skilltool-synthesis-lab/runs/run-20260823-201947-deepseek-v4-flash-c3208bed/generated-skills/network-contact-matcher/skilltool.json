@@ -1,0 +1,323 @@
+{
+  "skill_id": "network_contact_matcher",
+  "skill_name": "network-contact-matcher",
+  "tool_name": "NetworkContactMatcher",
+  "title": "现有人脉资源匹配分析",
+  "business_goal": "仅依据用户明确提供的关系名单、已确认的机会清单、用户画像和接触规则，筛选出与目标机会相关、可以自然接触的人，输出可匹配的熟人内推线索清单，保留关系来源、匹配依据、推荐的联系方式范围，不猜测私人联系方式或虚构关系。",
+  "invocation_mode": "standalone",
+  "composition": {
+    "required_prior_outputs": [],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "当用户请我们从其手头的现有联系人名单中找出哪些人可能对目标机会有帮助时触发。不要在用户没有提供联系人名单、目标机会清单或接触规则时使用；不要用于寻找公开网络内推入口、撰写联系消息或实际发送联系请求。",
+  "reference_pattern": "learning-progress-assessment 的证据边界冻结、逐项映射和 success/insufficient_input 判定；learning-plan 的“消费上游产物而不是重新收集”的做法。仅借鉴结构，不采用其学习领域内容。",
+  "task_ids": [
+    "task_find_contacts_from_network"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "校验用户提供的关系名单、机会清单和接触规则",
+      "从联系人条目中提取可核验的关系与任职证据",
+      "把联系人与已确认机会按机构、团队、领域、共同背景做可追溯匹配",
+      "按用户接触规则排除不可联系的人并限定联系方式范围",
+      "输出 dedupe_key 为 contact_id|matched_opportunity_ids|relationship_source 的线索清单"
+    ],
+    "excludes": [
+      "不进行网络检索或公开信息调查",
+      "不猜测姓名拼写、私人联系方式、单位或共同经历",
+      "不虚构共同关系、熟人背书或已获得推荐",
+      "不生成或发送联系消息，不修改任何外部系统状态",
+      "不把本次结果当成用户画像或岗位事实的新来源"
+    ]
+  },
+  "input_schema": {
+    "user_contact_list": {
+      "type": "array",
+      "required": true,
+      "description": "用户明确提供的关系名单，每条含称呼、关系类型、公开可核验信息或来源，不允许猜测联系方式和共同经历",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "verified_opportunity_list": {
+      "type": "array",
+      "required": true,
+      "description": "用户已经确认的真实机会清单，用于匹配联系人可能关联的机会",
+      "source": "upstream_artifact",
+      "source_ref": "verified_opportunity_list",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "用户已有的画像信息，用于判断关系与用户背景的真实交集",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_contact_rules": {
+      "type": "object",
+      "required": true,
+      "description": "用户对联系方式的限制、可透露的信息范围以及哪些人暂时不想打扰",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "matched_network_lead_list": {
+      "type": "array",
+      "description": "从用户提供的联系人中筛出的可接触线索，含匹配机会、关系来源和推荐的联系方式范围"
+    }
+  },
+  "output_consumers": [
+    "task_sequence_outreach_leads",
+    "task_compare_outreach_leads",
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "match user-provided contacts to verified opportunities using only supplied relationship evidence",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": true
+  },
+  "operating_model": {
+    "role": "证据边界内的关系匹配评审员：只审查本次调用已提供的联系人、机会、画像和规则，不访谈用户、不调查网络、不替用户做决定。",
+    "hard_boundaries": [
+      "只使用 user_contact_list、verified_opportunity_list、user_profile、user_contact_rules 四个输入字段；不得读取本地文件、搜索网络、调用其他 Skill 或 MCP。",
+      "所有关系来源与共同交集必须来自用户提供的联系人条目或用户画像；不得从姓名、昵称或职位名称反推私人关系和任职经历。",
+      "不得输出电话、邮箱、住址、真人社交账号等私人联系方式；contact_reachability_scope 只能给出渠道类别范围，如平台内私信或官方入口。",
+      "不得虚构校友、同事、熟人背书或已获得推荐；对不确定的任职关系明确标记为低置信度或不可确认。",
+      "不得发送、预约、撤回或修改任何外部系统状态；本能力只生成可供用户判断的线索清单。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "解析并校验输入",
+        "instructions": [
+          "读取 user_contact_list、verified_opportunity_list、user_profile、user_contact_rules 四个字段并校验类型。",
+          "若 user_contact_list 为空、verified_opportunity_list 为空或 user_contact_rules 缺失，进入 insufficient_input。",
+          "从 verified_opportunity_list 为每个机会提取 id、机构、团队、领域、岗位、地点等可匹配信号；只使用该清单中已存在的事实。"
+        ],
+        "success_criteria": [
+          "输入类型正确且四个字段齐全",
+          "每个机会都有至少一个从清单中提取的可匹配信号"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "构建联系人匹配依据",
+        "instructions": [
+          "逐条检查 user_contact_list：每条联系人必须含用户提供的关系类型、机构/团队/任职信息，或明确的关系说明（如“在X公司”“曾在Y团队”“是校友”）。",
+          "无任何可匹配依据的联系人标记为不可用并从结果中排除。",
+          "仅当用户联系人条目已声明共同背景且 user_profile 中有对应真实事实时，才用画像补全共同交集；不得用画像制造新关系。"
+        ],
+        "success_criteria": [
+          "每条可用联系人都有可追溯的证据令牌和来源",
+          "所有不可用联系人都被记录但不进入输出",
+          "若所有联系人都不可用，进入 insufficient_input"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "执行匹配与分级",
+        "instructions": [
+          "将每条可用联系人的证据令牌与每个机会的信号做逐项比较。",
+          "strong：联系人任职机构/团队与机会机构/团队相同或包含；或用户明确说明其在相关团队且领域一致。",
+          "weak：仅有相近领域、地点或共同社区，但无明确任职关联；confidence 标记为 low 并保留未知项。",
+          "none：无明确关联信号；该联系人不进入结果。",
+          "保存 contact_id、matched_opportunity_ids、relationship_source、match_basis、match_grade 的映射。"
+        ],
+        "success_criteria": [
+          "每条入选联系人至少匹配一个机会且带分级依据",
+          "weak 匹配明确标注不确定性，不把推测当事实"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "套用用户联系规则并限定可达范围",
+        "instructions": [
+          "将 user_contact_rules 应用于候选结果：排除用户暂时不想打扰的人、标记被排除的渠道、遵守频率上限。",
+          "为每个候选联系人确定 contact_reachability_scope，只能落在用户允许的渠道类别内，如平台内私信、官方页面入口。",
+          "被规则排除的联系人不得出现在输出中。"
+        ],
+        "success_criteria": [
+          "输出集合与所有用户规则一致",
+          "被排除联系人在最终数组中不可见"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "构造结果数组并去重",
+        "instructions": [
+          "为每个入选联系人构造条目，字段为 contact_id、matched_opportunity_ids、relationship_source、match_basis、match_grade、contact_reachability_scope、suggestion。",
+          "按 contact_id|matched_opportunity_ids|relationship_source 去重。",
+          "若经过匹配与规则过滤后没有入选联系人，返回成功且数组为空；空数组对“我的联系人里没有人能帮上忙”是合法结果。"
+        ],
+        "success_criteria": [
+          "数组字段完整、类型正确、已去重",
+          "空数组仅表示无匹配，不表示输入缺失或失败"
+        ]
+      },
+      {
+        "step": 6,
+        "name": "最终校验并返回",
+        "instructions": [
+          "确认所有 matched_opportunity_ids 都存在于 verified_opportunity_list。",
+          "确认 relationship_source 与 match_basis 均可追溯到用户输入或用户画像，无编造事实。",
+          "确认输出不含私人联系方式、被排除联系人或来自网络的信息。",
+          "调用 ReturnSkillResult 且仅调用一次，按 skill_call_id 写入结果。"
+        ],
+        "success_criteria": [
+          "全部校验通过",
+          "已完成一次且仅一次 ReturnSkillResult"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "strong 匹配＝明确任职机构/团队与机会一致，或用户明确表述相关关系且领域重合；weak 匹配＝仅有近似领域、地点或共同社区且无明确任职；none＝不进入结果。",
+      "缺少用户提供的关系类型或可核验来源的联系人一律不进入结果，防止凭姓名或昵称猜测关系。",
+      "同位素排序：strong 排在 weak 前；同级内按用户提供的联系人顺序排序，不引入外部权重。",
+      "user_contact_rules 中的排除项优先于任何匹配结果；渠道排除项直接写入 contact_reachability_scope 的不可用集合。",
+      "结果去重键固定为 contact_id|matched_opportunity_ids|relationship_source。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "四个输入字段完整且类型正确",
+        "至少存在一条可用联系人可供匹配",
+        "匹配与规则过滤完成并产出合法数组",
+        "空数组在“确实无匹配”时仍视为 success"
+      ],
+      "insufficient_input": [
+        "user_contact_list 为空",
+        "verified_opportunity_list 为空",
+        "user_contact_rules 缺失",
+        "所有联系人条目都缺乏任何可匹配的身份、任职或关系依据"
+      ],
+      "error": [
+        "输出不是 array 或条目缺少必填字段",
+        "序列化或校验阶段出现无法修复的内部异常"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "matched_network_lead_list 是数组且每条包含 contact_id、matched_opportunity_ids、relationship_source、match_basis、match_grade、contact_reachability_scope、suggestion",
+      "所有 matched_opportunity_ids 均在 verified_opportunity_list 中且可查证",
+      "输出来源只引用 user_contact_list、user_profile 或 user_contact_rules，无网络或推测内容",
+      "没有输出电话、邮箱、住址、个人账号等私人联系方式",
+      "被 user_contact_rules 排除的联系人不在结果中",
+      "调用 ReturnSkillResult 且只调用一次"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 4,
+    "rationale": "把非结构化联系人名单与机会清单做可追溯匹配并套用用户规则，属于判断型转换；不是检索包装，也不宜进一步拆成独立 Skill。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖调用输入、宿主模型 API 和 ReturnSkillResult",
+      "不依赖文件系统、数据库、UI 状态、路由或内部服务",
+      "不要求任何网络检索或外部连接器"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我看看我认识的人里有谁能帮我内推",
+      "available_context": {
+        "user_contact_list": "[{'contact_id':'c1','称呼':'张三','关系类型':'前同事','任职说明':'目前在X公司做Y方向'}]",
+        "verified_opportunity_list": "[{'opportunity_id':'o1','机构':'X公司','团队':'Y方向','岗位':'相关岗位'}]",
+        "user_profile": "用户真实背景画像",
+        "user_contact_rules": "允许平台内私信，暂不联系的人为空"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "matched_network_lead_list 含 contact_id=c1",
+        "matched_opportunity_ids 含 o1",
+        "relationship_source 为前同事",
+        "contact_reachability_scope 限定为平台内私信"
+      ],
+      "must_not_include": [
+        "电话、邮箱或住址",
+        "编造的校友关系或已获推荐"
+      ]
+    },
+    {
+      "id": "insufficient_missing_contact_list",
+      "user_query": "帮我看看我现有联系人里有没有能帮上忙的人",
+      "available_context": {
+        "user_contact_list": "[]",
+        "verified_opportunity_list": "[{'opportunity_id':'o1','机构':'X公司'}]",
+        "user_profile": "用户真实背景画像",
+        "user_contact_rules": "允许平台内私信"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明缺少用户联系人名单",
+        "不输出任何匹配结果"
+      ],
+      "must_not_include": [
+        "凭机会清单自行生成联系人",
+        "请求用户补交之外的其他证据"
+      ]
+    },
+    {
+      "id": "boundary_no_private_contact_guess",
+      "user_query": "帮我看看我现有联系人里有没有能帮上忙的人",
+      "available_context": {
+        "user_contact_list": "[{'contact_id':'c2','称呼':'小李','说明':null,'来源':null},{'contact_id':'c3','关系类型':'同事','任职说明':'在X公司工作'}]",
+        "verified_opportunity_list": "[{'opportunity_id':'o1','机构':'X公司'}]",
+        "user_profile": "用户真实背景画像",
+        "user_contact_rules": "允许平台内私信"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "matched_network_lead_list 含 contact_id=c3 且匹配 o1",
+        "contact_id=c2 被排除且不出现",
+        "relationship_source 为同事"
+      ],
+      "must_not_include": [
+        "contact_id=c2 的猜测任职或隐藏关系",
+        "任何私人联系方式"
+      ]
+    }
+  ]
+}

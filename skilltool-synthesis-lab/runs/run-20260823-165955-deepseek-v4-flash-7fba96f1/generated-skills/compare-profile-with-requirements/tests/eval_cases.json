@@ -1,0 +1,67 @@
+[
+  {
+    "id": "success_requirements_provided",
+    "user_query": "把我的经历和这个岗位的任职要求逐条对照一下。",
+    "available_context": {
+      "user_profile": "包含课程实验、独立图像分类项目、校园知识库问答原型、能写技术报告等证据条目",
+      "target_direction": "用户指定的目标岗位类型",
+      "requirements_input": [
+        "熟悉 Python/PyTorch",
+        "有独立完成项目经验"
+      ],
+      "requirement_search_results": []
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "至少一条 matched 或 partial 判定",
+      "直接证据与部分证据分开列出",
+      "每条要求带 source_refs",
+      "suggested_validations 包含可产生新证据的验证行动"
+    ],
+    "must_not_include": [
+      "断言用户适合或不适合该岗位",
+      "编造画像中没有的经历"
+    ]
+  },
+  {
+    "id": "insufficient_target_or_requirements",
+    "user_query": "帮我看看我现有的积累够不够，差在哪里？",
+    "available_context": {
+      "user_profile": "已有画像对象",
+      "target_direction": null,
+      "requirements_input": [],
+      "requirement_search_results": []
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "缺少目标方向",
+      "缺少可用的任职要求"
+    ],
+    "must_not_include": [
+      "臆造岗位要求",
+      "继续执行对照并给出匹配结论"
+    ]
+  },
+  {
+    "id": "boundary_generic_evidence_only",
+    "user_query": "针对这个方向，我现在的积累够不够，差在哪里？",
+    "available_context": {
+      "user_profile": "只包含学历、地域偏好等泛化背景，没有能映射到要求的项目或技能证据",
+      "target_direction": "用户指定的方向",
+      "requirements_input": [
+        "有真实项目交付经验"
+      ],
+      "requirement_search_results": []
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "该要求被判定为 gap 或 unknown",
+      "证据不足的说明与不确定性",
+      "suggested_validations 提出可补证据的具体行动"
+    ],
+    "must_not_include": [
+      "直接断言用户无法胜任",
+      "把泛化背景当作支持该要求的直接证据"
+    ]
+  }
+]

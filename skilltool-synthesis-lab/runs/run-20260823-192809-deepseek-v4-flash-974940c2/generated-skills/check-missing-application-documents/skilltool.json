@@ -1,0 +1,311 @@
+{
+  "skill_id": "check_missing_application_documents",
+  "skill_name": "check-missing-application-documents",
+  "tool_name": "CheckMissingApplicationDocuments",
+  "title": "检查还缺哪些申请材料",
+  "business_goal": "把目标岗位要求的材料文件与用户已准备的材料逐项比对，列出还缺哪几份、每份的格式要求和补齐优先级，全部基于用户提供和已验证的信息，不编造缺项。",
+  "invocation_mode": "aggregate",
+  "composition": {
+    "required_prior_outputs": [
+      "material_requirements"
+    ],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "用户准备投递某个岗位时，需要知道对照岗位材料要求还缺哪几份文件、每份应满足什么格式、应优先补齐哪些。仅当用户已提供目标岗位信息（或已有已梳理的材料要求产物）以及当前已备材料清单时使用。不要用于撰写或补全缺失材料，不要用于深度审查已有文件的格式合规性，不要用于重新生成或修改用户画像、岗位事实和投递排序。",
+  "reference_pattern": "baseline-assessment：采用其证据边界冻结、只做判定不主动收集、success/insufficient_input 分离、每条结论必须可回溯到来源的结构性做法；并借鉴学习类参考中把上游 artifact 作为不可改写输入、缺失输入时返回 insufficient_input 而非猜测的处理方式。仅借鉴结构，不照搬其能力评估或学习计划内容。",
+  "task_ids": [
+    "task_check_missing_application_documents"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "解析目标岗位要求提交的材料清单及格式约束，来源限定为 target_opportunity 或可选上游产物 material_requirements",
+      "逐项比对已备材料与岗位要求，识别缺失或不完整材料",
+      "按 application_focus_brief 和岗位要求中的强制程度给出补齐优先级",
+      "为每个缺失项标注来源并生成可编辑、可导出的 missing_documents_report"
+    ],
+    "excludes": [
+      "不撰写缺失材料的内容或代替用户准备文件",
+      "不重新生成或修改用户画像、岗位事实、投递排序",
+      "不把岗位要求改写成用户已经具备的能力",
+      "不做已有文件格式、篇幅、命名合规性的深度审计（归属其他能力）",
+      "不收集网络、本地文件或画像之外的新证据"
+    ]
+  },
+  "input_schema": {
+    "prepared_materials": {
+      "type": "array",
+      "required": true,
+      "description": "用户已准备的材料清单，每项包含文档名称、格式状态和是否完成",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "target_opportunity": {
+      "type": "object",
+      "required": true,
+      "description": "目标岗位描述或材料要求说明，用于确定要交哪些文件和格式约束；与已验证岗位信息一致时可只提供岗位标识",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "material_requirements": {
+      "type": "object",
+      "required": true,
+      "description": "可选：已梳理出的岗位材料要求清单，存在时优先作为比对基准",
+      "source": "prior_skill_output",
+      "source_ref": "material_requirements",
+      "available": true,
+      "acquisition": {
+        "mode": "prior_skill",
+        "provider": "task_extract_application_requirements",
+        "fallback": null
+      }
+    },
+    "application_focus_brief": {
+      "type": "object",
+      "required": true,
+      "description": "投递材料准备要点，用于判断缺失材料的优先顺序",
+      "source": "upstream_artifact",
+      "source_ref": "application_focus_brief",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "missing_documents_report": {
+      "type": "object",
+      "description": "缺失材料清单，包含缺失文件、对应格式要求、当前状态、补齐优先级和信息来源"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "对照岗位材料要求与用户已备材料清单，列出缺失文件、格式要求和补齐优先级",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": true
+  },
+  "operating_model": {
+    "role": "材料要求核对员：只基于调用时输入和已声明的上游产物做逐项比对与缺口判定，不收集新证据、不生成缺失文件内容、不修改已确认的画像、岗位事实或投递排序。",
+    "hard_boundaries": [
+      "只使用 prepared_materials、target_opportunity、application_focus_brief 和可选的 material_requirements；不得使用网络、本地文件、用户画像之外的材料或其他 Skill 结果扩充证据",
+      "不得把岗位要求中未明确列出的文件判定为缺失项",
+      "不得把岗位要求改写成用户已具备的能力，也不得修改用户画像、岗位事实或投递排序",
+      "每个缺失项必须能回溯到岗位要求来源与当前状态来源，禁止无来源结论",
+      "不撰写、补全或生成缺失材料的内容"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "解析岗位要求基准",
+        "instructions": [
+          "优先读取 material_requirements 中的材料种类清单及其格式约束；该产物缺失时，从 target_opportunity 解析明确列出的要提交材料及格式、篇幅、语言、命名等约束",
+          "只保留能指出处的材料项；岗位描述未列出的材料不得加入要求清单",
+          "若 target_opportunity 仅提供岗位标识，则以 material_requirements 为唯一基准；两者都不可用时返回 insufficient_input"
+        ],
+        "success_criteria": [
+          "得到一组带来源的岗位要求材料项，并且 material_requirements 或 target_opportunity 至少一项能够支撑",
+          "要求清单中没有无法回溯来源的项"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "建立已备材料索引",
+        "instructions": [
+          "从 prepared_materials 数组逐项提取文档名称、文档类型、格式状态、是否完成，保留原始条目以便回溯",
+          "按语义判断名称等价关系（例如简历与 CV 视为同一材料），但不得把格式状态为未完成或缺失的项视为已准备",
+          "索引必须覆盖数组全部条目"
+        ],
+        "success_criteria": [
+          "每个已备条目都能回答其对应的文档类型与完成状态",
+          "同义不同名的条目能被识别为等价，不因措辞差异误判"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "逐项比对生成缺失项",
+        "instructions": [
+          "对每个岗位要求项，在已备材料索引中查找语义等价项",
+          "标记缺失项：要求中存在但无等价已备项，或已备项状态明确为未完成",
+          "为每个缺失项记录文档名/要求项、对应格式要求、当前状态、来源（material_requirements 或 target_opportunity 负责要求，prepared_materials 负责状态）"
+        ],
+        "success_criteria": [
+          "每个缺失项同时可回溯到岗位要求来源和当前状态结论",
+          "未标记任何无岗位要求依据的缺失项"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "计算补齐优先级",
+        "instructions": [
+          "主键：岗位要求中的强制/必须材料优先于推荐/可选材料",
+          "次键：application_focus_brief 中标注为关键环节对应的材料优先",
+          "再次：完全未准备优先于已开始但未完成",
+          "为每个缺失项输出 1 以内的一句优先级理由并标注依据来源"
+        ],
+        "success_criteria": [
+          "优先级排序可解释且每条理由可回到 application_focus_brief、岗位要求或当前状态"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "组装缺失材料报告",
+        "instructions": [
+          "生成 missing_documents_report：summary 说明基于当前输入范围的总缺项数；missing_items 数组逐项包含缺失文件、对应格式要求、当前状态、补齐优先级、优先级理由和信息来源",
+          "没有任何缺失时 missing_items 为空数组，并在 summary 中说明基于当前输入材料已齐备",
+          "报告保持结构化以便用户继续编辑或导出"
+        ],
+        "success_criteria": [
+          "报告字段完整且每个字段内容均来自输入或上游产物",
+          "未包含任何编造的缺失文件、格式要求或优先级结论"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "缺失判定规则：岗位要求项在已备索引中无语义等价项，或等价项状态为未完成时，才记为缺失项",
+      "优先级规则：强制材料 > 推荐材料；同档内 application_focus_brief 关键环节的材料优先；再同档内完全未准备优先于未完成",
+      "要求来源冲突时，material_requirements 优先于从 target_opportunity 现场解析的结果，并在来源字段同时注明"
+    ],
+    "outcome_rules": {
+      "success": [
+        "岗位要求基准可确定且 prepared_materials 可解析",
+        "生成 missing_documents_report，每个缺失项具备格式要求、当前状态、优先级和信息来源"
+      ],
+      "insufficient_input": [
+        "可以解析的材料要求基准不存在：material_requirements 缺失且 target_opportunity 未包含可用于提取材料清单的信息",
+        "prepared_materials 不是可解析的材料清单时，仅报告该事实，不猜测缺哪些材料"
+      ],
+      "error": [
+        "输入数据结构损坏导致无法完成第 1 至第 3 步的确定性处理",
+        "结果序列化或返回阶段失败"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "每个缺失项都能回溯到岗位要求来源（material_requirements 或 target_opportunity）与当前状态来源（prepared_materials）",
+      "报告中未包含任何岗位画像、岗位事实或投递排序的修改",
+      "没有把任何岗位要求改写成用户已具备的能力，也没有新增岗位要求之外的缺失项",
+      "缺失项格式要求与当前状态均未超出输入内容",
+      "调用 ReturnSkillResult 前完成以上断言并只调用一次"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 5,
+    "rationale": "需要解析岗位材料要求、对已备材料做语义等价匹配、判断缺失项并依据焦点要点排序，产出可回溯的结构化报告；既不是简单检索包装，也没有多个可独立拆分的决策点。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖输入契约 target_opportunity、prepared_materials、application_focus_brief 和可选上游产物 material_requirements",
+      "不依赖主程序导入、数据库、UI 状态、路由或内部服务调用"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我看申请这个岗位还差哪几份材料",
+      "available_context": {
+        "material_requirements": "包含简历PDF、成绩单、两封推荐信及各自的格式约束",
+        "prepared_materials": "仅包含一份已完成简历PDF",
+        "application_focus_brief": "强调成绩单为必需材料",
+        "target_opportunity": "与 material_requirements 信息一致"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "missing_items 包含 成绩单 与 推荐信",
+        "每个缺失项标注对应格式要求和信息来源",
+        "成绩单优先级高于推荐信并给出理由"
+      ],
+      "must_not_include": [
+        "岗位要求之外的编造材料如自我介绍",
+        "来源无法回溯的缺失项"
+      ]
+    },
+    {
+      "id": "insufficient_input_no_requirements",
+      "user_query": "帮我看看申请这个岗位还缺哪些材料",
+      "available_context": {
+        "material_requirements": "缺失",
+        "target_opportunity": "未包含任何要提交材料的说明",
+        "prepared_materials": "包含一份简历",
+        "application_focus_brief": "不存在或内容为空"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明无法从当前输入确定岗位材料要求",
+        "不把缺要求的事实编成具体缺失文件"
+      ],
+      "must_not_include": [
+        "列出具体缺失材料清单"
+      ]
+    },
+    {
+      "id": "boundary_fallback_to_target_opportunity",
+      "user_query": "这个岗位要求交的材料里，我还没有准备哪些文件",
+      "available_context": {
+        "material_requirements": "缺失",
+        "target_opportunity": "明确要求提交简历与成绩单，并给出成绩单格式",
+        "prepared_materials": "只有简历",
+        "application_focus_brief": "存在且未强调新材料"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "从 target_opportunity 提取要求并标注来源 target_opportunity",
+        "缺失项仅包含成绩单"
+      ],
+      "must_not_include": [
+        "因缺少 material_requirements 而直接返回失败"
+      ]
+    },
+    {
+      "id": "boundary_semantic_alias_not_marked_missing",
+      "user_query": "对照岗位要求，把我手头有的和缺的对一遍",
+      "available_context": {
+        "material_requirements": "要求提交简历、项目作品清单",
+        "prepared_materials": "包含一份命名 CV 的已完成文件、一份项目作品页",
+        "application_focus_brief": "存在",
+        "target_opportunity": "与 material_requirements 一致"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "将 CV 判定为 简历 的等价项而不列为缺失",
+        "missing_items 为空或仅包含真实缺失项"
+      ],
+      "must_not_include": [
+        "同义不同名被误判为缺失"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+[
+  {
+    "task_id": "task_assess_material_readiness",
+    "name": "检查申请材料还缺什么",
+    "scene": "岗位材料准备",
+    "business_goal": "对照岗位要求和已有证据，检查证明材料、格式和事实缺口，列出需要补充或确认的事项。",
+    "user_request_examples": [
+      "帮我看一下这套材料还缺什么",
+      "检查一下我准备的材料有没有明显缺口",
+      "我申请这个岗位还差哪些证明或信息",
+      "帮我校对一下现有材料是否覆盖了岗位要求"
+    ],
+    "evolution_direction": "initialization",
+    "source_task_ids": [],
+    "invocation_mode": "standalone",
+    "parallel_group": "材料质量与缺口检查",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把岗位要求、已有材料与证据缺口做交叉判断并给出优先级，属于可复用的评估决策。",
+    "execution_provider": null,
+    "need_ids": [
+      "material_gap_assessment"
+    ],
+    "inputs": [
+      {
+        "name": "evidence_gap_analysis",
+        "description": "经历与要求对照结果，用于识别哪些要求已有证据支撑",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "evidence_gap_analysis",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "已确认的用户画像，用于判断材料中的背景信息是否完整",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "prepared_materials",
+        "description": "用户已准备的材料清单，每项注明文档类型、状态和是否完成",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "application_focus_brief",
+        "description": "投递材料准备要点，用于判断材料覆盖是否完整",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "application_focus_brief",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "material_gap_report",
+        "display_name": "材料缺口报告",
+        "description": "按优先级排列的材料缺口清单，包含缺什么、为什么缺、需要用户补充什么事实",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "material_gap_report_for_target_opportunity",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": false,
+    "iteration": 1,
+    "output_hypotheses": [
+      "material_gap_report_for_target_opportunity"
+    ]
+  }
+]

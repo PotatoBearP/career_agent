@@ -1,0 +1,64 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "按这个岗位的要求帮我调整一下简历重点",
+    "available_context": {
+      "resume_draft": "包含教育、两个项目和技能清单的简历文本",
+      "target_opportunity": "包含明确职责、要求关键词和投递说明的岗位对象",
+      "application_focus_brief": "包含本岗位最需要突出的两个要点",
+      "user_profile": "已确认的教育、经历、技能证据",
+      "format_preferences": "中文、一页内、标准章节顺序"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "tailored_resume.resume_sections 与岗位要求顺序一致",
+      "tailored_resume.keyword_matching_notes 引用岗位原句与简历原文",
+      "tailored_resume.fact_boundary_notes 覆盖所有调整条目",
+      "tailored-resume.json 写回并通过 Read 校验"
+    ],
+    "must_not_include": [
+      "不存在于用户画像或简历草稿中的新数字、新成果",
+      "把岗位要求表述直接写成用户已具备的能力"
+    ]
+  },
+  {
+    "id": "insufficient_missing_opportunity",
+    "user_query": "帮我把这份简历改一改，突出跟我经历最相关的部分",
+    "available_context": {
+      "resume_draft": "完整的简历文本",
+      "target_opportunity": "未提供",
+      "application_focus_brief": "存在",
+      "user_profile": "存在",
+      "format_preferences": "未提供"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确返回 insufficient_input 并说明缺少目标岗位描述，无法决定章节顺序与关键词匹配"
+    ],
+    "must_not_include": [
+      "在没有目标岗位的情况下自行假设一个岗位并改写简历",
+      "输出一份完整的 tailored_resume"
+    ]
+  },
+  {
+    "id": "boundary_no_fabrication",
+    "user_query": "按这个岗位的要求帮我调整一下简历重点",
+    "available_context": {
+      "resume_draft": "简历中只有课程项目和原型，没有生产部署经历",
+      "target_opportunity": "岗位要求中明确包含生产级部署与高并发实践经验",
+      "application_focus_brief": "强调部署经验为第一重点",
+      "user_profile": "已确认证据中没有任何生产部署或多用户高并发证据",
+      "format_preferences": "中文、一页内"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "facts_needing_confirmation 列出‘生产级部署’无证据支撑",
+      "keyword_matching_notes 对该要求标记为 missing 并援引岗位原句",
+      "fact_boundary_notes 说明未将课程项目改写为生产部署"
+    ],
+    "must_not_include": [
+      "把课程项目或原型描述成生产部署、多用户高并发环境",
+      "在简历正文中新增任何无源的能力声明"
+    ]
+  }
+]

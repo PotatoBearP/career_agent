@@ -1,0 +1,31 @@
+{
+  "tool_name": "NetworkActionPlan",
+  "user_facing_name": "人脉跟进与拓展行动计划",
+  "search_hint": "制定接下来一段时间的人脉跟进和拓展行动计划",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "current_situation_snapshot": {
+      "type": "json",
+      "required": true,
+      "description": "用户当前的进展、已投递清单、已有联系人、待核验线索等现状信息，由用户直接提供"
+    },
+    "opportunity_pursuit_ranking": {
+      "type": "json",
+      "required": true,
+      "description": "用户已确认的机会投递优先顺序，用于安排行动计划中的先后"
+    },
+    "user_time_and_rules": {
+      "type": "json",
+      "required": true,
+      "description": "用户可投入的周期、每周时间、联系方式上限、偏好渠道和不能打扰的时间"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的画像信息，用于确保计划符合用户真实条件和偏好"
+    }
+  }
+}

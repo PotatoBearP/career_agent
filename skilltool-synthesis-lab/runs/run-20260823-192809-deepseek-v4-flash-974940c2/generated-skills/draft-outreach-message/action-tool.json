@@ -1,0 +1,26 @@
+{
+  "tool_name": "DraftOutreachMessage",
+  "user_facing_name": "把问题写成可发送的消息",
+  "search_hint": "把材料要求确认问题清单改写为可直接发送的沟通消息草稿",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "question_list": {
+      "type": "json",
+      "required": true,
+      "description": "已经整理好的材料要求确认问题清单，每条注明想确认的信息和使用场景"
+    },
+    "conversation_context": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供的沟通对象身份、渠道、称呼和可接受的篇幅限制"
+    },
+    "outreach_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户对语言、语气以及是否需要附带简历或背景说明的要求"
+    }
+  }
+}

@@ -1,0 +1,176 @@
+[
+  {
+    "task_id": "check_opportunity_availability",
+    "name": "确认这些岗位机会是否仍然有效",
+    "scene": "职业方向探索与真实机会验证",
+    "business_goal": "我想确认手上这些岗位机会是否仍然有效：链接能不能访问、信息是否还在发布期，避免把时间花在已经失效的机会上。",
+    "user_request_examples": [
+      "帮我看看这几个招聘链接还能不能打开，岗位是不是还在招。",
+      "这些岗位信息还能用吗？帮我确认一下时效。",
+      "帮我检查这些机会是不是已经过期或下架了。"
+    ],
+    "evolution_direction": "decomposition",
+    "source_task_ids": [
+      "verify_opportunity_sources"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "opportunity_intelligence",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把页面原文、发布时间和发布状态等证据综合成每个机会的有效性结论并标注不确定性，不是简单取回页面内容。",
+    "execution_provider": null,
+    "need_ids": [
+      "need_opportunity_availability_check"
+    ],
+    "inputs": [
+      {
+        "name": "opportunities_to_check",
+        "description": "用户提供的待确认岗位清单，每项含标题、组织、链接和已知信息",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "status_page_extracts",
+        "description": "从待确认链接取得的页面原文，用于判断链接可访问性与当前发布状态",
+        "type": "array",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebFetch"
+        }
+      },
+      {
+        "name": "status_search_results",
+        "description": "针对岗位名称与组织的补充检索结果，用于交叉确认机会是否仍在招聘期",
+        "type": "array",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebSearch"
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "opportunity_availability_report",
+        "display_name": "岗位有效性核验结果",
+        "description": "每个机会的链接可访问性、发布状态、最近核实时间、证据来源和不确定性",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "opportunity_availability_check_report",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": true,
+    "iteration": 3,
+    "output_hypotheses": [
+      "opportunity_availability_check_report"
+    ]
+  },
+  {
+    "task_id": "verify_organization_credibility",
+    "name": "核实招聘方组织身份与可信度",
+    "scene": "职业方向探索与真实机会验证",
+    "business_goal": "我想弄清发布这些岗位的组织是否真实存在、招聘信息是否可信，识别可疑信号，避免被虚假机会误导。",
+    "user_request_examples": [
+      "帮我查一下发这些招聘的组织是不是真的，靠不靠谱。",
+      "这些招聘信息会不会是骗人的？帮我核实一下来源。",
+      "帮我确认这些机会背后的组织身份和可信度。"
+    ],
+    "evolution_direction": "decomposition",
+    "source_task_ids": [
+      "verify_opportunity_sources"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "opportunity_intelligence",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要跨多个公开来源交叉核对组织身份、官网信息、经营动态和风险信号，并给出带证据来源的可信度判断，属于综合研判。",
+    "execution_provider": null,
+    "need_ids": [
+      "need_organization_credibility_check"
+    ],
+    "inputs": [
+      {
+        "name": "organizations_to_verify",
+        "description": "用户提供的待核实组织清单，每项含组织名称、招聘上下文与相关链接",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "credibility_search_results",
+        "description": "关于组织身份、注册信息、经营动态和投诉记录的公开检索结果",
+        "type": "array",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebSearch"
+        }
+      },
+      {
+        "name": "credibility_page_extracts",
+        "description": "官网、企业信息页等原文内容，用于核对组织身份与风险信号",
+        "type": "array",
+        "input_origin": "tool_generated",
+        "source": "ordinary_tool_output",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "ordinary_tool",
+          "provider": "WebFetch"
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "organization_credibility_report",
+        "display_name": "组织可信度核验结果",
+        "description": "每个组织的身份核验结论、可信度信号、风险提示、证据来源和不确定性",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "organization_credibility_assessment_report",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": true,
+    "iteration": 3,
+    "output_hypotheses": [
+      "organization_credibility_assessment_report"
+    ]
+  }
+]

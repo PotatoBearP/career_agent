@@ -1,0 +1,26 @@
+{
+  "tool_name": "EmailBodyFromCoverLetter",
+  "user_facing_name": "把求职信改成邮件正文",
+  "search_hint": "把已写好的求职信压缩成可以直接放进邮件正文的版本",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "cover_letter_draft": {
+      "type": "string",
+      "required": true,
+      "description": "已生成的岗位定向求职信草稿，作为邮件正文的改写来源"
+    },
+    "email_context": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供的邮件使用场景，包括收件人身份、发送渠道、篇幅限制和语气偏好"
+    },
+    "target_opportunity": {
+      "type": "json",
+      "required": true,
+      "description": "目标岗位的职责与要求关键词，用于判断邮件正文必须保留的匹配点"
+    }
+  }
+}

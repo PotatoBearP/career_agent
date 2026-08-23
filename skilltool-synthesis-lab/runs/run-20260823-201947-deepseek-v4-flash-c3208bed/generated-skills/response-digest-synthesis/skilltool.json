@@ -1,0 +1,297 @@
+{
+  "skill_id": "response_digest_synthesis",
+  "skill_name": "response-digest-synthesis",
+  "tool_name": "ResponseActionDigest",
+  "title": "外联回复汇总与行动项提取",
+  "business_goal": "把投递与跟进台账中出现的所有回复、面试邀约、婉拒和待办合并成一份按紧急度排序的回复待办总览，让用户一眼看到每件事的回复要点、下一步动作和截止时间。",
+  "invocation_mode": "aggregate",
+  "composition": {
+    "required_prior_outputs": [
+      "application_tracking_ledger"
+    ],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "用户已经积累了投递、回复、面试、跟进或关闭记录，并希望知道目前所有回复分别该怎么处理时使用；也用于在发送任何回复或修改外部系统状态之前生成一份只读的行动总览。不在本能力范围内的情况包括：从零记录新的投递状态、起草或改写回复消息、实际发送或撤回消息、重新生成用户画像或岗位机会清单。",
+  "reference_pattern": "采用 learning-plan 的结构性做法，将上游已有产物（台账、机会清单、材料包）作为冻结输入，用确定性规则计算优先级并输出可消费结果；同时借用 baseline-assessment 的证据边界和结果约定，只使用调用时已提供的输入，不主动收集或核验新事实，并通过一次 ReturnSkillResult 返回结果。业务内容不照搬参考技能。",
+  "task_ids": [
+    "task_synthesize_response_digest"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "按机会聚合 application_tracking_ledger 中的回复相关状态",
+      "将最新状态归类为面试邀约、材料请求、婉拒、等待回复、需要跟进、已回复等回复类型",
+      "根据 ledger 中的事件时间、回复处理偏好和已准备材料推导 required_action 与 due_time",
+      "按紧急度和截止时间排序并生成回复待办总览",
+      "为每个条目保留 source、updated_at 和来源机会标识"
+    ],
+    "excludes": [
+      "更新、写入或删除投递与跟进台账",
+      "起草、润色或发送任何回复消息",
+      "修改外部系统、招聘平台或联系人渠道状态",
+      "重新生成用户画像、机会清单、投递材料或材料质量报告",
+      "执行公开网络检索或获取新的市场事实"
+    ]
+  },
+  "input_schema": {
+    "application_tracking_ledger": {
+      "type": "object",
+      "required": true,
+      "description": "用户已有产物，是按机会记录的投递、回复、面试、跟进和关闭状态台账",
+      "source": "prior_skill_output",
+      "source_ref": "application_tracking_ledger",
+      "available": true,
+      "acquisition": {
+        "mode": "prior_skill",
+        "provider": "task_record_tracking_status",
+        "fallback": null
+      }
+    },
+    "verified_opportunity_list": {
+      "type": "array",
+      "required": true,
+      "description": "场景已有产物，是用户确认过的真实机会清单，用于把回复对应到具体机会",
+      "source": "upstream_artifact",
+      "source_ref": "verified_opportunity_list",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "tailored_application_packages": {
+      "type": "array",
+      "required": true,
+      "description": "场景已有产物，是用户准备过的投递材料，用于判断回复中提到的材料是否满足要求",
+      "source": "upstream_artifact",
+      "source_ref": "tailored_application_packages",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "reply_handling_preferences": {
+      "type": "object",
+      "required": true,
+      "description": "用户希望以什么方式处理不同回复、多少天内响应、以及哪些回复想先看不想直接处理",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "response_action_digest": {
+      "type": "array",
+      "description": "按紧急度排序的回复处理总览，含来源机会或联系人、回复要点、需要用户做的动作和截止时间"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "organize received application responses into prioritized next actions",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": true
+  },
+  "operating_model": {
+    "role": "回复事务调度员：只读取已提供的台账、机会清单、材料包和用户偏好，把分散的回复状态转化为确定性的待办总览，不代替用户做任何外部动作。",
+    "hard_boundaries": [
+      "禁止修改、写入或删除 application_tracking_ledger 中的任何记录。",
+      "禁止虚构回复内容、联系人、日期、截止时间或机会信息；所有事实只能来自输入字段。",
+      "禁止调用 WebSearch、WebFetch 或其他普通工具补齐外部证据。",
+      "禁止发送消息、投递、撤回或修改任何外部系统状态；本能力只输出只读总览。",
+      "禁止把回复待办总览变成为每个机会重新排序投递优先级或评估用户能力。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "加载并校验输入",
+        "instructions": [
+          "读取 application_tracking_ledger、verified_opportunity_list、tailored_application_packages、reply_handling_preferences。",
+          "确认 ledger 为 object 且包含可按机会聚合的记录；确认 verified_opportunity_list 为 array 且可按机会 id 建立映射。",
+          "若任一必要输入缺失或类型不符，返回 insufficient_input；若 ledger 存在但没有任何可识别的机会记录，也返回 insufficient_input。"
+        ],
+        "success_criteria": [
+          "四个输入均可解析，verified_opportunity_list 已建立 opportunity_id 到机会对象的映射。"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "提取回复相关事件",
+        "instructions": [
+          "遍历 ledger 中每个机会的最新状态记录，保留含最新状态、更新时间和来源的条目。",
+          "过滤掉与回复无关的状态，如仍标记为尚未投递或投递后无任何回复线索的记录。",
+          "把可以被识别为回复的记录绑定到 verified_opportunity_list 中的机会；无法绑定到任何已验证机会的记录不进入总览。"
+        ],
+        "success_criteria": [
+          "得到一组绑定到已验证机会的回复候选条目，每条保留来源机会、最新状态、source 和 updated_at。"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "归类回复类型并推导动作与截止时间",
+        "instructions": [
+          "根据最新状态文本做语义归类：面试邀约→interview_invitation，婉拒或关闭→decline，需要补充材料→material_request，等待对方回复→waiting，需要跟进→follow_up_required，需要用户回复→reply_pending，明确录用→offer_received。",
+          "按回复类型生成 required_action；材料请求类必须对照 tailored_application_packages 判断材料是否已有，缺失则写 material_hint 提示用户确认。",
+          "按用户偏好计算 due_time：能获得事件日期的用事件日期加用户设定的响应窗口；对方给了明确截止日的直接使用；两者都不可得时写“未明确”，绝不编造日期。"
+        ],
+        "success_criteria": [
+          "每条回复候选都有 response_type、required_action 和确定的 due_time 或“未明确”标记。"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "按紧急度排序",
+        "instructions": [
+          "高优先级：面试邀约、需要立即确认的录用或婉拒、有明确截止日的材料请求。",
+          "中优先级：reply_pending、follow_up_required、无明确截止日的材料请求。",
+          "低优先级：waiting、只需告知收悉的 decline。",
+          "组内排序：有明确 due_time 的在“未明确”之前，due_time 较早的在前；仍并列时按 source_opportunity_id 字典序保持稳定顺序。"
+        ],
+        "success_criteria": [
+          "digest 数组按高、中、低优先级排序，且高优先级中有明确截止时间的条目排在同类中较早位置。"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "汇总输出并返回",
+        "instructions": [
+          "为每条生成一项 response_action_digest，字段包括 source_opportunity_id、response_type、reply_summary、required_action、due_time、priority、source、updated_at，必要时加 material_hint。",
+          "按 dedupe_key source_opportunity_id|response_type|required_action|due_time|priority 去重，同名机会的最新回复优先保留。",
+          "调用 ReturnSkillResult 一次，返回结构化数组；不输出额外文件或其他总结。"
+        ],
+        "success_criteria": [
+          "返回的数组可直接消费，且未对任何输入或外部系统产生副作用。"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "回复类型映射只依据 ledger 中的最新状态文本和 next_action 字段，不依据猜测。",
+      "priority 排序规则固定为：高优先级（interview_invitation、offer_received、带明确截止日的 material_request、需要及时确认的 decline）> 中优先级（reply_pending、follow_up_required、无截止日的 material_request）> 低优先级（waiting、仅告知收悉的 decline）。",
+      "due_time 要么来自对方给出的明确时间，要么来自用户偏好窗口加事件时间，要么标记为“未明确”；禁止使用当前日期推断或推算用户没有提供的时间。",
+      "material_request 的 material_hint 只能引用 tailored_application_packages 中确实存在的材料或明确缺失的材料，不能假装用户拥有某份材料。",
+      "同一机会存在多条回复时，以 updated_at 最新的记录为准，并保留该记录来源。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "至少有一条可被识别并绑定到已验证机会的回复记录",
+        "返回的 response_action_digest 为排序后的数组，每项含来源机会、回复类型、回复要点、动作、截止时间和优先级",
+        "所有 due_time 要么有输入依据，要么明确标记为“未明确”"
+      ],
+      "insufficient_input": [
+        "application_tracking_ledger 缺失、为空或无法解析",
+        "verified_opportunity_list 无法用于绑定任何 ledger 记录",
+        "reply_handling_preferences 缺失且导致无法推导任何默认响应方式"
+      ],
+      "error": [
+        "输入字段类型与声明不符且无法安全解析",
+        "输出序列化失败或返回结构无法被标准 JSON 解析",
+        "出现无法归入任一回复类型的冲突状态且没有 next_action 可作依据"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "response_action_digest 中每个 source_opportunity_id 都能在 verified_opportunity_list 中找到对应机会。",
+      "每个条目的 required_action、response_type 和 priority 均来自确定性规则，没有空值。",
+      "每个条目的 due_time 要么有输入依据，要么显示为“未明确”。",
+      "每个条目都保留了 source 和 updated_at 来源字段。",
+      "本次调用没有写入文件、没有调用其他技能或普通工具、没有修改任何外部状态。"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 5,
+    "rationale": "需要跨台账、机会清单、材料包和偏好做归类、推导和排序，是真正的决策性转换；但所有规则可确定化，不需要继续拆成更小的 SkillTool。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "只依赖调用时提供的结构化输入与外部模型 API",
+      "不依赖数据库、UI 状态、路由或应用内部服务",
+      "不读取用户画像、岗位材料或任何未在 input_schema 中声明的内容"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+      "available_context": {
+        "application_tracking_ledger": "包含两条机会记录：一条最新状态为面试邀约并带收到时间，一条最新状态为需要跟进",
+        "verified_opportunity_list": "包含两个与台账机会 id 匹配的机会对象",
+        "tailored_application_packages": "包含每个机会对应的投递材料",
+        "reply_handling_preferences": "包含标准响应天数和面试确认偏好"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "返回有序 response_action_digest 数组",
+        "面试邀约条目优先级高于需要跟进条目",
+        "每项含 source_opportunity_id、response_type、required_action、due_time、priority、source、updated_at"
+      ],
+      "must_not_include": [
+        "调用 WebSearch 或修改台账",
+        "虚构回复内容或日期"
+      ]
+    },
+    {
+      "id": "insufficient_input_missing_ledger",
+      "user_query": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+      "available_context": {
+        "application_tracking_ledger": "未提供或为空对象",
+        "verified_opportunity_list": "存在机会清单",
+        "tailored_application_packages": "存在材料包",
+        "reply_handling_preferences": "存在用户偏好"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明缺少可读取的台账记录",
+        "不猜测任何回复"
+      ],
+      "must_not_include": [
+        "生成伪造的回复待办条目",
+        "尝试从机会清单推断回复状态"
+      ]
+    },
+    {
+      "id": "boundary_ambiguous_due_time",
+      "user_query": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+      "available_context": {
+        "application_tracking_ledger": "面试邀约记录只有收到时间，没有面试截止日期",
+        "verified_opportunity_list": "有对应机会",
+        "tailored_application_packages": "有材料包",
+        "reply_handling_preferences": "没有提供面试确认的响应窗口"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "该面试邀约条目的 due_time 为“未明确”",
+        "该条仍归入高优先级并排在总览前列"
+      ],
+      "must_not_include": [
+        "自行编造一个具体的日期或截止时间"
+      ]
+    }
+  ]
+}

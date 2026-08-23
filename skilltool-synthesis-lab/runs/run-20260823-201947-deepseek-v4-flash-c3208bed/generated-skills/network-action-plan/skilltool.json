@@ -1,0 +1,327 @@
+{
+  "skill_id": "network_action_plan",
+  "skill_name": "network-action-plan",
+  "tool_name": "NetworkActionPlan",
+  "title": "阶段性人脉拓展与跟进规划",
+  "business_goal": "把用户当前的找入口、核验、联系、投递、跟进等现状动作，按已确认的机会优先级、用户可投入时间和联系方式边界，编排成一份带时间窗口、里程碑和检查点的近期行动计划，并确保计划只包含草稿、清单和提醒，不触发任何外部动作。",
+  "invocation_mode": "standalone",
+  "composition": {
+    "required_prior_outputs": [],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "当用户请求“安排接下来一段时间的跟进和拓展计划”“排一下接下来几周先做什么”“什么时候联系谁、什么时候跟进”时使用。不要在用户只需要单一动作排序、单次联系话术、本周待办清单、状态台账更新或机会比较时使用。",
+  "reference_pattern": "learning-plan：冻结并消费既有输入（机会优先级、用户画像、用户声明的约束），按可解释的确定性规则排序和分阶段，定义可观察的完成条件，并在返回前验证输出结构；此处仅借鉴其计划编排和边界控制的做法，不引入学习计划内容。",
+  "task_ids": [
+    "task_network_action_plan"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "解析 current_situation_snapshot 中的已投递清单、已有联系人、待核验线索和当前进展",
+      "按 opportunity_pursuit_ranking 中的优先顺序决定动作先后",
+      "按 user_time_and_rules 中的周期、每周时间、联系方式上限、偏好渠道和不可打扰时间排程",
+      "使用 user_profile 中的真实偏好与约束校准计划，不重写画像",
+      "输出 plan_window、actions、milestones、checkpoints、constraints_version"
+    ],
+    "excludes": [
+      "重新生成或修改 user_profile、verified_opportunity_list、opportunity_pursuit_ranking、tailored_application_packages、material_quality_report",
+      "实际寻找入口、核验线索、起草消息、投递或发送任何内容",
+      "更新投递与跟进状态台账",
+      "把计划拆成一周可勾选清单",
+      "比较机会或人脉渠道并给出优先级之外的推荐"
+    ]
+  },
+  "input_schema": {
+    "current_situation_snapshot": {
+      "type": "object",
+      "required": true,
+      "description": "用户当前的进展、已投递清单、已有联系人、待核验线索等现状信息，由用户直接提供",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "opportunity_pursuit_ranking": {
+      "type": "array",
+      "required": true,
+      "description": "用户已确认的机会投递优先顺序，用于安排行动计划中的先后",
+      "source": "upstream_artifact",
+      "source_ref": "opportunity_pursuit_ranking",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_time_and_rules": {
+      "type": "object",
+      "required": true,
+      "description": "用户可投入的周期、每周时间、联系方式上限、偏好渠道和不能打扰的时间",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "用户已有的画像信息，用于确保计划符合用户真实条件和偏好",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "networking_action_plan": {
+      "type": "object",
+      "description": "按时间窗口编排的接触、核验、联系、投递、跟进动作和检查点计划"
+    }
+  },
+  "output_consumers": [
+    "task_build_weekly_checklist",
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "制定接下来一段时间的人脉跟进和拓展行动计划",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": false
+  },
+  "operating_model": {
+    "role": "近期行动规划师：只做行动计划的编排与检查点设计，不执行任何联系、核验、投递或跟进动作，也不收集新事实。",
+    "hard_boundaries": [
+      "不得修改或重新生成 user_profile、verified_opportunity_list、opportunity_pursuit_ranking、tailored_application_packages、material_quality_report 等既有产物，只读取其内容。",
+      "不得实际发送、投递、撤回或修改任何外部系统状态；计划中只能出现草稿、清单、提醒和待用户确认的动作。",
+      "不得虚构用户已投递的岗位、已认识的人、愿意使用的渠道、投递时间或跟进频率；这些只能来自 current_situation_snapshot 和 user_time_and_rules。",
+      "不得把 user_profile 中的偏好或约束当作外部事实；它只用于校准计划的时间、节奏和边界。",
+      "不得把计划拆成周度勾选清单或单次联系排序；本能力只输出时间窗口级别的行动计划与检查点。",
+      "如果 current_situation_snapshot、opportunity_pursuit_ranking 或 user_time_and_rules 中必需内容缺失或无法解析，返回 insufficient_input，不猜测补齐。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "校验输入并解析现状",
+        "instructions": [
+          "解析 current_situation_snapshot，提取已投递清单、已有联系人、待核验线索、当前进展四类内容",
+          "校验 opportunity_pursuit_ranking 是可排序的对象数组，每个条目包含可识别机会标识和相对优先级",
+          "校验 user_time_and_rules 含计划周期、每周可投入时间、联系方式上限、偏好渠道、不可打扰时间",
+          "读取 user_profile 仅用于识别用户偏好和约束"
+        ],
+        "success_criteria": [
+          "四个输入字段均存在且可解析",
+          "ranking 中每个条目可对应到机会标识",
+          "没有任何输入内容被改写或补齐"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "识别现状动作与依赖",
+        "instructions": [
+          "把 current_situation_snapshot 中的每条现状归类为动作类型：待寻找入口、待核验线索、待起草联系、待投递、待跟进、待更新状态",
+          "给每个动作标注来源条目和关联机会标识",
+          "建立依赖关系：核验在线索联系之前，起草在联系之前，联系在跟进之前"
+        ],
+        "success_criteria": [
+          "每条现状条目至少归入一个动作类型",
+          "每个动作有关联的机会标识或明确的现状来源",
+          "依赖关系可解释且不循环"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "确定计划窗口与时间预算",
+        "instructions": [
+          "从 user_time_and_rules 提取 plan_window 的起止时间或周期标签",
+          "计算每个时间窗口可用的总时长，依据是用户给出的每周可投入时间，不得自行假设",
+          "记录联系方式上限、偏好渠道和不可打扰时间作为排程约束",
+          "若计划窗口或每周时间缺失，停止并返回 insufficient_input"
+        ],
+        "success_criteria": [
+          "plan_window 与 constraints_version 已确定",
+          "每个时间窗口有可解释的时长上限",
+          "联系动作数量不超过用户给出的上限"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "排序并排程动作",
+        "instructions": [
+          "按 opportunity_pursuit_ranking 的优先顺序对动作分组排序，同一机会内再按依赖关系排序",
+          "为每个动作分配时间窗口、预估耗时和建议渠道，渠道只能取 user_time_and_rules 中用户给出的偏好渠道",
+          "跳过会落在不可打扰时间的动作，并在计划中标注冲突或顺延",
+          "当每周时长溢出时，保留高优先级动作，把低优先级动作标记为下一窗口"
+        ],
+        "success_criteria": [
+          "每个排程动作包含 opportunity_id、action_type、time_window、estimated_effort、channel",
+          "动作顺序可由机会优先级和依赖关系解释",
+          "没有任何动作被安排在用户已排除的时间或渠道"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "设置检查点、组装并验证输出",
+        "instructions": [
+          "按 plan_window 的边界设置里程碑，每个里程碑写明可观察的完成条件",
+          "在里程碑之间设置检查点，例如完成某批核验、发出某条草稿、记录某次跟进",
+          "组装 networking_action_plan 对象，包含 plan_window、actions、milestones、checkpoints、constraints_version",
+          "验证输出可重建 dedupe_key 语义：plan_window|user_constraints_version|milestones"
+        ],
+        "success_criteria": [
+          "每个里程碑有可验证的完成标准",
+          "输出字段与 output_schema 契约一致",
+          "所有动作、时间和约束均可追溯到四个输入字段"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "机会优先级排序：关联高优先级机会的动作先于低优先级机会的动作。",
+      "依赖优先级：核验先于联系和投递，起草先于联系，联系先于跟进；若排序与依赖冲突，依赖优先。",
+      "时间预算：动作的预估耗时总和不得超过用户给出的每周可投入时间；溢出部分顺延并标注。",
+      "联系上限：若 user_time_and_rules 有每周联系上限，对外发联系/跟进动作计数并截断。",
+      "渠道约束：只使用用户列出的偏好渠道；不在不可打扰时间安排动作。",
+      "现状新鲜度：以 current_situation_snapshot 为调用时点的现状，不推断调用前未发生的事件。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "networking_action_plan 包含 plan_window、actions、milestones、checkpoints、constraints_version",
+        "actions 非空且每个动作都有关联机会标识和来源条目",
+        "计划只包含草稿、清单、提醒和待确认动作"
+      ],
+      "insufficient_input": [
+        "current_situation_snapshot、opportunity_pursuit_ranking 或 user_time_and_rules 缺失或无法解析",
+        "user_time_and_rules 未提供计划周期或每周可投入时间",
+        "opportunity_pursuit_ranking 为空且无法从中建立任何动作顺序"
+      ],
+      "error": [
+        "输出对象无法序列化为 JSON",
+        "验证过程中发现输出字段与契约不一致且无法修正"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "所有 action 的 opportunity_id 都可从 opportunity_pursuit_ranking 或 current_situation_snapshot 解析得到。",
+      "所有时间窗口、每周时长、渠道和联系上限均来自 user_time_and_rules，无模型自造数值。",
+      "计划中没有任何实际发送、投递、撤回或修改外部系统状态的指令，只有草稿和提醒。",
+      "输出可重建 dedupe_key：plan_window|user_constraints_version|milestones。",
+      "每个里程碑都有可观察的完成条件，不只写日期标签。"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 5,
+    "rationale": "需要把现状动作按机会优先级、依赖关系和时间约束编排成窗口级计划并设检查点，属于计划型决策；不是简单格式化包装，也不应继续拆成更小的单次排序任务。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖 current_situation_snapshot、opportunity_pursuit_ranking、user_time_and_rules、user_profile 四个输入",
+      "不依赖应用内数据库、主程序导入或运行状态",
+      "不需要外部工具即可完成计划编排",
+      "不依赖任何先前 SkillTool 输出"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我安排接下来几周的人脉跟进计划",
+      "available_context": {
+        "current_situation_snapshot": "包含已投递清单、已有联系人、待核验线索和当前进展的对象",
+        "opportunity_pursuit_ranking": "包含机会标识和优先顺序的数组",
+        "user_time_and_rules": "包含计划周期、每周可投入时间、偏好渠道和不可打扰时间的对象",
+        "user_profile": "包含用户真实偏好和约束的对象"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "networking_action_plan 含 plan_window、actions、milestones、checkpoints、constraints_version",
+        "动作按机会优先级和依赖关系有序排列",
+        "所有排程时间和渠道来自用户输入"
+      ],
+      "must_not_include": [
+        "实际发送或投递指令",
+        "模型自造的每周时间或联系上限"
+      ]
+    },
+    {
+      "id": "insufficient_input_missing_snapshot",
+      "user_query": "帮我做个计划，什么时候联系谁、什么时候跟进",
+      "available_context": {
+        "current_situation_snapshot": "缺失",
+        "opportunity_pursuit_ranking": "已有",
+        "user_time_and_rules": "已有",
+        "user_profile": "已有"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确指出缺少 current_situation_snapshot",
+        "说明无法在不了解已投递和已联系情况的前提下排程"
+      ],
+      "must_not_include": [
+        "编造已投递清单或联系人"
+      ]
+    },
+    {
+      "id": "insufficient_input_missing_time_rules",
+      "user_query": "帮我安排接下来几周的人脉跟进计划",
+      "available_context": {
+        "current_situation_snapshot": "已有",
+        "opportunity_pursuit_ranking": "已有",
+        "user_time_and_rules": "缺少计划周期和每周可投入时间",
+        "user_profile": "已有"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确指出无法确定计划窗口和每周时间容量"
+      ],
+      "must_not_include": [
+        "默认假设每周可投入时长或固定周期"
+      ]
+    },
+    {
+      "id": "boundary_no_external_actions",
+      "user_query": "帮我安排接下来几周的人脉跟进计划",
+      "available_context": {
+        "current_situation_snapshot": "包含待联系和待跟进条目的现状对象",
+        "opportunity_pursuit_ranking": "包含多个机会的数组",
+        "user_time_and_rules": "包含周期、每周时间、渠道上限和不可打扰时间",
+        "user_profile": "包含用户偏好"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "所有外发联系动作被标记为待用户确认的草稿或提醒",
+        "计划中明确保留需要用户确认后才可执行的边界"
+      ],
+      "must_not_include": [
+        "任何自动发送、投递或撤回指令"
+      ]
+    }
+  ]
+}

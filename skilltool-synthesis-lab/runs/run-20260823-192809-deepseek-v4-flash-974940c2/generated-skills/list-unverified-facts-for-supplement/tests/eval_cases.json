@@ -1,0 +1,75 @@
+[
+  {
+    "id": "success_with_draft_materials",
+    "user_query": "看看这版简历和项目描述里有哪些细节需要我去确认",
+    "available_context": {
+      "evidence_gap_analysis": "包含多个岗位要求及其证据状态，其中部分要求标为无证据或待确认",
+      "user_profile": "包含教育、项目、技能和成果，但部分项目缺少时间或结果",
+      "draft_materials": "包含简历草稿和项目经历文本"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "facts_to_supplement.items 中的每条记录包含 material_location、missing_fact、current_evidence_state、supplement_hint",
+      "至少包含一个 needs_confirmation 的条目，指向草稿中缺失数字或时间细节的项目表述"
+    ],
+    "must_not_include": [
+      "任何编造的数值、成果或职责",
+      "对材料进行重新改写后的文本内容"
+    ]
+  },
+  {
+    "id": "insufficient_missing_gap_analysis",
+    "user_query": "帮我把材料里需要我自己补充的事实列出来",
+    "available_context": {
+      "evidence_gap_analysis": "未提供",
+      "user_profile": "存在完整画像",
+      "draft_materials": "存在草稿"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确指出缺少 evidence_gap_analysis，无法确定围绕哪些岗位要求列出事实缺口",
+      "不生成任何清单条目"
+    ],
+    "must_not_include": [
+      "调用 WebSearch、WebFetch 或 AskUserQuestion 来补证据",
+      "基于猜测生成需要补充的事实列表"
+    ]
+  },
+  {
+    "id": "boundary_no_draft_materials",
+    "user_query": "申请这个岗位我还需要补充哪些事实或证明材料",
+    "available_context": {
+      "evidence_gap_analysis": "已提供且包含缺失要求",
+      "user_profile": "已提供但未覆盖部分要求",
+      "draft_materials": "未提供"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "facts_to_supplement 正常生成",
+      "material_location 使用 user_profile 或 evidence_gap_analysis 中的对应位置",
+      "整理出基于画像与岗位要求就能确认的待补充事实"
+    ],
+    "must_not_include": [
+      "因为草稿缺失而返回 insufficient_input 或让用户先交草稿",
+      "把画像中不存在的事实当成已有证据"
+    ]
+  },
+  {
+    "id": "boundary_all_requirements_supported",
+    "user_query": "把材料里还没有证据支撑的地方列出来，我自己补",
+    "available_context": {
+      "evidence_gap_analysis": "所有要求均有已确认证据支撑",
+      "user_profile": "覆盖所有相关要求",
+      "draft_materials": "可提供"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "facts_to_supplement.items 为空数组",
+      "summary 说明当前没有需要补充或确认的事实"
+    ],
+    "must_not_include": [
+      "凭空生成待确认条目",
+      "对已有证据提出无依据的怀疑"
+    ]
+  }
+]

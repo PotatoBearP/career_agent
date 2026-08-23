@@ -1,0 +1,33 @@
+{
+  "tool_name": "FindReferralEntryPoints",
+  "user_facing_name": "帮我找这些机会的公开内推入口和人脉线索",
+  "search_hint": "find public referral entry points and public contact leads for verified opportunities with source-backed evidence",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [
+    "WebSearch"
+  ],
+  "input": {
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已经确认的真实机会清单，作为寻找内推入口和人脉线索的目标对象"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的画像信息，用于匹配与用户背景相关的公开线索和判断适用渠道"
+    },
+    "search_result_web": {
+      "type": "json",
+      "required": true,
+      "description": "公开网络检索到的机会对应公司或机构的内推、招聘、活动或联系人线索，需带来源"
+    },
+    "user_preferred_channels": {
+      "type": "json",
+      "required": true,
+      "description": "用户愿意使用的平台和渠道范围，例如官方网站、公开社区、职业社交平台等"
+    }
+  }
+}

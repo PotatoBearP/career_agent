@@ -1,0 +1,26 @@
+{
+  "tool_name": "ApplicationFocusBrief",
+  "user_facing_name": "投递材料准备要点",
+  "search_hint": "prepare application material focus from requirement gap analysis",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "evidence_gap_analysis": {
+      "type": "json",
+      "required": true,
+      "description": "已有经历与目标方向要求的逐项对照结果，作为生成投递重点的基础"
+    },
+    "target_direction": {
+      "type": "string",
+      "required": true,
+      "description": "要准备投递或展示的目标方向或岗位类型"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户画像中的已有证据与偏好，用于确认哪些经历可以如实突出"
+    }
+  }
+}

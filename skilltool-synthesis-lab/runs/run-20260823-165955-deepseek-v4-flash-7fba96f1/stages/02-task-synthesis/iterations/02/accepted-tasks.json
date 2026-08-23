@@ -1,0 +1,376 @@
+[
+  {
+    "task_id": "rank_opportunities_to_pursue",
+    "name": "帮我排一下这些岗位先投哪些",
+    "scene": "职业方向探索与真实机会验证",
+    "business_goal": "我想根据已经找到的真实岗位清单，结合我的情况和偏好，排出先联系、后联系和暂缓的顺序，并说明为什么这样排。",
+    "user_request_examples": [
+      "帮我把这些岗位排一下，先投哪些、后投哪些。",
+      "这些机会里哪些最值得我优先去投？",
+      "结合我的情况，帮我排出联系这些岗位的先后顺序。"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "find_real_opportunities",
+      "compare_profile_with_requirements"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "opportunity_prioritization",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把机会清单、个人画像和匹配分析综合成有取舍的先后排序并解释理由，属于非平凡的决策支持。",
+    "execution_provider": null,
+    "need_ids": [
+      "need_opportunity_priority_ranking"
+    ],
+    "inputs": [
+      {
+        "name": "verified_opportunity_list",
+        "description": "已核验的真实岗位机会清单，作为待排序的候选机会",
+        "type": "array",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "find_real_opportunities:output:verified_opportunity_list:1",
+        "available": true,
+        "from_task": "find_real_opportunities",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "find_real_opportunities"
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户画像中的证据、偏好与现实约束，用于判断各岗位的贴合度与优先级",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "ranking_preferences",
+        "description": "用户关心的排序因素，如地理位置、组织类型、机会类型、时间紧迫性和准备成本",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "evidence_gap_analysis",
+        "description": "已有经历与目标方向要求的对照结果，作为排序时的匹配度补充参考；没有时忽略",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "compare_profile_with_requirements:output:evidence_gap_analysis:1",
+        "available": true,
+        "from_task": "compare_profile_with_requirements",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "compare_profile_with_requirements"
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "opportunity_pursuit_ranking",
+        "display_name": "岗位投递优先顺序",
+        "description": "排序后的机会列表，每项给出建议顺序、排序理由、与用户证据的匹配点、不确定性和需要先核实的事项",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "opportunity_pursuit_priority_ranking",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "find_real_opportunities",
+      "compare_profile_with_requirements"
+    ],
+    "estimated_steps": 4,
+    "fresh_data_required": false,
+    "iteration": 2,
+    "output_hypotheses": [
+      "opportunity_pursuit_priority_ranking"
+    ]
+  },
+  {
+    "task_id": "prepare_application_focus_brief",
+    "name": "投这些岗位时重点突出什么、需要补什么",
+    "scene": "职业方向探索与真实机会验证",
+    "business_goal": "我想在投递或展示自己之前，知道针对这些方向应该重点呈现哪些已有经历、回避或弥补哪些短板，让材料更有针对性。",
+    "user_request_examples": [
+      "帮我把经历整理成适合投这些岗位的重点说明。",
+      "投这个方向时，我该突出哪些东西、弱化哪些？",
+      "针对我要投的方向，帮我列一份材料准备要点。"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "compare_profile_with_requirements"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "application_preparation",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把逐项匹配结果改写成面向投递的表达策略，包括突出点、弱化点和待补充证据，属于个性化内容决策。",
+    "execution_provider": null,
+    "need_ids": [
+      "need_application_focus_guidance"
+    ],
+    "inputs": [
+      {
+        "name": "evidence_gap_analysis",
+        "description": "已有经历与目标方向要求的逐项对照结果，作为生成投递重点的基础",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "compare_profile_with_requirements:output:evidence_gap_analysis:1",
+        "available": true,
+        "from_task": "compare_profile_with_requirements",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "compare_profile_with_requirements"
+        }
+      },
+      {
+        "name": "target_direction",
+        "description": "要准备投递或展示的目标方向或岗位类型",
+        "type": "string",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户画像中的已有证据与偏好，用于确认哪些经历可以如实突出",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "application_focus_brief",
+        "display_name": "投递材料准备要点",
+        "description": "针对目标方向的材料重点，包括建议突出的经历、建议弱化或避免的表达、待补充证据和不确定性说明",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "application_focus_brief",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "compare_profile_with_requirements"
+    ],
+    "estimated_steps": 4,
+    "fresh_data_required": false,
+    "iteration": 2,
+    "output_hypotheses": [
+      "application_focus_brief"
+    ]
+  },
+  {
+    "task_id": "draft_informational_interview_outreach",
+    "name": "帮我写联系从业者约聊的开口消息",
+    "scene": "职业方向探索与真实机会验证",
+    "business_goal": "我想基于准备好的访谈目标，写出适合不同场合的短消息，礼貌地约相关从业者交流，并让对方愿意回复。",
+    "user_request_examples": [
+      "帮我写一条约人聊天的私信，不要太正式。",
+      "我要在求职平台联系一位从业者，帮我写个开场消息。",
+      "帮我把访谈目标改写成不同版本的约聊话术。"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "prepare_informational_interviews"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "outreach_preparation",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把访谈目标、个人背景和场合要求转化成多版得体、有针对性的开口消息，属于个性化文案生成与判断。",
+    "execution_provider": null,
+    "need_ids": [
+      "need_outreach_message_drafting"
+    ],
+    "inputs": [
+      {
+        "name": "interview_prep_kit",
+        "description": "已生成的信息访谈目标与提问重点，作为消息内容的基础",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "prepare_informational_interviews:output:interview_prep_kit:1",
+        "available": true,
+        "from_task": "prepare_informational_interviews",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "prepare_informational_interviews"
+        }
+      },
+      {
+        "name": "outreach_context",
+        "description": "联系场合、平台类型、与对方的关系以及希望的语气",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户画像中的已有背景与约束，用于写出真实可信的自我介绍",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "outreach_message_drafts",
+        "display_name": "约聊开口消息草稿",
+        "description": "多版联系消息草稿，每版说明适用场合、语气特点、希望对方回应的点和注意事项",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "informational_interview_outreach_message_drafts",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "prepare_informational_interviews"
+    ],
+    "estimated_steps": 3,
+    "fresh_data_required": false,
+    "iteration": 2,
+    "output_hypotheses": [
+      "informational_interview_outreach_message_drafts"
+    ]
+  },
+  {
+    "task_id": "preview_likely_evaluation_questions",
+    "name": "预判申请这些方向时可能被问到的问题",
+    "scene": "职业方向探索与真实机会验证",
+    "business_goal": "我想在投递和沟通前，先知道这个方向的人通常会被考察什么、我的回答重点怎么准备，减少临场没把握的情况。",
+    "user_request_examples": [
+      "投这个方向一般会被问哪些问题？",
+      "根据我的经历和岗位要求，帮我想想对方可能会考察我什么。",
+      "帮我预判一下申请这些机会时最可能被问的问题和回答要点。"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "compare_profile_with_requirements",
+      "understand_entry_requirements"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "evaluation_preparation",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要结合个人证据缺口和该方向的常见要求，推断最可能被考察的点并组织回答思路，属于非平凡的个性化预判。",
+    "execution_provider": null,
+    "need_ids": [
+      "need_evaluation_question_preview"
+    ],
+    "inputs": [
+      {
+        "name": "evidence_gap_analysis",
+        "description": "已有经历与目标方向要求的对照结果，用于找到容易被追问的部分",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "compare_profile_with_requirements:output:evidence_gap_analysis:1",
+        "available": true,
+        "from_task": "compare_profile_with_requirements",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "compare_profile_with_requirements"
+        }
+      },
+      {
+        "name": "entry_requirements_report",
+        "description": "目标方向的进入条件与常见路径说明，用于判断最可能被考察的共性要求",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "understand_entry_requirements:output:entry_requirements_report:1",
+        "available": true,
+        "from_task": "understand_entry_requirements",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "understand_entry_requirements"
+        }
+      },
+      {
+        "name": "target_direction",
+        "description": "用户关心的目标方向或岗位类型",
+        "type": "string",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "likely_question_guide",
+        "display_name": "可能被考察的问题与准备要点",
+        "description": "按主题分组的问题清单，每项给出可能被问的原因、参考答案思路、与个人证据的关联和需要补充的准备",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "likely_evaluation_question_guide",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "compare_profile_with_requirements",
+      "understand_entry_requirements"
+    ],
+    "estimated_steps": 4,
+    "fresh_data_required": false,
+    "iteration": 2,
+    "output_hypotheses": [
+      "likely_evaluation_question_guide"
+    ]
+  }
+]

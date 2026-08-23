@@ -1,0 +1,36 @@
+{
+  "tool_name": "CompareOpportunityTargets",
+  "user_facing_name": "比较几个岗位机会并给出最值得现在投入的建议",
+  "search_hint": "compare user-specified verified opportunities using user criteria, profile, and existing pursuit ranking",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "candidate_opportunity_ids": {
+      "type": "json",
+      "required": true,
+      "description": "用户指定的待比较机会标识，可引用已有机会清单中的对象"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已经确认的真实机会清单，用于按标识取出待比较机会的完整信息"
+    },
+    "opportunity_pursuit_ranking": {
+      "type": "json",
+      "required": true,
+      "description": "用户已确认的机会投递优先顺序，用于与本次比较结果互相印证"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的画像信息，用于判断每个候选机会与用户的匹配程度"
+    },
+    "comparison_criteria": {
+      "type": "json",
+      "required": true,
+      "description": "用户重视的维度，例如现阶段价值、时间成本、接触难度、与目标方向的一致性等"
+    }
+  }
+}

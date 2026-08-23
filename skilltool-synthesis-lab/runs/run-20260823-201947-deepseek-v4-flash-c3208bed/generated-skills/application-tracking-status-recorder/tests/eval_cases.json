@@ -1,0 +1,111 @@
+[
+  {
+    "id": "success_incremental_update",
+    "user_query": "帮我记一下我今天投了这个岗位，另外上个月投的那个还没消息，帮我记下该跟进了",
+    "available_context": {
+      "status_update_events": [
+        {
+          "event": "投递了岗位A",
+          "date": "3月10日",
+          "source": "公司官网"
+        },
+        {
+          "event": "上个月投的岗位B还没消息，该跟进了",
+          "date": "2月5日",
+          "source": "招聘平台"
+        }
+      ],
+      "current_tracking_records": {},
+      "verified_opportunity_list": [
+        {
+          "opportunity_id": "opp_a",
+          "name": "岗位A"
+        },
+        {
+          "opportunity_id": "opp_b",
+          "name": "岗位B"
+        }
+      ],
+      "user_followup_cadence": {
+        "interval": "7天",
+        "preferred_channel": "邮件"
+      }
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "application_tracking_ledger.opportunities.opp_a.latest_status 为 applied",
+      "application_tracking_ledger.opportunities.opp_b.latest_status 为 needs_followup",
+      "opportunities.opp_b.next_action 包含按用户偏好渠道跟进",
+      "status_source 保留 公司官网 和 招聘平台 原文"
+    ],
+    "must_not_include": [
+      "修改 verified_opportunity_list 的内容",
+      "为 opp_a 或 opp_b 补造不存在的面试记录",
+      "调用普通工具获取系统当前时间"
+    ]
+  },
+  {
+    "id": "insufficient_input_unmatchable_event",
+    "user_query": "帮我更新一下之前那个公司的情况，它回我了",
+    "available_context": {
+      "status_update_events": [
+        {
+          "event": "那个公司回我了",
+          "date": null,
+          "source": null
+        }
+      ],
+      "current_tracking_records": {},
+      "verified_opportunity_list": [
+        {
+          "opportunity_id": "opp_a",
+          "name": "岗位A"
+        }
+      ],
+      "user_followup_cadence": null
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "返回 insufficient_input",
+      "说明缺少可关联到 verified_opportunity_list 的机会标识",
+      "说明事件缺少用户提供的时间和来源"
+    ],
+    "must_not_include": [
+      "猜测该事件属于 opp_a",
+      "补造 occurred_at 或 source",
+      "产出包含猜测机会状态的台账"
+    ]
+  },
+  {
+    "id": "boundary_missing_followup_cadence",
+    "user_query": "帮我记一下我今天投了这个岗位",
+    "available_context": {
+      "status_update_events": [
+        {
+          "event": "投递了岗位C",
+          "date": "3月12日",
+          "source": "内部推荐"
+        }
+      ],
+      "current_tracking_records": {},
+      "verified_opportunity_list": [
+        {
+          "opportunity_id": "opp_c",
+          "name": "岗位C"
+        }
+      ],
+      "user_followup_cadence": null
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "application_tracking_ledger.opportunities.opp_c.latest_status 为 applied",
+      "next_action 为等待回复并按用户确认的节奏检查",
+      "reminder_basis 为 null",
+      "warnings 中提示未提供跟进节奏"
+    ],
+    "must_not_include": [
+      "使用默认 7 天或任何默认跟进周期",
+      "把 latest_status 直接推导为 needs_followup"
+    ]
+  }
+]

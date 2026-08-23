@@ -1,0 +1,26 @@
+{
+  "tool_name": "PrepareProjectShowcaseSheet",
+  "user_facing_name": "做一页纸的项目作品清单",
+  "search_hint": "make a one-page project showcase sheet from rewritten project descriptions for an application",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "rewritten_project_descriptions": {
+      "type": "json",
+      "required": true,
+      "description": "已按岗位要求改写好的项目经历描述，作为作品清单的内容来源"
+    },
+    "showcase_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户对篇幅、语言、排序方式以及是否保留链接或证明材料占位的要求"
+    },
+    "target_opportunity": {
+      "type": "json",
+      "required": true,
+      "description": "目标岗位的职责和关注点，用于筛选最相关的项目；不提供时按现有项目完整整理"
+    }
+  }
+}

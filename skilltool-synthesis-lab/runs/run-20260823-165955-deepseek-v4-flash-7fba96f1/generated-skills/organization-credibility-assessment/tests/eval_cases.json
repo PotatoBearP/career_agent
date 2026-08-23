@@ -1,0 +1,83 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我查一下发这些招聘的组织是不是真的，靠不靠谱。",
+    "available_context": {
+      "organizations_to_verify": [
+        {
+          "name": "示例云科技公司",
+          "recruitment_context": "上海某算法工程师岗位，链接指向疑似官网",
+          "links": [
+            "https://example-org.com/jobs"
+          ]
+        }
+      ],
+      "credibility_search_results": [
+        "示例云科技公司 企业信用信息公示 上海",
+        "示例云科技公司官网 / 投诉记录"
+      ],
+      "credibility_page_extracts": [
+        "官网页面含公司全称、地址、联系方式；企业信息页显示注册主体与招聘名称一致"
+      ]
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "organization_name 与 verification_status",
+      "identity_evidence 引用官网和企业信息页",
+      "risk_signal 或明确写出的无风险信号",
+      "uncertainty 字段"
+    ],
+    "must_not_include": [
+      "用户是否适合该岗位的评论",
+      "岗位链接是否有效或是否仍在招聘的结论"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_evidence",
+    "user_query": "这个招聘方靠不靠谱？帮我核实一下。",
+    "available_context": {
+      "organizations_to_verify": [],
+      "credibility_search_results": [],
+      "credibility_page_extracts": []
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "指明缺少可核验的组织身份对象",
+      "列出需要用户提供或补充的组织名称、招聘上下文与相关链接"
+    ],
+    "must_not_include": [
+      "对不存在组织的可信度推断",
+      "主动生成投递建议或职业建议"
+    ]
+  },
+  {
+    "id": "boundary_no_posting_validity",
+    "user_query": "帮我确认这些机会背后的组织身份和可信度，顺便看看这些岗位是不是还在招。",
+    "available_context": {
+      "organizations_to_verify": [
+        {
+          "name": "示例组织",
+          "recruitment_context": "某城市运营岗位招聘信息",
+          "links": [
+            "https://recruiter.example.com/job/123"
+          ]
+        }
+      ],
+      "credibility_search_results": [
+        "示例组织 企业信息 官网"
+      ],
+      "credibility_page_extracts": [
+        "官网显示组织名称与业务范围；检索结果未发现明显负面记录"
+      ]
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "组织可信度核验结果及证据来源",
+      "明确说明岗位是否仍在招聘不在本核实范围内"
+    ],
+    "must_not_include": [
+      "对招聘链接可访问性或岗位有效期的结论",
+      "对用户适合性的判断"
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "tool_name": "InfoConversationPrep",
+  "user_facing_name": "信息交流准备单",
+  "search_hint": "prepare a grounded information-conversation prep sheet for a verified contact",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "role_conversation_context_brief": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是按机会整理的对方日常工作、团队协作和可聊话题简报"
+    },
+    "network_lead_verification_report": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有产物，是待联系对象的公开信息核实结果，用于保证谈话内容有理有据"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "场景已有产物，是用户的真实经历和能力画像，用于准备符合本人情况的介绍和提问"
+    },
+    "conversation_focus": {
+      "type": "json",
+      "required": true,
+      "description": "用户想在这次交流中达成的目标，例如了解团队、询问申请建议、确认投递时机或单纯建立联系"
+    }
+  }
+}

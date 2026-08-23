@@ -1,0 +1,288 @@
+{
+  "skill_id": "rewrite_project_accounts_for_opportunity",
+  "skill_name": "rewrite-project-accounts-for-opportunity",
+  "tool_name": "RewriteProjectAccountsForOpportunity",
+  "title": "按岗位要求改写项目经历",
+  "business_goal": "针对目标岗位的职责与要求关键词，把用户的项目经历逐条改写成招聘方能快速看出对应关系的描述，同时标记哪些事实有证据支撑、哪些属于不可改动或需要用户补充的事实边界。",
+  "invocation_mode": "standalone",
+  "composition": {
+    "required_prior_outputs": [],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "当用户提供一组项目经历条目、目标岗位要求，以及已有的经历与要求对照结果（evidence_gap_analysis）和用户画像（user_profile），并要求把这些项目经历改写成对应岗位可用的描述时使用。已有普通工具或官方材料处理过的岗位事实不得在此重复核查。不要用于生成简历整体、撰写求职信、判断岗位匹配度或评估用户能力。",
+  "reference_pattern": "采用 baseline-assessment 的证据冻结边界与 outcome-rules 结构（success/insufficient_input/error 分离），并借鉴 learning-plan 的输入快照校验 + 确定性排序/决策规则 + 单一返回值交付方式；业务内容完全改为岗位定向项目经历改写，不照搬学习规划领域。",
+  "task_ids": [
+    "task_rewrite_project_accounts"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "把用户提供的每个项目条目按目标岗位要求关键词重新组织动作、结果和技能表述",
+      "标注每条改写所对应的岗位关键词",
+      "用 evidence_gap_analysis 与 user_profile 核对事实边界，列出不可改写的事实",
+      "输出需要用户补充或确认的事实清单"
+    ],
+    "excludes": [
+      "重新生成或修改 evidence_gap_analysis、user_profile、target_opportunity 等输入产物",
+      "编造或估算任何项目结果、数字、职责或技能",
+      "把岗位要求改写为用户已经具备的能力",
+      "生成整份简历、求职信、作品清单或其他申请材料",
+      "联网检索岗位信息或调用任何外部工具补足证据"
+    ]
+  },
+  "input_schema": {
+    "project_entries": {
+      "type": "array",
+      "required": true,
+      "description": "用户提供的项目经历条目，每条包含项目名称、承担角色、事实性动作、结果和相关技能",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "target_opportunity": {
+      "type": "object",
+      "required": true,
+      "description": "目标岗位的职责、要求关键词和招聘方关注点",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "evidence_gap_analysis": {
+      "type": "object",
+      "required": true,
+      "description": "经历与要求对照结果，用于识别哪些项目事实已经是可靠证据",
+      "source": "upstream_artifact",
+      "source_ref": "evidence_gap_analysis",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "已确认的用户画像，用于核对项目事实和技能表述",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "rewritten_project_descriptions": {
+      "type": "object",
+      "description": "逐条改写后的项目描述，包含原事实、改写后表述、对应岗位关键词和不可改写的事实边界"
+    }
+  },
+  "output_consumers": [
+    "task_prepare_project_showcase_sheet",
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "rewrite project experience entries to match an opportunity's requirement keywords while preserving factual boundaries",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": true
+  },
+  "operating_model": {
+    "role": "项目经历改写者：只负责把输入中的项目条目重新组织为与目标岗位要求对应的表述，并充当事实边界审核者，凡是证据不足的事实一律标注，不得代用户确认或补写。",
+    "hard_boundaries": [
+      "只处理本次调用输入中的 project_entries；绝不从 evidence_gap_analysis、user_profile 或岗位要求之外添加任何经历、数字、职责或成果。",
+      "不重新生成或修改 evidence_gap_analysis、user_profile、target_opportunity；这三个输入只作为核对与比对基准，禁止写入或改写。",
+      "不得把岗位要求改写成用户已经具备的能力；岗位要求中的技能若在证据中不存在，必须在 fact_boundary_notes 中标为待确认。",
+      "不调用任何外部工具、不检索网络、不读取本地文件；只基于 project_entries、target_opportunity、evidence_gap_analysis、user_profile 完成改写。",
+      "改写只能改变表述重点、语序和用词，不得改变原事实的语义、程度或归属；凡需要调整事实范围的改动一律拒绝并标注。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "装载并校验输入",
+        "instructions": [
+          "读取 project_entries，确认其为非空数组且每条至少包含项目名称、承担角色和事实性动作。",
+          "读取 target_opportunity，确认其中能解析出职责或要求关键词；无法解析则返回 insufficient_input。",
+          "读取 evidence_gap_analysis 与 user_profile，确认二者作为事实基准可用；任一缺失且无法从其余输入推断时返回 insufficient_input。"
+        ],
+        "success_criteria": [
+          "四类输入均已确认存在且类型可用",
+          "已能从 target_opportunity 提取出至少一组要求关键词或职责"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "建立岗位要求索引并映射证据",
+        "instructions": [
+          "从 target_opportunity 抽取要求关键词、职责和招聘方关注点，整理为 requirement_index。",
+          "从 evidence_gap_analysis 读取每个项目事实的证据状态（可靠证据 / 缺口 / 待确认）。",
+          "把每个 project_entry 的动作、结果、技能与 requirement_index 中的关键词逐一建立候选映射；只保留有事实依据的映射。"
+        ],
+        "success_criteria": [
+          "requirement_index 已生成",
+          "每个项目条目至少完成一次证据状态归类",
+          "所有候选映射都来源于输入字段，没有自创关键词"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "逐条改写并守证据边界",
+        "instructions": [
+          "对每个 project_entry，先锁定 original_facts（名称、角色、事实性动作、结果、技能）。",
+          "针对命中的要求关键词重写描述：突出与岗位相关的动作与结果、调整语序、使用招聘方可快速识别的表达。",
+          "凡某个结果或技能在 evidence_gap_analysis 或 user_profile 中没有证据支撑，不得写入改写后的结果句；改写成仅描述已动作或标记 requires_user_confirmation=true。"
+        ],
+        "success_criteria": [
+          "每个 entry 都有 rewritten_description 且可追溯到原 project_entry",
+          "无证据的数字、职责或成果未被写入任意 rewritten_description",
+          "每个 entry 都填写 matched_opportunity_keywords、unchanged_facts、fact_boundary_notes"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "整理补充事实并按输出契约返回",
+        "instructions": [
+          "汇总所有 requires_user_confirmation=true 的条目，生成 fact_supplement_requests 列表，每条说明相关材料位置、缺失内容、当前证据状态和补充提示。",
+          "按输出契约组装 rewritten_project_descriptions 对象，写入 entries、fact_supplement_requests 与 source_provenance。",
+          "检查字段名、类型与完整性后，调用 ReturnSkillResult 一次并返回单个结果对象。"
+        ],
+        "success_criteria": [
+          "输出对象包含 entries、fact_supplement_requests、source_provenance",
+          "fact_supplement_requests 与各 entry 的 fact_boundary_notes 一致",
+          "ReturnSkillResult 只调用一次且携带调用信封中的 skill_call_id 与 skill_name"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "映射排序：优先把 evidence_gap_analysis 中确认为可靠证据且与岗位关键词直接相关的动作、结果放在每条描述最前；缺口或待确认项只能放在陈述之后并用事实边界标注。",
+      "语态判定：动作有证据支持时用主动语态（完成了、设计了、实现了）；仅部分证据时用保守表达（参与了、完成了部分）；完全无证据时只描述项目本身背景，不得断言个人贡献。",
+      "事实冲突：改写后的表述若与 evidence_gap_analysis 中标记为缺口的内容冲突，以缺口状态为准，降级表述并置为 requires_user_confirmation。",
+      "结果数字规则：任何数量、指标或成果数字只能出现在 user_profile 或 evidence_gap_analysis 已确认的证据中；其他一律记入 fact_boundary_notes 并加入 fact_supplement_requests，禁止估算或推断。",
+      "低相关条目：某项目条目无法对应任何岗位关键词时，保留其原始事实表达并在 fact_boundary_notes 注明与目标岗位相关性低，不强行改写。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "project_entries 为非空数组且每条可解析",
+        "target_opportunity 可解析出职责或要求关键词",
+        "至少一个项目条目完成改写并以对象形式返回",
+        "所有无证据内容均已降级表述或标记 requires_user_confirmation"
+      ],
+      "insufficient_input": [
+        "project_entries 缺失、为空或不是数组",
+        "target_opportunity 缺少职责与要求关键词，无法建立映射基准",
+        "evidence_gap_analysis 或 user_profile 缺失，且无法确认真实事实边界"
+      ],
+      "error": [
+        "任一输入字段类型与契约不符且无法解析",
+        "改写请求要求编造数字、结果或职责（例如“把没有的指标写上”）",
+        "输出序列化失败或未能在一次 ReturnSkillResult 内返回结果对象"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "每个 rewritten_description 都能对应到输入中的一个原始 entry 及其项目名称和角色，未新增任何无证据事实。",
+      "matched_opportunity_keywords 均来自 target_opportunity 的原始文本，未自创关键词。",
+      "fact_boundary_notes 与 fact_supplement_requests 覆盖所有 evidence_gap_analysis 中标为缺口且与目标岗位相关的事实。",
+      "输出字段名与类型严格符合 rewritten_project_descriptions 契约：entries 为 array，fact_supplement_requests 为 array，source_provenance 为 object。",
+      "整个执行未调用任何子工具、外部网络或文件系统。",
+      "ReturnSkillResult 已恰好调用一次。"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 4,
+    "rationale": "这是一个有明确判断边界的改写任务：需要逐条映射证据与岗位关键词、决定语态与表述重点、标记事实缺口并汇总补充请求；不是简单格式化或检索包装，也不需要再拆分。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖调用时提供的 project_entries、target_opportunity 以及已注入的 evidence_gap_analysis、user_profile",
+      "不依赖任何本地数据库、主程序状态、路由或内部服务",
+      "结果通过标准模型返回交付，不依赖外部文件系统或第三方写操作"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我按这个岗位的要求改写我的项目经历",
+      "available_context": {
+        "project_entries": "包含 3 个条目，每个条目有项目名称、角色、事实性动作、结果和技能",
+        "target_opportunity": "岗位描述含明确职责与要求关键词（如实验设计、数据处理、报告撰写）",
+        "evidence_gap_analysis": "已确认其中 2 个项目的动作与结果属于可靠证据，1 个项目的结果待确认",
+        "user_profile": "画像含与上述动作一致的技能与经历描述"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "rewritten_project_descriptions.entries 为 array，且每个 entry 含 rewritten_description 与 matched_opportunity_keywords",
+        "待确认的项目结果被标记 requires_user_confirmation=true 并出现在 fact_supplement_requests"
+      ],
+      "must_not_include": [
+        "任何未在 user_profile 或 evidence_gap_analysis 中出现的数字、成果或职责"
+      ]
+    },
+    {
+      "id": "insufficient_missing_entries",
+      "user_query": "帮我把项目经历改得更贴近这个职位",
+      "available_context": {
+        "project_entries": "空数组或未提供",
+        "target_opportunity": "岗位描述含要求关键词",
+        "evidence_gap_analysis": "已有对照结果",
+        "user_profile": "已有画像"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明缺少可供改写的项目经历条目",
+        "不给出任何改写后的项目描述"
+      ],
+      "must_not_include": [
+        "从 evidence_gap_analysis 或其他输入推断出的编造项目描述"
+      ]
+    },
+    {
+      "id": "boundary_missing_evidence_for_result",
+      "user_query": "帮我把这个项目按岗位要求重写，突出我带来的成果",
+      "available_context": {
+        "project_entries": "条目包含项目名称、角色和动作，但结果字段为空",
+        "target_opportunity": "岗位要求强调量化成果与业务影响",
+        "evidence_gap_analysis": "该项目结果被标记为缺口/待确认",
+        "user_profile": "画像中无该项目成果数字"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "项目描述在事实边界内改写，定量成果被降级为待确认状态",
+        "fact_boundary_notes 与 fact_supplement_requests 明确列出缺失的成果数字"
+      ],
+      "must_not_include": [
+        "为满足岗位要求而估算或填写的任何结果数字"
+      ]
+    }
+  ]
+}

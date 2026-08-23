@@ -1,0 +1,705 @@
+[
+  {
+    "name": "user_profile",
+    "description": "已确认的用户画像，包含可验证的教育、经历、技能、偏好与约束",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_build_base_resume_bank:input:user_profile:1",
+    "consumer_task_id": "task_build_base_resume_bank",
+    "task_name": "整理一版基础简历",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "user_supplied_material",
+    "description": "用户补充的原始经历、项目、技能或成果文本，用于补全画像中未覆盖的事实",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_build_base_resume_bank:input:user_supplied_material:2",
+    "consumer_task_id": "task_build_base_resume_bank",
+    "task_name": "整理一版基础简历",
+    "iteration": 1,
+    "semantic_key": "user_supplied_material"
+  },
+  {
+    "name": "material_preferences",
+    "description": "用户对基础简历的语言、篇幅、章节顺序和是否包含教育细节等要求",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_build_base_resume_bank:input:material_preferences:3",
+    "consumer_task_id": "task_build_base_resume_bank",
+    "task_name": "整理一版基础简历",
+    "iteration": 1,
+    "semantic_key": "material_preferences"
+  },
+  {
+    "name": "job_posting_text",
+    "description": "用户提供的岗位描述或材料要求文本，与已验证岗位清单中内容等价时可省略",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_extract_application_requirements:input:job_posting_text:1",
+    "consumer_task_id": "task_extract_application_requirements",
+    "task_name": "梳理岗位要求交什么材料",
+    "iteration": 1,
+    "semantic_key": "job_posting_text"
+  },
+  {
+    "name": "job_posting_url",
+    "description": "可选：用户提供的岗位页面链接，用于抓取岗位描述",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_extract_application_requirements:input:job_posting_url:2",
+    "consumer_task_id": "task_extract_application_requirements",
+    "task_name": "梳理岗位要求交什么材料",
+    "iteration": 1,
+    "semantic_key": "job_posting_url"
+  },
+  {
+    "name": "job_posting_content",
+    "description": "通过 WebFetch 从岗位链接抓取到的页面正文；仅在用户提供链接时生成",
+    "type": "string",
+    "input_origin": "tool_generated",
+    "source": "ordinary_tool_output",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "ordinary_tool",
+      "provider": "WebFetch"
+    },
+    "pool_id": "task_extract_application_requirements:input:job_posting_content:3",
+    "consumer_task_id": "task_extract_application_requirements",
+    "task_name": "梳理岗位要求交什么材料",
+    "iteration": 1,
+    "semantic_key": "job_posting_content"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "已验证的真实岗位机会清单，用于核对岗位标识和已有要求",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_extract_application_requirements:input:verified_opportunity_list:4",
+    "consumer_task_id": "task_extract_application_requirements",
+    "task_name": "梳理岗位要求交什么材料",
+    "iteration": 1,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "resume_draft",
+    "description": "用户提供的现有简历草稿文本，可包含工作经历、项目、技能和教育信息",
+    "type": "string",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_tailor_resume_for_opportunity:input:resume_draft:1",
+    "consumer_task_id": "task_tailor_resume_for_opportunity",
+    "task_name": "按岗位要求调整简历重点",
+    "iteration": 1,
+    "semantic_key": "resume_draft"
+  },
+  {
+    "name": "target_opportunity",
+    "description": "目标岗位的描述，包括职责、要求关键词、投递说明和招聘方关注点",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_tailor_resume_for_opportunity:input:target_opportunity:2",
+    "consumer_task_id": "task_tailor_resume_for_opportunity",
+    "task_name": "按岗位要求调整简历重点",
+    "iteration": 1,
+    "semantic_key": "target_opportunity"
+  },
+  {
+    "name": "application_focus_brief",
+    "description": "上一阶段形成的投递材料准备要点",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "application_focus_brief",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_tailor_resume_for_opportunity:input:application_focus_brief:3",
+    "consumer_task_id": "task_tailor_resume_for_opportunity",
+    "task_name": "按岗位要求调整简历重点",
+    "iteration": 1,
+    "semantic_key": "application_focus_brief"
+  },
+  {
+    "name": "user_profile",
+    "description": "已确认的用户画像，用于校验简历内容是否在事实范围内",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_tailor_resume_for_opportunity:input:user_profile:4",
+    "consumer_task_id": "task_tailor_resume_for_opportunity",
+    "task_name": "按岗位要求调整简历重点",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "format_preferences",
+    "description": "用户对简历语言、篇幅、版式和命名规则的要求",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_tailor_resume_for_opportunity:input:format_preferences:5",
+    "consumer_task_id": "task_tailor_resume_for_opportunity",
+    "task_name": "按岗位要求调整简历重点",
+    "iteration": 1,
+    "semantic_key": "format_preferences"
+  },
+  {
+    "name": "project_entries",
+    "description": "用户提供的项目经历条目，每条包含项目名称、承担角色、事实性动作、结果和相关技能",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_rewrite_project_accounts:input:project_entries:1",
+    "consumer_task_id": "task_rewrite_project_accounts",
+    "task_name": "按岗位要求改写项目经历",
+    "iteration": 1,
+    "semantic_key": "project_entries"
+  },
+  {
+    "name": "target_opportunity",
+    "description": "目标岗位的职责、要求关键词和招聘方关注点",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_rewrite_project_accounts:input:target_opportunity:2",
+    "consumer_task_id": "task_rewrite_project_accounts",
+    "task_name": "按岗位要求改写项目经历",
+    "iteration": 1,
+    "semantic_key": "target_opportunity"
+  },
+  {
+    "name": "evidence_gap_analysis",
+    "description": "经历与要求对照结果，用于识别哪些项目事实已经是可靠证据",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "evidence_gap_analysis",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_rewrite_project_accounts:input:evidence_gap_analysis:3",
+    "consumer_task_id": "task_rewrite_project_accounts",
+    "task_name": "按岗位要求改写项目经历",
+    "iteration": 1,
+    "semantic_key": "evidence_gap_analysis"
+  },
+  {
+    "name": "user_profile",
+    "description": "已确认的用户画像，用于核对项目事实和技能表述",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_rewrite_project_accounts:input:user_profile:4",
+    "consumer_task_id": "task_rewrite_project_accounts",
+    "task_name": "按岗位要求改写项目经历",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "target_opportunity",
+    "description": "目标岗位的职责、要求、公司或组织背景以及材料提交说明",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_draft_cover_letter:input:target_opportunity:1",
+    "consumer_task_id": "task_draft_cover_letter",
+    "task_name": "写一封有针对性的求职信",
+    "iteration": 1,
+    "semantic_key": "target_opportunity"
+  },
+  {
+    "name": "user_profile",
+    "description": "已确认的用户画像，用于选取真实、相关的经历作为求职信支撑",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_draft_cover_letter:input:user_profile:2",
+    "consumer_task_id": "task_draft_cover_letter",
+    "task_name": "写一封有针对性的求职信",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "application_focus_brief",
+    "description": "投递材料准备要点，用于确认求职信应突出的重点",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "application_focus_brief",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_draft_cover_letter:input:application_focus_brief:3",
+    "consumer_task_id": "task_draft_cover_letter",
+    "task_name": "写一封有针对性的求职信",
+    "iteration": 1,
+    "semantic_key": "application_focus_brief"
+  },
+  {
+    "name": "letter_preferences",
+    "description": "用户对求职信语言、篇幅、语气、称呼和希望突出经历的要求",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_draft_cover_letter:input:letter_preferences:4",
+    "consumer_task_id": "task_draft_cover_letter",
+    "task_name": "写一封有针对性的求职信",
+    "iteration": 1,
+    "semantic_key": "letter_preferences"
+  },
+  {
+    "name": "evidence_gap_analysis",
+    "description": "经历与要求对照结果，用于识别哪些要求已有证据支撑",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "evidence_gap_analysis",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_assess_material_readiness:input:evidence_gap_analysis:1",
+    "consumer_task_id": "task_assess_material_readiness",
+    "task_name": "检查申请材料还缺什么",
+    "iteration": 1,
+    "semantic_key": "evidence_gap_analysis"
+  },
+  {
+    "name": "user_profile",
+    "description": "已确认的用户画像，用于判断材料中的背景信息是否完整",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_assess_material_readiness:input:user_profile:2",
+    "consumer_task_id": "task_assess_material_readiness",
+    "task_name": "检查申请材料还缺什么",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "prepared_materials",
+    "description": "用户已准备的材料清单，每项注明文档类型、状态和是否完成",
+    "type": "array",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_assess_material_readiness:input:prepared_materials:3",
+    "consumer_task_id": "task_assess_material_readiness",
+    "task_name": "检查申请材料还缺什么",
+    "iteration": 1,
+    "semantic_key": "prepared_materials"
+  },
+  {
+    "name": "application_focus_brief",
+    "description": "投递材料准备要点，用于判断材料覆盖是否完整",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "application_focus_brief",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_assess_material_readiness:input:application_focus_brief:4",
+    "consumer_task_id": "task_assess_material_readiness",
+    "task_name": "检查申请材料还缺什么",
+    "iteration": 1,
+    "semantic_key": "application_focus_brief"
+  },
+  {
+    "name": "draft_materials",
+    "description": "用户起草的申请材料，按文档名组织，包含简历、求职信、项目描述等文本",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_fact_check_application_materials:input:draft_materials:1",
+    "consumer_task_id": "task_fact_check_application_materials",
+    "task_name": "检查材料里有没有编造或不一致的内容",
+    "iteration": 1,
+    "semantic_key": "draft_materials"
+  },
+  {
+    "name": "user_profile",
+    "description": "已确认的用户画像，作为事实核验基准",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "user_profile",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_fact_check_application_materials:input:user_profile:2",
+    "consumer_task_id": "task_fact_check_application_materials",
+    "task_name": "检查材料里有没有编造或不一致的内容",
+    "iteration": 1,
+    "semantic_key": "user_profile"
+  },
+  {
+    "name": "evidence_gap_analysis",
+    "description": "经历与要求对照结果，用于判断哪些能力有证据、哪些仍待补充",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "evidence_gap_analysis",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_fact_check_application_materials:input:evidence_gap_analysis:3",
+    "consumer_task_id": "task_fact_check_application_materials",
+    "task_name": "检查材料里有没有编造或不一致的内容",
+    "iteration": 1,
+    "semantic_key": "evidence_gap_analysis"
+  },
+  {
+    "name": "opportunity_pair",
+    "description": "用户选择对比的两个岗位标识或岗位描述，包含各自材料要求",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_compare_material_requirements:input:opportunity_pair:1",
+    "consumer_task_id": "task_compare_material_requirements",
+    "task_name": "对比两个岗位的材料要求",
+    "iteration": 1,
+    "semantic_key": "opportunity_pair"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "已验证的真实岗位机会清单，用于补充岗位的准确信息",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_compare_material_requirements:input:verified_opportunity_list:2",
+    "consumer_task_id": "task_compare_material_requirements",
+    "task_name": "对比两个岗位的材料要求",
+    "iteration": 1,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "application_focus_brief",
+    "description": "投递材料准备要点，用于判断各岗位的材料重点差异",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "application_focus_brief",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_compare_material_requirements:input:application_focus_brief:3",
+    "consumer_task_id": "task_compare_material_requirements",
+    "task_name": "对比两个岗位的材料要求",
+    "iteration": 1,
+    "semantic_key": "application_focus_brief"
+  },
+  {
+    "name": "opportunity_pursuit_ranking",
+    "description": "岗位投递优先顺序，作为材料准备排序的输入依据",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "opportunity_pursuit_ranking",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_prioritize_material_prep_plan:input:opportunity_pursuit_ranking:1",
+    "consumer_task_id": "task_prioritize_material_prep_plan",
+    "task_name": "规划先准备哪些岗位的材料",
+    "iteration": 1,
+    "semantic_key": "opportunity_pursuit_ranking"
+  },
+  {
+    "name": "verified_opportunity_list",
+    "description": "已验证的真实岗位机会清单，包含各岗位的基本信息和材料要求来源",
+    "type": "array",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "verified_opportunity_list",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_prioritize_material_prep_plan:input:verified_opportunity_list:2",
+    "consumer_task_id": "task_prioritize_material_prep_plan",
+    "task_name": "规划先准备哪些岗位的材料",
+    "iteration": 1,
+    "semantic_key": "verified_opportunity_list"
+  },
+  {
+    "name": "user_constraints",
+    "description": "用户提供的各岗位材料截止时间、每周可投入时间、希望优先处理的岗位和可用验证周期",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_prioritize_material_prep_plan:input:user_constraints:3",
+    "consumer_task_id": "task_prioritize_material_prep_plan",
+    "task_name": "规划先准备哪些岗位的材料",
+    "iteration": 1,
+    "semantic_key": "user_constraints"
+  },
+  {
+    "name": "application_focus_brief",
+    "description": "投递材料准备要点，用于估计每个岗位需要准备的材料量",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "application_focus_brief",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_prioritize_material_prep_plan:input:application_focus_brief:4",
+    "consumer_task_id": "task_prioritize_material_prep_plan",
+    "task_name": "规划先准备哪些岗位的材料",
+    "iteration": 1,
+    "semantic_key": "application_focus_brief"
+  },
+  {
+    "name": "evidence_gap_analysis",
+    "description": "经历与要求对照结果，用于确定哪些材料要求最需要向外部确认",
+    "type": "object",
+    "input_origin": "existing_artifact",
+    "source": "upstream_artifact",
+    "source_ref": "evidence_gap_analysis",
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "provided",
+      "provider": null
+    },
+    "pool_id": "task_prepare_informational_questions:input:evidence_gap_analysis:1",
+    "consumer_task_id": "task_prepare_informational_questions",
+    "task_name": "整理需要向相关人员确认的材料问题",
+    "iteration": 1,
+    "semantic_key": "evidence_gap_analysis"
+  },
+  {
+    "name": "target_opportunity",
+    "description": "目标岗位的描述、材料要求和用户已经了解到的信息",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_prepare_informational_questions:input:target_opportunity:2",
+    "consumer_task_id": "task_prepare_informational_questions",
+    "task_name": "整理需要向相关人员确认的材料问题",
+    "iteration": 1,
+    "semantic_key": "target_opportunity"
+  },
+  {
+    "name": "conversation_context",
+    "description": "用户打算通过什么渠道确认，例如招聘方、内部员工、校友，以及对方可接受的沟通方式和时长",
+    "type": "object",
+    "input_origin": "user_provided",
+    "source": "user_input",
+    "source_ref": null,
+    "available": true,
+    "from_task": null,
+    "acquisition": {
+      "mode": "request_user",
+      "provider": null
+    },
+    "pool_id": "task_prepare_informational_questions:input:conversation_context:3",
+    "consumer_task_id": "task_prepare_informational_questions",
+    "task_name": "整理需要向相关人员确认的材料问题",
+    "iteration": 1,
+    "semantic_key": "conversation_context"
+  }
+]

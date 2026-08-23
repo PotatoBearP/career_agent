@@ -1,0 +1,60 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把这些项目整理成一页纸的附件，跟着简历一起交",
+    "available_context": {
+      "rewritten_project_descriptions": "包含 4 个按岗位改写好的项目条目，每条含名称、角色、关键动作和结果",
+      "showcase_preferences": "语种中文、单页最多 3 个项目、保留链接占位",
+      "target_opportunity": "提供岗位关键词集合，其中 2 个项目与关键词有明显重合"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "project_showcase_sheet.entries 中最多 3 个且按岗位相关性排序的项目",
+      "每个条目包含名称、角色、关键动作和结果",
+      "layout_suggestions 包含排版建议",
+      "所有事实可回溯到输入项目经历"
+    ],
+    "must_not_include": [
+      "编造的项目成果或数字",
+      "访问用户画像或岗位清单"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_project_descriptions",
+    "user_query": "帮我做一份项目作品清单",
+    "available_context": {
+      "rewritten_project_descriptions": "未提供",
+      "showcase_preferences": "语种中文、单页最多 3 个项目",
+      "target_opportunity": "未提供"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少改写后的项目经历输入",
+      "列出需要用户提供的缺失输入",
+      "不生成任何虚构的项目条目"
+    ],
+    "must_not_include": [
+      "向用户提出引导性追问",
+      "返回空表格或占位项目条目"
+    ]
+  },
+  {
+    "id": "boundary_no_target_opportunity",
+    "user_query": "把这些项目做成作品页，不需要按岗位筛",
+    "available_context": {
+      "rewritten_project_descriptions": "包含 5 个完整项目条目，名称、角色、动作、结果齐全",
+      "showcase_preferences": "语种中文、单页最多 2 个项目、保持输入顺序",
+      "target_opportunity": "未提供"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "按 showcase_preferences 的排序要求保持原顺序",
+      "按 max_items 截断为 2 个条目",
+      "明确标注未应用岗位相关性筛选"
+    ],
+    "must_not_include": [
+      "因缺少 target_opportunity 而报错",
+      "把排版建议当作岗位相关性结论"
+    ]
+  }
+]

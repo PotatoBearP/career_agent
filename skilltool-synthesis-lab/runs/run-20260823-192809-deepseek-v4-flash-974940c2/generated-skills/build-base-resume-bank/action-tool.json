@@ -1,0 +1,26 @@
+{
+  "tool_name": "BuildBaseResumeBank",
+  "user_facing_name": "整理一版基础简历",
+  "search_hint": "把用户已有经历整理成一版可编辑的基础简历底稿",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "已确认的用户画像，包含可验证的教育、经历、技能、偏好与约束"
+    },
+    "user_supplied_material": {
+      "type": "string",
+      "required": true,
+      "description": "用户补充的原始经历、项目、技能或成果文本，用于补全画像中未覆盖的事实"
+    },
+    "material_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户对基础简历的语言、篇幅、章节顺序和是否包含教育细节等要求"
+    }
+  }
+}

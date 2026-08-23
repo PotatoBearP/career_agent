@@ -1,0 +1,26 @@
+{
+  "tool_name": "PreviewLikelyEvaluationQuestions",
+  "user_facing_name": "预判申请这些方向时可能被问到的问题",
+  "search_hint": "preview likely evaluation questions for a target direction from existing evidence and entry requirement artifacts",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "evidence_gap_analysis": {
+      "type": "json",
+      "required": true,
+      "description": "已有经历与目标方向要求的对照结果，用于找到容易被追问的部分"
+    },
+    "entry_requirements_report": {
+      "type": "json",
+      "required": true,
+      "description": "目标方向的进入条件与常见路径说明，用于判断最可能被考察的共性要求"
+    },
+    "target_direction": {
+      "type": "string",
+      "required": true,
+      "description": "用户关心的目标方向或岗位类型"
+    }
+  }
+}

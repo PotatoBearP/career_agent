@@ -1,0 +1,295 @@
+{
+  "skill_id": "draft_informational_interview_outreach",
+  "skill_name": "draft-informational-interview-outreach",
+  "tool_name": "DraftInformationalInterviewOutreach",
+  "title": "帮我写联系从业者约聊的开口消息",
+  "business_goal": "在既有信息访谈准备材料基础上，结合联系场合与用户画像，产出多版礼貌、具体、可发送的约聊开口消息草稿，并逐版标注适用场合、语气特点、希望对方回应的点和注意事项。",
+  "invocation_mode": "aggregate",
+  "composition": {
+    "required_prior_outputs": [
+      "interview_prep_kit"
+    ],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "当用户已经准备好信息访谈材料，要求把访谈目标改写为联系从业者的开场消息、私信或约聊话术时使用。不用于生成简历、求职信、推荐请求、访谈问题清单或完整谈话脚本；不重新生成访谈准备材料；不代替用户发送消息、安排时间或模拟对方回复。",
+  "reference_pattern": "learning-plan：把上游产物作为冻结事实输入，不重新收集也不改写上游材料，转换为新的下游交付物，并对 success / insufficient_input / error 设定清晰判定；同时借鉴 baseline-assessment 的证据边界思路，只使用本次输入提供的 interview_prep_kit、outreach_context 和 user_profile，不回读其他上下文。",
+  "task_ids": [
+    "draft_informational_interview_outreach"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "open",
+    "explicit_domains": [],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "从 interview_prep_kit 中提炼约聊目的、拟探讨主题和希望了解的问题点",
+      "根据 outreach_context 确定联系平台、场合、与对方关系和希望的语气",
+      "基于 user_profile 中可核验的事实撰写简短真实的自我介绍",
+      "产出多版约聊消息草稿，每版标注适用场合、语气特点、希望对方回应的点、注意事项",
+      "设计低门槛、可拒绝的请求方式，尊重对方时间"
+    ],
+    "excludes": [
+      "不生成访谈问题清单本身，访谈内容只能来自 interview_prep_kit",
+      "不生成简历、求职信、推荐请求、套磁信或完整谈话脚本",
+      "不虚构对方背景、共同联系人、职位、公司、历史互动或共同经历",
+      "不代替用户发送消息、承诺时间或安排日程",
+      "不修改用户画像或信息访谈准备材料"
+    ]
+  },
+  "input_schema": {
+    "interview_prep_kit": {
+      "type": "object",
+      "required": true,
+      "description": "已生成的信息访谈目标与提问重点，作为消息内容的基础",
+      "source": "prior_skill_output",
+      "source_ref": "interview_prep_kit",
+      "available": true,
+      "acquisition": {
+        "mode": "prior_skill",
+        "provider": "prepare_informational_interviews",
+        "fallback": null
+      }
+    },
+    "outreach_context": {
+      "type": "object",
+      "required": true,
+      "description": "联系场合、平台类型、与对方的关系以及希望的语气",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "用户画像中的已有背景与约束，用于写出真实可信的自我介绍",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "outreach_message_drafts": {
+      "type": "array",
+      "description": "多版联系消息草稿，每版说明适用场合、语气特点、希望对方回应的点和注意事项"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "generate informational interview outreach message drafts from interview prep kit, outreach context, and user profile",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": false
+  },
+  "operating_model": {
+    "role": "备稿者：把信息访谈准备材料转化为一组可由用户审阅后发送的约聊开口消息草稿，不替用户决定联系谁，也不替用户发送消息。",
+    "hard_boundaries": [
+      "只使用 skill-action 输入提供的 interview_prep_kit、outreach_context、user_profile 三个来源；不调用 WebSearch、WebFetch、Read、Bash 等工具，不回读其他文件、画像目录或历史上下文。",
+      "不虚构对方姓名、公司、职位、共同联系人、活动经历、历史互动或任何未经用户确认的信息；凡输入中不存在的细节一律省略或标记为“需用户确认”。",
+      "不生成简历文案、求职信、推荐请求、访谈问题清单或完整谈话脚本；访谈内容必须来自 interview_prep_kit。",
+      "不代替用户发送消息、承诺交流时间或生成对方回复；不得使用“你上次说……”“我们之前聊过”等无证据表述。",
+      "只调用 ReturnSkillResult 一次；调用前不向用户追加使用建议或额外指导。"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "冻结输入并提取四要素",
+        "instructions": [
+          "从 interview_prep_kit 提取访谈目标、拟探讨主题和待验证疑点。",
+          "从 outreach_context 提取联系平台、正常场合、与对方关系、希望语气。",
+          "从 user_profile 提取可核验的自我介绍事实。",
+          "分别列出“对方是谁/为什么找对方/想了解什么/我为什么值得回复”四项，缺失项单独记录。",
+          "不引入输入之外的任何个人信息。"
+        ],
+        "success_criteria": [
+          "四要素清单已列出且每项都能追溯到输入字段",
+          "缺失要素已被明确标记"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "确定消息版本矩阵",
+        "instructions": [
+          "根据 outreach_context 确定 2-3 个版本；多平台或多关系时按场景拆分，单一平台至少保留一版正式一版简短。",
+          "为每版确定适用场合、语气标签、称呼方式、目标长度和最希望对方回应的点。",
+          "每版控制在普通陌生人两分钟内能读完的篇幅。"
+        ],
+        "success_criteria": [
+          "每版都有适用场合、语气、期望回应点",
+          "版本间差异可解释且不出现求职信语气"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "起草每条消息",
+        "instructions": [
+          "按“简短自我介绍→联系理由→一个具体低门槛请求→礼貌退出”的结构起草。",
+          "自我介绍只使用 user_profile 中的已声明事实。",
+          "联系理由只使用 interview_prep_kit 的访谈目标以及 outreach_context 中用户提供的对方可见信息。",
+          "请求设计为可拒绝、低时间成本的形式，如 20-30 分钟语音或文字交流；只根据 outreach_context 判断是否可建议更长形式。",
+          "不写“我十分适合”“我觉得您”等无证据断言，不把访谈目标改成求职推销。"
+        ],
+        "success_criteria": [
+          "每条消息包含自我介绍、理由、具体请求、退出语",
+          "可被不认识用户的人独立理解",
+          "请求可被低门槛接受"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "校验并标注每版草稿",
+        "instructions": [
+          "确认每版都标记了适用场合、语气特点、希望对方回应的点、注意事项。",
+          "检查所有个人背景可追溯到 user_profile，所有对方信息可追溯到 outreach_context 或已标记“需用户确认”。",
+          "若 outreach_context 未提供对方姓名、公司或具体联系理由，在注意事项中提示用户发送前补充。",
+          "若 interview_prep_kit 缺失访谈目标或可转化的问题点，不靠猜测补全，直接进入 insufficient_input。"
+        ],
+        "success_criteria": [
+          "每版都有四项标注",
+          "不存在未标注的推测事实",
+          "不存在与输入冲突的表述"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "组装并返回结果",
+        "instructions": [
+          "将每版草稿组装为 outreach_message_drafts 数组，每个元素包含 draft_text、适用场合、语气特点、希望对方回应的点、注意事项。",
+          "确认全部内容组装完成后再调用 ReturnSkillResult 一次。",
+          "成功时返回数组；输入不足时返回 insufficient_input 说明缺失项，不返回半成品。"
+        ],
+        "success_criteria": [
+          "数组完整且字段齐全",
+          "已恰好调用一次 ReturnSkillResult",
+          "调用后未再追加任何内容"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "版本数量：默认 2-3 版；outreach_context 指明多个平台或多种关系时按场景拆分；只有单一平台时至少保留一版较正式和一版更简短，避免单版不可用。",
+      "语气映射：职场或招聘类平台默认“礼貌正式但简洁”；私信、社群或邮件默认“平实具体”；用户明确要求“不要太正式”时使用口语化但保持尊重。",
+      "请求门槛：优先设计可拒绝、低时间成本的请求；只有 outreach_context 明确允许时才建议更长的交流形式。",
+      "证据归属：自我介绍只使用 user_profile 中已声明事实；对方信息只使用 outreach_context 中用户提供的内容；两者之外的细节必须省略或标记“需用户确认”。",
+      "冲突处理：interview_prep_kit 与 outreach_context 的语气或目标冲突时，以 outreach_context 的场合为准，并在注意事项中说明该冲突。"
+    ],
+    "outcome_rules": {
+      "success": [
+        "interview_prep_kit 包含访谈目标且至少有一个可转化为消息的问题点",
+        "outreach_context 提供了平台或场合、与对方关系、语气意愿",
+        "user_profile 中至少存在一项可用于自我介绍的可核验事实",
+        "输出了至少 2 版带四项标注的约聊消息草稿"
+      ],
+      "insufficient_input": [
+        "interview_prep_kit 缺失或缺少可用的访谈目标与问题点",
+        "outreach_context 缺失平台/场合/关系/语气，且用户拒绝补充",
+        "user_profile 中没有任何可核验的自我介绍事实",
+        "此时返回 insufficient_input 并列出缺失项，不猜测补全"
+      ],
+      "error": [
+        "输入结构与声明类型不符，如 interview_prep_kit 不是 object",
+        "结果无法序列化为 outreach_message_drafts 数组",
+        "返回 error 并说明原因，不输出半成品"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "outreach_message_drafts 是 array 且至少 2 版，每版都包含 draft_text、适用场合、语气特点、希望对方回应的点、注意事项。",
+      "每条消息中的所有个人背景都可追溯到 user_profile，所有对方信息都可追溯到 outreach_context 或已标记“需用户确认”。",
+      "未调用 WebSearch、WebFetch、Read、Bash 等工具，未生成简历、求职信、推荐请求或访谈问题清单。",
+      "未虚构任何对方姓名、公司、职位、共同经历或历史关系。",
+      "已只调用一次 ReturnSkillResult，且发生在全部内容组装完成后。"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 5,
+    "rationale": "不是简单模板填充：需要在访谈目标、联系场合、对方关系和真实自我证据之间做有取舍的组合，并逐版判断语气、请求门槛与可发送性；输入输出边界清晰，无需进一步拆分。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖 skill-action 输入中的 interview_prep_kit、outreach_context 和 user_profile",
+      "依赖外部模型能力完成文案生成与改写",
+      "不依赖文件系统、数据库、路由状态或主程序实现"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我把访谈目标改写成不同版本的约聊话术。",
+      "available_context": {
+        "interview_prep_kit": "包含访谈目标“了解该领域从业者的真实日常工作”和一个提问重点",
+        "outreach_context": "求职平台私信、对方为该领域从业者、语气不要太正式",
+        "user_profile": "包含已在读背景和一个可核验的项目事实"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "至少 2 版 draft_text",
+        "每版包含适用场合、语气特点、希望对方回应的点、注意事项"
+      ],
+      "must_not_include": [
+        "虚构的工作经历或对方身份",
+        "超出 interview_prep_kit 范围的访谈问题清单"
+      ]
+    },
+    {
+      "id": "insufficient_input_missing_outreach_context",
+      "user_query": "帮我写一条约人聊天的私信。",
+      "available_context": {
+        "interview_prep_kit": "已提供访谈目标",
+        "outreach_context": "缺失平台、场合、关系或语气",
+        "user_profile": "已有可核验背景"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确指出平台/场合/关系/语气等缺失项",
+        "不猜测并生成完整消息"
+      ],
+      "must_not_include": [
+        "已经生成的可用消息草稿",
+        "要求用户自行重写全部材料"
+      ]
+    },
+    {
+      "id": "boundary_no_invented_facts",
+      "user_query": "帮我在领英上给一位前辈写约聊消息，可以提一下我们共同的朋友和我参加过的一个小活动。",
+      "available_context": {
+        "interview_prep_kit": "有访谈目标",
+        "outreach_context": "平台、关系、语气已提供，但共同朋友和小活动未出现在任何输入中",
+        "user_profile": "有可核验背景"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "可发送的消息草稿",
+        "对“共同朋友/小活动”标记为需用户确认或被省略"
+      ],
+      "must_not_include": [
+        "任何未经确认的对方信息被写成事实",
+        "自行编造共同朋友或活动细节"
+      ]
+    }
+  ]
+}

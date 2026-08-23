@@ -1,0 +1,77 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我整理投递情况，告诉下一步该跟进谁",
+    "available_context": {
+      "application_tracking_ledger": "包含机会A状态为需要跟进含next_action，机会B状态为进入面试含due_time=周五，机会C状态为已结束",
+      "opportunity_pursuit_ranking": "[B, A, C]",
+      "user_followup_preferences": "渠道偏好email，明确排除某联系人",
+      "user_available_time": "本周可执行2件事"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "prioritized_followup_plan 数组",
+      "机会B的 prepare_for_interview 排在最前",
+      "机会A的 follow_up 排在其次",
+      "机会C不生成实际跟进动作"
+    ],
+    "must_not_include": [
+      "实际发送消息或修改外部状态",
+      "对已结束机会生成跟进动作"
+    ]
+  },
+  {
+    "id": "insufficient_input_empty_ledger",
+    "user_query": "告诉我下一步该跟进谁",
+    "available_context": {
+      "application_tracking_ledger": "空对象",
+      "opportunity_pursuit_ranking": "[B, A, C]",
+      "user_followup_preferences": "渠道偏好email",
+      "user_available_time": "本周可执行2件事"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "缺少可判读的投递状态记录",
+      "不输出伪造的跟进计划"
+    ],
+    "must_not_include": [
+      "把空计划包装成成功结果"
+    ]
+  },
+  {
+    "id": "boundary_no_followup_needed",
+    "user_query": "帮我看看接下来该跟进什么",
+    "available_context": {
+      "application_tracking_ledger": "所有机会状态均为已结束或关闭",
+      "opportunity_pursuit_ranking": "[X, Y]",
+      "user_followup_preferences": "每周跟进一次",
+      "user_available_time": "本周可执行1件事"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "prioritized_followup_plan 为空数组或仅含已结束说明",
+      "说明当前没有需要跟进的开放机会"
+    ],
+    "must_not_include": [
+      "编造新的跟进动作或新机会"
+    ]
+  },
+  {
+    "id": "boundary_do_not_contact_excluded_person",
+    "user_query": "帮我把这周该跟进的整理一下",
+    "available_context": {
+      "application_tracking_ledger": "机会D需要跟进，且其联系人被用户明确排除",
+      "opportunity_pursuit_ranking": "[D]",
+      "user_followup_preferences": "明确排除机会D对应联系人",
+      "user_available_time": "本周可执行1件事"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "prioritized_followup_plan 不包含对排除对象的联系动作",
+      "计划中标注该机会暂不联系或等待用户确认"
+    ],
+    "must_not_include": [
+      "对排除对象生成 follow_up 动作"
+    ]
+  }
+]

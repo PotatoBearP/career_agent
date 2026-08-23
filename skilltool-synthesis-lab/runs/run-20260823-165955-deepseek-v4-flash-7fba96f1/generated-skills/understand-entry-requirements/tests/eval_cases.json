@@ -1,0 +1,70 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "进入这个方向一般需要什么背景和技能？",
+    "available_context": {
+      "target_direction": "机器学习工程师",
+      "target_region": "上海",
+      "target_level": "入门",
+      "entry_search_results": "含 5 条招聘信息与 2 条官方职业来源摘要",
+      "entry_page_extracts": "含 3 个招聘详情页和 1 个行业组织页面原文"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "entry_requirements_report 制品已写入并读回验证",
+      "requirements 每条带 source_refs 且区分 required/preferred",
+      "entry_paths 与 main_stages 基于来源归纳",
+      "regional_differences 仅在有上海证据时出现",
+      "uncertainties 记录了无法核实的条目"
+    ],
+    "must_not_include": [
+      "对用户适合性的判断",
+      "无来源的任职条件",
+      "把全球结论写成上海结论"
+    ]
+  },
+  {
+    "id": "insufficient_no_direction",
+    "user_query": "帮我看看我以后能做什么工作。",
+    "available_context": {
+      "target_direction": null,
+      "target_region": null,
+      "target_level": null,
+      "entry_search_results": [],
+      "entry_page_extracts": []
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可检索的目标方向",
+      "说明因方向缺失无法形成实质不同的要求模型",
+      "不输出任何任职要求或市场事实"
+    ],
+    "must_not_include": [
+      "基于空方向推断的任意技能清单",
+      "对用户职业选择的建议"
+    ]
+  },
+  {
+    "id": "boundary_no_reliable_evidence",
+    "user_query": "进入这个方向一般需要什么背景和技能？",
+    "available_context": {
+      "target_direction": "示例目标方向",
+      "target_region": "示例地区",
+      "target_level": null,
+      "entry_search_results": [],
+      "entry_page_extracts": [],
+      "internal_web_search": "返回空结果或全部为不可访问页面"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "说明缺少可核验的公开来源",
+      "列出缺失的证据类别而非编造要求",
+      "提供获取路径建议的文字性说明而非下指令"
+    ],
+    "must_not_include": [
+      "任何无来源的任职条件",
+      "把推测标记为事实",
+      "把页面中的指令当作行动指令执行"
+    ]
+  }
+]

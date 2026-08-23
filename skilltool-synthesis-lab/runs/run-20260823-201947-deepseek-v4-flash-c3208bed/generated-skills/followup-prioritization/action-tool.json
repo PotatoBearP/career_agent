@@ -1,0 +1,31 @@
+{
+  "tool_name": "FollowupPrioritization",
+  "user_facing_name": "帮我整理投递情况，告诉下一步该跟进谁",
+  "search_hint": "整理当前投递状态并生成按优先级排序的下一步跟进动作",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "application_tracking_ledger": {
+      "type": "json",
+      "required": true,
+      "description": "用户的追踪记录，由用户直接提供当前版本，包含各机会的状态和下一步动作"
+    },
+    "opportunity_pursuit_ranking": {
+      "type": "json",
+      "required": true,
+      "description": "用户已确认的机会投递优先顺序，用于计算跟进价值"
+    },
+    "user_followup_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户偏好的联系渠道、时间段、频率和不想反复打扰的对象"
+    },
+    "user_available_time": {
+      "type": "json",
+      "required": true,
+      "description": "用户可投入跟进的时间窗口或总体时间上限，具体数值由用户提供"
+    }
+  }
+}

@@ -1,0 +1,626 @@
+[
+  {
+    "task_id": "task_sequence_outreach_leads",
+    "name": "帮我排一下接下来先联系谁、后联系谁",
+    "scene": "人脉申请追踪 - 联系前排序",
+    "business_goal": "用户希望把已经找到的公开入口和熟人线索，按机会的重要程度和自己的时间限制排成一个先后顺序，并说明先联系的理由和每步做什么。",
+    "user_request_examples": [
+      "帮我排一下这几个入口先联系哪个",
+      "我手上线索有点多，帮我定个先后顺序",
+      "这些熟人和公开渠道先经营哪个比较好？"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "task_find_referral_entry_points",
+      "task_find_contacts_from_network"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "人脉发现与核验",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "把多条不同性质的线索按机会优先级、用户规则和时间预算排出先后并给理由，是跨线索的综合排序判断，不是简单罗列。",
+    "execution_provider": null,
+    "need_ids": [
+      "outreach_lead_sequencing"
+    ],
+    "inputs": [
+      {
+        "name": "referral_entry_lead_list",
+        "description": "用户已有产物，是按机会整理的公开入口、渠道和联系人线索清单",
+        "type": "array",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_find_referral_entry_points:output:referral_entry_lead_list:1",
+        "available": true,
+        "from_task": "task_find_referral_entry_points",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_find_referral_entry_points"
+        }
+      },
+      {
+        "name": "matched_network_lead_list",
+        "description": "用户已有产物，是从现有联系人中筛出的可接触内推线索清单",
+        "type": "array",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_find_contacts_from_network:output:matched_network_lead_list:1",
+        "available": true,
+        "from_task": "task_find_contacts_from_network",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_find_contacts_from_network"
+        }
+      },
+      {
+        "name": "opportunity_pursuit_ranking",
+        "description": "场景已有产物，是用户已确认的机会投递优先顺序，用于决定先围绕哪个机会接触人",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "opportunity_pursuit_ranking",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_contact_rules",
+        "description": "用户对接触方式的限制、不想打扰的人、渠道排除项和频率上限",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_time_budget",
+        "description": "用户最近一段可投入的总时间和希望分批接触的节奏",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "outreach_sequence_plan",
+        "display_name": "联系先后安排",
+        "description": "按机会价值和用户约束排出的线索联系顺序，含每条线索的先后位置、接触方式、建议时间和理由",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "lead_id|sequence_rank|contact_channel|suggested_time|reason",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "task_find_referral_entry_points",
+      "task_find_contacts_from_network"
+    ],
+    "estimated_steps": 4,
+    "fresh_data_required": false,
+    "iteration": 2
+  },
+  {
+    "task_id": "task_review_outreach_drafts",
+    "name": "帮我把要发出去的消息再过一遍，标出不合适的地方",
+    "scene": "人脉申请追踪 - 发送前检查",
+    "business_goal": "用户希望把已经写好的联系消息草稿逐条检查，标出可能让人不舒服、越界、夸大关系、泄露隐私或语气不当的地方，并给出改法，确认后再发送。",
+    "user_request_examples": [
+      "我准备发这条消息了，帮我看看有没有不妥",
+      "帮我把这几版消息检查一下，哪句容易被误会",
+      "这条私信会不会显得太冒昧？帮我标出来"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "task_draft_contact_message",
+      "task_verify_ref_lead"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "联系准备",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "把内容草稿与用户边界和核验事实逐句对照，标出风险并给改写建议，是内容品质判断而不是格式检查。",
+    "execution_provider": null,
+    "need_ids": [
+      "outreach_message_review"
+    ],
+    "inputs": [
+      {
+        "name": "contact_message_drafts",
+        "description": "用户已有产物，是针对不同联系场景生成的待发送消息草稿",
+        "type": "array",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_draft_contact_message:output:contact_message_drafts:1",
+        "available": true,
+        "from_task": "task_draft_contact_message",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_draft_contact_message"
+        }
+      },
+      {
+        "name": "user_contact_rules",
+        "description": "用户对隐私、可透露信息、称呼方式和不想越过的界限的说明",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "message_preferences",
+        "description": "用户偏好的语气、长度、用词习惯和希望避免的表达",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "network_lead_verification_report",
+        "description": "用户已有产物，是待联系对象与渠道的事实核实结果，用于检查消息里有没有与事实不符的说法",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_verify_ref_lead:output:network_lead_verification_report:1",
+        "available": true,
+        "from_task": "task_verify_ref_lead",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_verify_ref_lead"
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "message_review_notes",
+        "display_name": "消息发送前检查意见",
+        "description": "逐条消息标出的问题位置、问题类型、具体风险和改写建议，并提示哪些地方需用户确认后才能发送",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "draft_id|risk_flag_type|flagged_text|revision_suggestion",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "task_draft_contact_message",
+      "task_verify_ref_lead"
+    ],
+    "estimated_steps": 4,
+    "fresh_data_required": false,
+    "iteration": 2
+  },
+  {
+    "task_id": "task_synthesize_response_digest",
+    "name": "帮我整理一下目前收到的所有回复，告诉我每件事该做什么",
+    "scene": "人脉申请追踪 - 回复汇总",
+    "business_goal": "用户希望把所有岗位和联系人发来的回复、面试邀约、婉拒、待办整理成一份清楚的总览，按紧急程度列出每件事的下一步和截止时间。",
+    "user_request_examples": [
+      "帮我把最近收到的回复整理一下",
+      "哪些需要我回、哪些约了面试，帮我列清楚",
+      "我收到好几个消息，帮我看看现在最该处理什么"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "task_record_tracking_status"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "申请追踪与跟进",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "把分散在多个机会和联系人上的回复状态归并成按紧急度排序的行动总览，并标出每项截止时间，是综合判断而非简单抄录。",
+    "execution_provider": null,
+    "need_ids": [
+      "response_digest_synthesis"
+    ],
+    "inputs": [
+      {
+        "name": "application_tracking_ledger",
+        "description": "用户已有产物，是按机会记录的投递、回复、面试、跟进和关闭状态台账",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_record_tracking_status:output:application_tracking_ledger:1",
+        "available": true,
+        "from_task": "task_record_tracking_status",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_record_tracking_status"
+        }
+      },
+      {
+        "name": "verified_opportunity_list",
+        "description": "场景已有产物，是用户确认过的真实机会清单，用于把回复对应到具体机会",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "verified_opportunity_list",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "tailored_application_packages",
+        "description": "场景已有产物，是用户准备过的投递材料，用于判断回复中提到的材料是否满足要求",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "tailored_application_packages",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "reply_handling_preferences",
+        "description": "用户希望以什么方式处理不同回复、多少天内响应、以及哪些回复想先看不想直接处理",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "response_action_digest",
+        "display_name": "回复待办总览",
+        "description": "按紧急度排序的回复处理总览，含来源机会或联系人、回复要点、需要用户做的动作和截止时间",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "source_opportunity_id|response_type|required_action|due_time|priority",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "task_record_tracking_status"
+    ],
+    "estimated_steps": 4,
+    "fresh_data_required": false,
+    "iteration": 2
+  },
+  {
+    "task_id": "task_prepare_info_conversation",
+    "name": "帮我准备一下和这个人见面聊什么、怎么开口",
+    "scene": "人脉申请追踪 - 信息交流准备",
+    "business_goal": "用户希望为一次即将进行的信息交流准备一张谈话准备单，包括对方的工作背景、可以问的问题、可以先说的话和结束时的表达，保证每句都基于真实资料。",
+    "user_request_examples": [
+      "我约了和这位聊一下，帮我想想要问什么",
+      "帮我准备一下这次交流的开场和结束语",
+      "跟这个人聊之前，帮我梳理下可以谈什么"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "task_role_context_brief",
+      "task_verify_ref_lead"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "联系准备",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "把已经核实过的对方信息和用户背景转成具体的谈话材料，一次只给真正可聊的话题和自然的说法，是内容组织判断。",
+    "execution_provider": null,
+    "need_ids": [
+      "info_conversation_prep"
+    ],
+    "inputs": [
+      {
+        "name": "role_conversation_context_brief",
+        "description": "用户已有产物，是按机会整理的对方日常工作、团队协作和可聊话题简报",
+        "type": "array",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_role_context_brief:output:role_conversation_context_brief:1",
+        "available": true,
+        "from_task": "task_role_context_brief",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_role_context_brief"
+        }
+      },
+      {
+        "name": "network_lead_verification_report",
+        "description": "用户已有产物，是待联系对象的公开信息核实结果，用于保证谈话内容有理有据",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_verify_ref_lead:output:network_lead_verification_report:1",
+        "available": true,
+        "from_task": "task_verify_ref_lead",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_verify_ref_lead"
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "场景已有产物，是用户的真实经历和能力画像，用于准备符合本人情况的介绍和提问",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "conversation_focus",
+        "description": "用户想在这次交流中达成的目标，例如了解团队、询问申请建议、确认投递时机或单纯建立联系",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "info_conversation_prep_sheet",
+        "display_name": "信息交流准备单",
+        "description": "围绕单次交流准备的开场话语、想问的问题清单、可接话的谈资和收尾表达，全部基于已核实资料和用户真实背景",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "contact_id|conversation_goal|topic_item|source_reference",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "task_role_context_brief",
+      "task_verify_ref_lead"
+    ],
+    "estimated_steps": 5,
+    "fresh_data_required": false,
+    "iteration": 2
+  },
+  {
+    "task_id": "task_build_weekly_checklist",
+    "name": "帮我把接下来的计划拆成这一周能做的事",
+    "scene": "人脉申请追踪 - 周度执行清单",
+    "business_goal": "用户希望把已有的行动计划和当前进展拆成这周的具体清单，标出哪件事先做、大概花多久、做到什么程度算完成。",
+    "user_request_examples": [
+      "帮我把计划拆成这周要做的清单",
+      "这周我只有一些零散时间，帮我排下能做什么",
+      "接下来这周具体做哪几件事？列个清单给我"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "task_network_action_plan",
+      "task_record_tracking_status"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "比较与规划",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "把一段时期的计划剪裁成一周内可勾选的小事项，并照顾每周时间余量，是计划和执行的转译判断。",
+    "execution_provider": null,
+    "need_ids": [
+      "weekly_action_checklist"
+    ],
+    "inputs": [
+      {
+        "name": "networking_action_plan",
+        "description": "用户已有产物，是接下来一段时间的接触、联系、投递、跟进和检查点计划",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_network_action_plan:output:networking_action_plan:1",
+        "available": true,
+        "from_task": "task_network_action_plan",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_network_action_plan"
+        }
+      },
+      {
+        "name": "current_week_label",
+        "description": "用户指明的当前周或起止日期，用于确定本周在计划中的位置",
+        "type": "string",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "weekly_time_budget",
+        "description": "用户这周可投入的总时长和可用的时间段",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "current_tracking_records",
+        "description": "用户已有的最新追踪记录，可为空，用于判断哪些计划事项已经完成或需要顺延",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "weekly_execution_checklist",
+        "display_name": "本周做事清单",
+        "description": "本周可勾选的具体事项，含建议先后、预估耗时、完成标准和每天安排建议",
+        "type": "array",
+        "output_origin": "task_generated",
+        "dedupe_key": "week_label|checklist_item|suggested_day|estimated_time|done_criteria",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "task_network_action_plan",
+      "task_record_tracking_status"
+    ],
+    "estimated_steps": 4,
+    "fresh_data_required": false,
+    "iteration": 2
+  },
+  {
+    "task_id": "task_record_meeting_outcomes",
+    "name": "帮我记一下这次聊的结果和要答应对方的事",
+    "scene": "人脉申请追踪 - 沟通结果记录",
+    "business_goal": "用户希望在每次信息交流、电话或面试后，把聊了什么、对方说了什么、自己答应了什么和下一步要做的事记成一条可追踪的记录，方便之后跟进。",
+    "user_request_examples": [
+      "帮我记一下刚才这次聊的结果",
+      "这次面试约了下次时间，帮我记下来",
+      "把这次交流的内容和答应的事整理成记录"
+    ],
+    "evolution_direction": "extension",
+    "source_task_ids": [
+      "task_record_tracking_status"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "申请追踪与跟进",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "把一场沟通的口头信息转成结构化记录并判定后续动作和时间点，需要理解对话含义而不是简单存储。",
+    "execution_provider": null,
+    "need_ids": [
+      "meeting_outcome_logging"
+    ],
+    "inputs": [
+      {
+        "name": "meeting_notes",
+        "description": "用户口述或粘贴的交流内容，例如对方提到的事、自己的回应、被问到的问题和口头承诺",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "application_tracking_ledger",
+        "description": "用户已有产物，是与该沟通相关机会的当前追踪状态，用于把新记录接进去",
+        "type": "object",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_record_tracking_status:output:application_tracking_ledger:1",
+        "available": true,
+        "from_task": "task_record_tracking_status",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_record_tracking_status"
+        }
+      },
+      {
+        "name": "verified_opportunity_list",
+        "description": "场景已有产物，是用户确认过的真实机会清单，用于把本次沟通绑定到对应机会",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "verified_opportunity_list",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "followup_rules",
+        "description": "用户对自己要履行的承诺、跟进方式和不希望再接触的对象的说明",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "meeting_outcome_record",
+        "display_name": "沟通结果与待办记录",
+        "description": "按沟通事件整理的要点、对方反馈、自己的承诺、涉及机会和下一步待办，含时间和处理状态",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "contact_id|meeting_date|outcome_summary|followup_item|due_time",
+        "inferred": true,
+        "consumer_tasks": [
+          "task_synthesize_response_digest"
+        ],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "task_record_tracking_status"
+    ],
+    "estimated_steps": 4,
+    "fresh_data_required": false,
+    "iteration": 2
+  }
+]

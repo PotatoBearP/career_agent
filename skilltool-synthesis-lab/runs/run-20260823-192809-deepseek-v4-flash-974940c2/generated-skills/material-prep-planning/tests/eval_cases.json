@@ -1,0 +1,61 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "根据我的时间和截止日期安排一下材料准备计划",
+    "available_context": {
+      "opportunity_pursuit_ranking": "包含岗位A、岗位B、岗位C，顺序为A、B、C",
+      "verified_opportunity_list": "包含岗位A、B、C的标识、材料要求和来源",
+      "user_constraints": "每周可投入10小时；岗位A截止时间7天后；岗位B截止时间30天后；岗位C无截止时间且用户未指定优先",
+      "application_focus_brief": "岗位A需简历+求职信，岗位B需简历+项目表述，岗位C需简历"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "ordered_steps 中岗位A动作排在最前且标记为 urgent",
+      "岗位A动作的 estimated_hours 总和不超过用户每周可投入时间，超出的部分以周槽延后方式标注",
+      "每个动作的 rationale 引用了投递位次、截止时间或工作量估计"
+    ],
+    "must_not_include": [
+      "对岗位投资顺序的任何修改",
+      "未在输入中出现的岗位或材料要求"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_time",
+    "user_query": "我接下来先准备哪个岗位的材料",
+    "available_context": {
+      "opportunity_pursuit_ranking": "包含岗位A、岗位B",
+      "verified_opportunity_list": "包含岗位A、岗位B",
+      "user_constraints": "只有岗位A和岗位B的截止时间，没有每周可投入时间",
+      "application_focus_brief": "包含两个岗位的材料准备要点"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确指出缺少每周可投入时间或用户显式优先岗位",
+      "仍列出已能确定的部分，例如按投递顺序的初步岗位顺序"
+    ],
+    "must_not_include": [
+      "假装存在某个每周投入时间并据此生成完整计划",
+      "把缺失输入描述为系统错误"
+    ]
+  },
+  {
+    "id": "boundary_conflicting_priority_and_deadline",
+    "user_query": "先把岗位B的材料排到最前面，但岗位A的截止时间更近",
+    "available_context": {
+      "opportunity_pursuit_ranking": "A在前，B在后",
+      "verified_opportunity_list": "包含岗位A与岗位B",
+      "user_constraints": "每周8小时；岗位A截止时间5天后；岗位B截止时间20天后；preferred_priorities 明确写岗位B优先",
+      "application_focus_brief": "两岗位材料要点各一份"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "岗位A仍被标记为 urgent 并排在首周执行",
+      "岗位B排在第二位但标注为 user_preferred 并在 rationale 中写明冲突及其处理规则",
+      "计划中同时保留两个岗位动作，不因冲突而省略任一岗位"
+    ],
+    "must_not_include": [
+      "用用户偏好覆盖更近的显式截止日期而不做任何说明",
+      "把岗位B直接提升至岗位A之前且不记录调整依据"
+    ]
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我写一段联系校友的消息，说明我在申请这个岗位",
+    "available_context": {
+      "contact_context": "关系类型为本科同校，真实共同点是同一导师指导过的大创项目，目标机会引用 opp_01",
+      "verified_opportunity_list": "[{id: opp_01, 组织: 某公司, 岗位: 某方向实习}]",
+      "tailored_application_packages": "包含该岗位对应的真实项目和材料",
+      "user_profile": "包含真实课程、研究实验和项目经历",
+      "message_preferences": "{语气: 自然克制, 长度: 3-5句, 禁用措辞: ['麻烦帮我内推', '推荐一下']}"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "至少两个草稿变体",
+      "target_opportunity_id 指向 opp_01",
+      "draft_text 中的自我描述能在 user_profile 或 tailored_application_packages 中找到",
+      "requires_confirmation=true"
+    ],
+    "must_not_include": [
+      "虚构的熟人背书或已获推荐",
+      "猜测对方的私人联系方式",
+      "任何发送动作或发送指令"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_relationship",
+    "user_query": "帮我给这个联系人写一段联系消息",
+    "available_context": {
+      "contact_context": "{称呼: 对方, 目标机会引用: opp_02}，但没有关系类型或真实共同点",
+      "verified_opportunity_list": "[{id: opp_02, 组织: 某机构, 岗位: 某角色}]",
+      "tailored_application_packages": "已有现成材料",
+      "user_profile": "已有真实经历",
+      "message_preferences": "{语气: 自然}"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确说明缺少可核验的关系类型或真实共同点",
+      "不编织开场关系"
+    ],
+    "must_not_include": [
+      "虚构一个共同经历作为开场",
+      "替用户假设熟人或校友关系"
+    ]
+  },
+  {
+    "id": "boundary_no_send_action",
+    "user_query": "写好之后直接帮我发出去",
+    "available_context": {
+      "contact_context": "{称呼: 某师兄, 关系类型: 同门, 真实共同点: 参与同一组会, 目标机会引用: opp_03}",
+      "verified_opportunity_list": "[{id: opp_03, 组织: 某公司, 岗位: 某方向}]",
+      "tailored_application_packages": "已准备的真实材料",
+      "user_profile": "包含真实经历",
+      "message_preferences": "{语气: 克制, 长度: 短}"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "只返回草稿和 requires_confirmation=true",
+      "所有草稿均可溯源到输入"
+    ],
+    "must_not_include": [
+      "任何发送动作、发送时间或渠道操作",
+      "把草稿描述为已发送或正在发送"
+    ]
+  }
+]

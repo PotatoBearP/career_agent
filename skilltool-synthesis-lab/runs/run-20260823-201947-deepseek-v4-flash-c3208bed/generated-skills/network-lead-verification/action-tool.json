@@ -1,0 +1,34 @@
+{
+  "tool_name": "NetworkLeadVerification",
+  "user_facing_name": "人脉线索与内推渠道核验",
+  "search_hint": "核验联系人或内推渠道是否真实、当前是否仍在该组织且可合法接触",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [
+    "WebSearch",
+    "WebFetch"
+  ],
+  "input": {
+    "lead_candidates": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供或从其他途径得到的联系人、内推渠道线索，必须含可公开核验的姓名、组织、链接或其他标识"
+    },
+    "search_result_web": {
+      "type": "json",
+      "required": true,
+      "description": "公开网络检索到的与线索相关的职业信息、组织信息和关联证据"
+    },
+    "page_content": {
+      "type": "json",
+      "required": true,
+      "description": "被检视的具体页面或主页内容，用于核验联系人职业身份和关系真实性"
+    },
+    "user_contact_rules": {
+      "type": "json",
+      "required": true,
+      "description": "用户对联系方式的限制和风险容忍度，以及哪些渠道被明确排除"
+    }
+  }
+}

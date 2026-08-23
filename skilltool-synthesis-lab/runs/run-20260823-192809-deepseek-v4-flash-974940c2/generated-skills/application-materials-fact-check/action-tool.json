@@ -1,0 +1,26 @@
+{
+  "tool_name": "ApplicationMaterialsFactCheck",
+  "user_facing_name": "申请材料事实核验",
+  "search_hint": "check application materials for fabricated, exaggerated, or inconsistent claims against confirmed user evidence",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "draft_materials": {
+      "type": "json",
+      "required": true,
+      "description": "用户起草的申请材料，按文档名组织，包含简历、求职信、项目描述等文本"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "已确认的用户画像，作为事实核验基准"
+    },
+    "evidence_gap_analysis": {
+      "type": "json",
+      "required": true,
+      "description": "经历与要求对照结果，用于判断哪些能力有证据、哪些仍待补充"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "我要和这个领域的人聊一聊，帮我准备一份访谈提纲。",
+    "available_context": {
+      "conversation_goal": "想弄清这个方向真实做什么、有哪些交付物，以及我现在的经历够不够。",
+      "target_direction": "目标岗位类型",
+      "user_profile": "包含已完成的课程实验和项目原型证据，并声明没有生产环境经验。"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "interview_goal 中有针对真实工作与自身证据对照的目标",
+      "question_outline 覆盖任务、交付物、协作和进入要求",
+      "evidence_probe_points 中包含对生产环境经验缺失的探询",
+      "communication_notes 包含交流注意事项"
+    ],
+    "must_not_include": [
+      "约聊消息",
+      "访谈时间安排",
+      "薪资或行业前景断言"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_goal",
+    "user_query": "帮我准备一份信息访谈材料。",
+    "available_context": {
+      "conversation_goal": null,
+      "target_direction": "目标岗位类型",
+      "user_profile": "存在完整用户画像对象"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "说明 conversation_goal 缺失导致无法确定访谈目标"
+    ],
+    "must_not_include": [
+      "编造的访谈目标",
+      "未经确认的提问清单"
+    ]
+  },
+  {
+    "id": "boundary_no_personal_invention",
+    "user_query": "帮我准备几个用于了解这个方向真实工作的提问。",
+    "available_context": {
+      "conversation_goal": "想了解目标方向的实际日常工作和交付成果。",
+      "target_direction": "目标岗位类型",
+      "user_profile": "用户画像中只明确提到课程项目经历，未提及任何实习或生产经历。"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "以开放问题了解日常任务和交付物",
+      "把未验证的经验差异列为探询点"
+    ],
+    "must_not_include": [
+      "把用户画像未提供的经历当成事实写入材料",
+      "断言该方向适合或不适合用户"
+    ]
+  }
+]

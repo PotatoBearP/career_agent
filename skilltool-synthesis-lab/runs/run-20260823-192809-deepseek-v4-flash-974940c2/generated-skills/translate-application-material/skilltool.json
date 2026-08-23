@@ -1,0 +1,312 @@
+{
+  "skill_id": "translate_application_material",
+  "skill_name": "translate-application-material",
+  "tool_name": "TranslateApplicationMaterial",
+  "title": "把材料翻译成指定语言",
+  "business_goal": "把已定稿的简历或求职信翻译成用户指定的语言，逐句保留原有结构与所有事实，并把无法确证官方写法的专有名词、机构名和术语整理成一份需要用户确认的清单，产出可直接继续编辑或提交的目标语言材料。",
+  "invocation_mode": "aggregate",
+  "composition": {
+    "required_prior_outputs": [
+      "tailored_resume"
+    ],
+    "optional_prior_outputs": []
+  },
+  "when_to_use": "当用户要求把已经定稿的岗位材料（当前绑定为 task_tailor_resume_for_opportunity 产出的 tailored_resume）翻译成指定语言时使用。需要用户提供目标语言和翻译偏好，且需要 user_profile 来核对姓名、机构等专有信息的固定写法。不要用于按岗位重新改写内容、生成多版草稿、润色原文、格式化排版，或替代招聘平台原文转写；缺少已定稿材料或目标语言时返回 insufficient_input，不使用网络检索用户个人事实。",
+  "reference_pattern": "参考 learning-plan 与 learning-stage-design 的结构性做法：消费上游已确认产物、冻结输入边界、先验证输入完整性、用确定性规则处理术语与事实保留、以结构化 artifact 返回结果并区分 success/insufficient_input/error；同时参考 baseline-assessment 的证据边界做法，只使用调用时已提供的输入，不自行采集或推断事实。",
+  "task_ids": [
+    "task_translate_application_material"
+  ],
+  "scenario_binding": {
+    "domain_source": "scenario_only",
+    "domain_mode": "explicit",
+    "explicit_domains": [
+      "岗位材料准备"
+    ],
+    "profile_role": "evidence_only"
+  },
+  "scope": {
+    "includes": [
+      "将 tailored_resume 全量翻译为用户指定语言，逐节保留原有结构",
+      "保留所有事实值：日期、数字、时长、机构名、学校名、课程名、项目名、工具名、角色表述",
+      "依据 user_profile 中的固定写法决定专有名词是否保留原文",
+      "对 profile 中无固定写法的专有名词、机构名和术语生成待确认清单",
+      "按 translation_preferences 处理专有名词保留策略、术语确认清单和目标读者语气"
+    ],
+    "excludes": [
+      "不重新生成或修改 tailored_resume 的内容、排序、事实边界与岗位匹配重点",
+      "不增删任何经历、技能、成果、数字或职责表述",
+      "不为 profile 中缺失的专有名词编造官方译名或英文名",
+      "不接受新草稿改写、润色、面试准备或格式转换请求",
+      "不向外部平台或岗位方发送或提交任何翻译材料"
+    ]
+  },
+  "input_schema": {
+    "tailored_resume": {
+      "type": "object",
+      "required": true,
+      "description": "已按目标岗位要求调整好的简历内容，作为翻译对象",
+      "source": "prior_skill_output",
+      "source_ref": "tailored_resume",
+      "available": true,
+      "acquisition": {
+        "mode": "prior_skill",
+        "provider": "task_tailor_resume_for_opportunity",
+        "fallback": null
+      }
+    },
+    "target_language": {
+      "type": "string",
+      "required": true,
+      "description": "用户指定的目标语言",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "translation_preferences": {
+      "type": "object",
+      "required": true,
+      "description": "用户对专有名词保留策略、是否输出术语确认清单和目标读者的要求",
+      "source": "user_input",
+      "source_ref": null,
+      "available": false,
+      "acquisition": {
+        "mode": "request_user",
+        "provider": null,
+        "fallback": null
+      }
+    },
+    "user_profile": {
+      "type": "object",
+      "required": true,
+      "description": "已确认的用户画像，用于核对姓名、机构等专有信息的固定写法",
+      "source": "upstream_artifact",
+      "source_ref": "user_profile",
+      "available": true,
+      "acquisition": {
+        "mode": "provided",
+        "provider": null,
+        "fallback": null
+      }
+    }
+  },
+  "output_schema": {
+    "translated_material": {
+      "type": "object",
+      "description": "翻译后的材料文本，以及需要用户确认的专有名词、机构名和术语清单，确保事实不被改动"
+    }
+  },
+  "output_consumers": [
+    "user_decision"
+  ],
+  "tool_selection": [],
+  "child_tools": [],
+  "harness_tools": [],
+  "fresh_data_policy": "none",
+  "action_tool": {
+    "search_hint": "translate finalized application material into a specified language with fact preservation and term confirmation notes",
+    "preserve_existing": true,
+    "always_load": true,
+    "read_only": false
+  },
+  "operating_model": {
+    "role": "你是一名严格的岗位材料翻译者：在保留原有事实边界和结构的前提下完成目标语言版本，并为所有无法确证的专有名词保留待确认记录。",
+    "hard_boundaries": [
+      "绝不改动 tailored_resume 中的任何事实值：日期、数字、时长、百分比、项目名、课程名、机构名、学校名、角色和技能必须在译文中逐项保留或被列入待确认清单",
+      "绝不因岗位要求或上下文推断而新增、删除或夸大任何经历、成果或能力；原稿没有的事实一律不得出现在译文中",
+      "绝不编造用户画像中不存在的官方译名或英文名称；无法确证时只给出谨慎的直译或音译并在 term_confirmation_notes 中标注",
+      "不使用网络检索、文件系统或用户画像之外的来源来补全用户个人事实或机构名称",
+      "只调用一次 ReturnSkillResult；不输出多份相互矛盾的译稿变体，不附加更改材料内容的额外建议"
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "name": "校验输入并冻结事实范围",
+        "instructions": [
+          "确认 tailored_resume 为非空对象且包含可翻译的章节内容；为空或缺失时返回 insufficient_input",
+          "确认 target_language 为非空且可解析的语言名称或代码；为空、为明显占位符或不可解析时返回 insufficient_input",
+          "确认 translation_preferences 对象存在；对其中未提供的可选项使用默认值：默认保留 user_profile 中有固定写法的专有名词，其余专有名词给出保守直译并进入确认清单",
+          "确认 user_profile 可用并读取其中的姓名、机构、学校、项目名、固定英文写法等字段，仅作为专有信息核对基准"
+        ],
+        "success_criteria": [
+          "所有必需输入已校验通过",
+          "已建立从 tailored_resume 与 user_profile 提取的可核对事实范围"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "提取需要保留的事实清单",
+        "instructions": [
+          "逐节扫描 tailored_resume，提取姓名、机构、学校、课程、项目、日期、数字、时长、角色、工具名、链接与代码标识等事实",
+          "对每一项事实，记录原文写法、所在章节，以及 user_profile 是否提供固定写法或其值是否与 profile 一致",
+          "将 profile 中已有固定写法的事实标记为 confirmed，其余标记为 needs_confirmation",
+          "发现 profile 与材料写法不一致时保留材料原文写法并将其加入待确认清单，不要静默统一"
+        ],
+        "success_criteria": [
+          "preserved_facts_manifest 已完整生成且每项都有出处",
+          "所有 needs_confirmation 项都有明确原因"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "确定翻译与术语策略",
+        "instructions": [
+          "从 translation_preferences 读取专有名词保留策略、是否输出确认清单、目标读者和语气要求",
+          "若用户的保留策略要求保留原文，则机构、项目、课程名等专有名词保持原文并加入确认清单备注",
+          "若要求翻译，仅对 user_profile 已确认固定写法的项使用该固定写法，其余仅做保守直译并注明",
+          "确定语体：面向招聘方，保持正式、简洁、无明显机翻痕迹；与原文表述一致，不夸大"
+        ],
+        "success_criteria": [
+          "翻译策略与用户偏好一致且可解释",
+          "每类专有名词都有明确处理规则"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "逐节翻译并保持事实不变",
+        "instructions": [
+          "按 tailored_resume 的章节顺序逐节翻译，保留原文档结构、条目顺序和字段组织",
+          "所有来自 preserved_facts_manifest 的事实值在译文中逐字保留或仅做必要的形态转换，如日期格式按目标语言惯例但数值与事实不变",
+          "对 needs_confirmation 的专有名词，使用受控策略处理并在对应位置登记到 term_confirmation_notes",
+          "不添加任何原文没有的能力描述、成果数字或岗位匹配措辞"
+        ],
+        "success_criteria": [
+          "translated_text 覆盖源材料全部章节",
+          "preserved_facts_manifest 中每一项事实在译文中可定位"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "组装输出并执行最终校验",
+        "instructions": [
+          "将译文、术语确认清单、事实保留清单和目标语言写入 translated_material",
+          "逐项核对 term_confirmation_notes：每项必须包含原文写法、译文处理、出现位置和确认原因",
+          "执行 final_checks 中的断言，全部成立后调用一次 ReturnSkillResult 返回 success"
+        ],
+        "success_criteria": [
+          "translated_material 对象结构完整且可直接被用户消费",
+          "所有最终断言通过"
+        ]
+      }
+    ],
+    "decision_rules": [
+      "目标语言解析规则：优先使用标准语言代码；不存在时使用可解析的语言名称；两者都不可解析则按 insufficient_input 处理",
+      "事实保留规则：日期、数字、时长、百分比等数值性事实在译文中保持物理值不变，仅允许语言化的格式表达",
+      "专有名词规则：user_profile 有固定写法 → 必须使用该写法；无固定写法且用户要求保留 → 保留原文并登记；无固定写法且用户要求翻译 → 仅保守直译/音译并登记，不得声称是官方名称",
+      "冲突处理：材料原文与 user_profile 不一致时，不改写事实，以材料原文为准翻译并登记冲突",
+      "语气规则：面向招聘方时为正式、准确、克制的表达；不加入情绪化、营销式或过度承诺措辞"
+    ],
+    "outcome_rules": {
+      "success": [
+        "tailored_resume、target_language、translation_preferences 均有效可用",
+        "translated_text 完整覆盖源材料结构且不包含新增事实",
+        "所有无固定写法的专有名词都进入 term_confirmation_notes",
+        "返回对象包含 translated_text、term_confirmation_notes、preserved_facts_manifest、target_language"
+      ],
+      "insufficient_input": [
+        "tailored_resume 缺失或为空",
+        "target_language 缺失、为空或不可解析",
+        "translation_preferences 缺失，无法确定术语策略且用户未授权默认策略",
+        "user_profile 缺失导致无法核对任何专有名词写法，且无法保守处理"
+      ],
+      "error": [
+        "无法生成合法的 translated_material 对象结构化输出",
+        "输出超过调用允许的结果大小上限",
+        "调用 ReturnSkillResult 时出现序列化或交付失败"
+      ]
+    },
+    "artifact_contract": {
+      "mode": "none",
+      "artifact_type": null,
+      "file_name_pattern": null,
+      "format": null,
+      "verification_steps": []
+    },
+    "final_checks": [
+      "校验 finalized_checks 前断言输出包含全部必填字段且类型正确",
+      "将 preserved_facts_manifest 与 translated_text 逐一比对，确认没有事实值被改动，也没有新增能力或成果",
+      "确认 term_confirmation_notes 为空仅在 user_profile 已提供所有专有名词固定写法时成立，否则每项待确认术语都登记了出现位置与处理方式",
+      "确认译文没有引用或改写 tailored_resume 之外的个人信息",
+      "确认本调用只执行一次 ReturnSkillResult"
+    ]
+  },
+  "complexity": {
+    "level": "bounded",
+    "estimated_steps": 5,
+    "rationale": "不是简单格式化包装：需要同时完成完整章节翻译、事实值逐项保留、专有名词固定写法核对、术语确认清单生成和策略冲突处理，是一个独立可复用的翻译与事实边界决策；继续拆分会把同一个决策切成不可独立消费的碎片。"
+  },
+  "independence": {
+    "portable": true,
+    "assumptions": [
+      "仅依赖任务契约声明的输入：tailored_resume、target_language、translation_preferences、user_profile",
+      "不依赖主程序导入、数据库、UI 状态、路由或内部服务",
+      "依赖子模型具备目标语言的翻译能力和对结构化输出的序列化能力"
+    ]
+  },
+  "evaluation_cases": [
+    {
+      "id": "success_complete_input",
+      "user_query": "帮我把这版简历翻译成英文",
+      "available_context": {
+        "tailored_resume": "包含教育、项目、技能章节的已定稿简历对象",
+        "target_language": "English",
+        "translation_preferences": "{\"term_policy\": \"keep_profile_confirmed\", \"with_notes\": true, \"audience\": \"hiring team\"}",
+        "user_profile": "包含姓名和学校固定英文写法的用户画像对象"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "translated_text 使用英文且保留全部原章节",
+        "preserved_facts_manifest 列出的日期、数字、项目名与译文一致",
+        "term_confirmation_notes 仅包含 user_profile 未提供固定写法的项"
+      ],
+      "must_not_include": [
+        "新增的技能或成果",
+        "对 profile 已确认固定写法的名称给出第二个译法",
+        "对事实值的改动"
+      ]
+    },
+    {
+      "id": "insufficient_missing_target_language",
+      "user_query": "帮我把材料翻译一下",
+      "available_context": {
+        "tailored_resume": "已定稿简历对象",
+        "target_language": "",
+        "translation_preferences": "{}",
+        "user_profile": "用户画像对象"
+      },
+      "expected_outcome": "insufficient_input",
+      "must_include": [
+        "明确说明缺少可解析的目标语言",
+        "不产出任何译文文本或待确认清单"
+      ],
+      "must_not_include": [
+        "默认假设为某一种语言并继续翻译",
+        "生成部分译稿"
+      ]
+    },
+    {
+      "id": "boundary_unknown_institution_name",
+      "user_query": "帮我把求职信翻成英语，机构名直接保留",
+      "available_context": {
+        "tailored_resume": "含某机构/项目名称且 user_profile 未提供其英文官方写法的简历对象",
+        "target_language": "English",
+        "translation_preferences": "{\"term_policy\": \"keep_original\", \"with_notes\": true}",
+        "user_profile": "姓名和学校有固定写法，但该机构名无固定英文写法"
+      },
+      "expected_outcome": "success",
+      "must_include": [
+        "该机构名在译文中保留原文",
+        "term_confirmation_notes 中登记该机构名、出现位置与“无固定官方写法”的原因",
+        "其余 profile 已确认的姓名与学校使用固定写法"
+      ],
+      "must_not_include": [
+        "擅自为该机构名编造一个官方英文名称",
+        "静默改写该机构名而不做任何确认"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "tool_name": "DraftContactMessage",
+  "user_facing_name": "帮我写一段自然、克制的联系消息",
+  "search_hint": "draft a restrained contact message from the user's verified relationship, opportunity, and application material context",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": false,
+  "child_tools": [],
+  "input": {
+    "contact_context": {
+      "type": "json",
+      "required": true,
+      "description": "对方称呼、关系类型、真实共同点或交集、公开联系方式以及拟使用的场合说明"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "用户已经确认的真实机会清单，用于在消息中准确说明申请目标"
+    },
+    "tailored_application_packages": {
+      "type": "json",
+      "required": true,
+      "description": "用户已准备好的投递材料，用于在消息中引用真实材料而不是虚构经历"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "用户已有的画像信息，用于保证消息中对自身的描述真实一致"
+    },
+    "message_preferences": {
+      "type": "json",
+      "required": true,
+      "description": "用户对语气、长度、渠道语言风格、称谓以及希望避免的措辞的偏好"
+    }
+  }
+}

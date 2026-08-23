@@ -1,0 +1,31 @@
+{
+  "tool_name": "CheckMissingApplicationDocuments",
+  "user_facing_name": "检查还缺哪些申请材料",
+  "search_hint": "对照岗位材料要求与用户已备材料清单，列出缺失文件、格式要求和补齐优先级",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "prepared_materials": {
+      "type": "json",
+      "required": true,
+      "description": "用户已准备的材料清单，每项包含文档名称、格式状态和是否完成"
+    },
+    "target_opportunity": {
+      "type": "json",
+      "required": true,
+      "description": "目标岗位描述或材料要求说明，用于确定要交哪些文件和格式约束；与已验证岗位信息一致时可只提供岗位标识"
+    },
+    "material_requirements": {
+      "type": "json",
+      "required": true,
+      "description": "可选：已梳理出的岗位材料要求清单，存在时优先作为比对基准"
+    },
+    "application_focus_brief": {
+      "type": "json",
+      "required": true,
+      "description": "投递材料准备要点，用于判断缺失材料的优先顺序"
+    }
+  }
+}

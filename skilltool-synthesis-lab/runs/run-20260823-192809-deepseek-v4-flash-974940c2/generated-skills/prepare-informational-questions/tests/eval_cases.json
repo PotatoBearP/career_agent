@@ -1,0 +1,58 @@
+[
+  {
+    "id": "success_complete_input",
+    "user_query": "帮我把这几个不确定的材料要求整理成可以直接问招聘方的问题清单",
+    "available_context": {
+      "evidence_gap_analysis": "包含一条标记为待确认的格式要求：简历页数字段证据不足",
+      "target_opportunity": "岗位描述提到需要提交简历与求职信，未说明页数限制",
+      "conversation_context": "对象为招聘方，渠道为邮件，对方可接受简短问题"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "question_list 中存在一条关于简历页数限制的问题",
+      "该问题标注预期用途为确定简历排版",
+      "问题范围与招聘方沟通场景一致"
+    ],
+    "must_not_include": [
+      "编造具体的页数上限",
+      "可发送的邮件正文",
+      "对用户匹配度的评估"
+    ]
+  },
+  {
+    "id": "insufficient_input_missing_target",
+    "user_query": "我想找内部人了解这个岗位看重什么材料，该问什么",
+    "available_context": {
+      "evidence_gap_analysis": "包含若干待确认的证据缺口",
+      "target_opportunity": "未提供任何岗位描述或岗位标识",
+      "conversation_context": "对象为内部员工，渠道为私信"
+    },
+    "expected_outcome": "insufficient_input",
+    "must_include": [
+      "明确返回 insufficient_input",
+      "说明原因是没有可确认的目标岗位"
+    ],
+    "must_not_include": [
+      "基于假设岗位生成的问题清单",
+      "询问用户问题的追问"
+    ]
+  },
+  {
+    "id": "boundary_audience_mismatch",
+    "user_query": "帮我列几个可以问招聘方的问题",
+    "available_context": {
+      "evidence_gap_analysis": "包含格式与评审重点两类待确认项",
+      "target_opportunity": "提供岗位材料要求与投递说明",
+      "conversation_context": "对象为校友，渠道为私信"
+    },
+    "expected_outcome": "success",
+    "must_include": [
+      "问题清单按校友对象过滤，移除仅适合招聘方直接回答的官方流程问题",
+      "对无法确定对象适配性的问题标注适用范围"
+    ],
+    "must_not_include": [
+      "按招聘方对象生成但适合校友场景的问题",
+      "未经标注的评审偏好问题"
+    ]
+  }
+]

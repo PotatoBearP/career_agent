@@ -1,0 +1,243 @@
+[
+  {
+    "task_id": "task_compare_opportunity_targets",
+    "name": "帮我比较这几个岗位机会，看哪个最值得现在投入",
+    "scene": "人脉申请追踪 - 机会比较",
+    "business_goal": "用户希望把自己指定的几个真实机会按自己关心的标准比较，得到现阶段最值得优先投递或重点准备的建议和理由。",
+    "user_request_examples": [
+      "帮我比较这几个岗位，看哪个最值得现在投",
+      "这几个机会里我想选一个重点准备，帮我比一比",
+      "我拿不定主意，帮我把这些岗位的条件列出来比一下",
+      "根据我的情况，这几个机会哪个优先级更高？"
+    ],
+    "evolution_direction": "decomposition",
+    "source_task_ids": [
+      "task_compare_pursuit_targets"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "比较与规划",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把用户自选标准、机会事实、用户背景和既有投递优先级放在一起权衡并给出推荐理由，是决策型综合判断，不是简单罗列差异。",
+    "execution_provider": null,
+    "need_ids": [
+      "opportunity_target_comparison"
+    ],
+    "inputs": [
+      {
+        "name": "candidate_opportunity_ids",
+        "description": "用户指定的待比较机会标识，可引用已有机会清单中的对象",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "verified_opportunity_list",
+        "description": "用户已经确认的真实机会清单，用于按标识取出待比较机会的完整信息",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "verified_opportunity_list",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "opportunity_pursuit_ranking",
+        "description": "用户已确认的机会投递优先顺序，用于与本次比较结果互相印证",
+        "type": "array",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "opportunity_pursuit_ranking",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户已有的画像信息，用于判断每个候选机会与用户的匹配程度",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "comparison_criteria",
+        "description": "用户重视的维度，例如现阶段价值、时间成本、接触难度、与目标方向的一致性等",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "opportunity_comparison_result",
+        "display_name": "机会比较结果",
+        "description": "按用户标准比较候选机会，给出优先建议、理由和权衡说明",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "candidate_opportunity_ids|criteria_version|recommendation",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [],
+    "estimated_steps": 4,
+    "fresh_data_required": false
+  },
+  {
+    "task_id": "task_compare_outreach_leads",
+    "name": "帮我比较这几个内推渠道和人，看先重点经营哪个",
+    "scene": "人脉申请追踪 - 人脉渠道比较",
+    "business_goal": "用户希望把自己指定的几个公开入口、内推渠道或联系人按自己关心的标准比较，得到现阶段最值得先重点接触哪个的建议和理由。",
+    "user_request_examples": [
+      "这几个内推渠道先经营哪个比较好？",
+      "帮我比较一下这几个联系人，看先联系谁更值得",
+      "这些公开入口里，哪个最值得我先花时间？",
+      "帮我把手上的几条人脉线索按价值排个先后"
+    ],
+    "evolution_direction": "decomposition",
+    "source_task_ids": [
+      "task_compare_pursuit_targets"
+    ],
+    "invocation_mode": "standalone",
+    "parallel_group": "比较与规划",
+    "synthesis_decision": "skilltool",
+    "decision_reason": "需要把公开线索、熟人线索、用户背景和接触规则放在一起权衡并给出优先建议及理由，是决策型综合判断。",
+    "execution_provider": null,
+    "need_ids": [
+      "outreach_lead_comparison"
+    ],
+    "inputs": [
+      {
+        "name": "candidate_lead_ids",
+        "description": "用户指定的待比较人脉渠道或联系人标识，可引用已有线索清单中的对象",
+        "type": "array",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "referral_entry_lead_list",
+        "description": "用户已有产物，是按机会整理的公开入口、渠道和联系人线索清单",
+        "type": "array",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_find_referral_entry_points:output:referral_entry_lead_list:1",
+        "available": true,
+        "from_task": "task_find_referral_entry_points",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_find_referral_entry_points"
+        }
+      },
+      {
+        "name": "matched_network_lead_list",
+        "description": "用户已有产物，是从现有联系人中筛出的可接触内推线索清单",
+        "type": "array",
+        "input_origin": "prior_task_output",
+        "source": "prior_output",
+        "source_ref": "task_find_contacts_from_network:output:matched_network_lead_list:1",
+        "available": true,
+        "from_task": "task_find_contacts_from_network",
+        "acquisition": {
+          "mode": "prior_task",
+          "provider": "task_find_contacts_from_network"
+        }
+      },
+      {
+        "name": "user_profile",
+        "description": "用户已有的画像信息，用于判断候选线索与用户真实背景的相关程度",
+        "type": "object",
+        "input_origin": "existing_artifact",
+        "source": "upstream_artifact",
+        "source_ref": "user_profile",
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "provided",
+          "provider": null
+        }
+      },
+      {
+        "name": "user_contact_rules",
+        "description": "用户对接触方式、不想打扰对象、渠道排除项和频率上限的说明",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      },
+      {
+        "name": "comparison_criteria",
+        "description": "用户重视的维度，例如接触难度、回复可能、长期价值、时间成本等",
+        "type": "object",
+        "input_origin": "user_provided",
+        "source": "user_input",
+        "source_ref": null,
+        "available": true,
+        "from_task": null,
+        "acquisition": {
+          "mode": "request_user",
+          "provider": null
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "name": "outreach_lead_comparison_result",
+        "display_name": "人脉渠道比较结果",
+        "description": "按用户标准比较候选内推渠道和联系人，给出优先接触建议、理由和权衡说明",
+        "type": "object",
+        "output_origin": "task_generated",
+        "dedupe_key": "candidate_lead_ids|criteria_version|recommendation",
+        "inferred": true,
+        "consumer_tasks": [],
+        "final_consumer": "user"
+      }
+    ],
+    "dependencies": [
+      "task_find_referral_entry_points",
+      "task_find_contacts_from_network"
+    ],
+    "estimated_steps": 4,
+    "fresh_data_required": false
+  }
+]

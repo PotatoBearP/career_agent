@@ -1,0 +1,31 @@
+{
+  "tool_name": "RewriteProjectAccountsForOpportunity",
+  "user_facing_name": "按岗位要求改写项目经历",
+  "search_hint": "rewrite project experience entries to match an opportunity's requirement keywords while preserving factual boundaries",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "project_entries": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供的项目经历条目，每条包含项目名称、承担角色、事实性动作、结果和相关技能"
+    },
+    "target_opportunity": {
+      "type": "json",
+      "required": true,
+      "description": "目标岗位的职责、要求关键词和招聘方关注点"
+    },
+    "evidence_gap_analysis": {
+      "type": "json",
+      "required": true,
+      "description": "经历与要求对照结果，用于识别哪些项目事实已经是可靠证据"
+    },
+    "user_profile": {
+      "type": "json",
+      "required": true,
+      "description": "已确认的用户画像，用于核对项目事实和技能表述"
+    }
+  }
+}

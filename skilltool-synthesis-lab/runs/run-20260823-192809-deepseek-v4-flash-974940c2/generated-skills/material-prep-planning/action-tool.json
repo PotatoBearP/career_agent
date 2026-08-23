@@ -1,0 +1,31 @@
+{
+  "tool_name": "MaterialPrepPlanner",
+  "user_facing_name": "规划先准备哪些岗位的材料",
+  "search_hint": "plan which job application materials to prepare first given priorities, deadlines, and weekly hours",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "opportunity_pursuit_ranking": {
+      "type": "json",
+      "required": true,
+      "description": "岗位投递优先顺序，作为材料准备排序的输入依据"
+    },
+    "verified_opportunity_list": {
+      "type": "json",
+      "required": true,
+      "description": "已验证的真实岗位机会清单，包含各岗位的基本信息和材料要求来源"
+    },
+    "user_constraints": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供的各岗位材料截止时间、每周可投入时间、希望优先处理的岗位和可用验证周期"
+    },
+    "application_focus_brief": {
+      "type": "json",
+      "required": true,
+      "description": "投递材料准备要点，用于估计每个岗位需要准备的材料量"
+    }
+  }
+}

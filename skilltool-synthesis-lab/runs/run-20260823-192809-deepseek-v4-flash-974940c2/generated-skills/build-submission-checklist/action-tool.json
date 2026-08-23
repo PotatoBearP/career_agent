@@ -1,0 +1,26 @@
+{
+  "tool_name": "BuildSubmissionChecklist",
+  "user_facing_name": "做一张提交前核对清单",
+  "search_hint": "把已梳理的岗位材料要求与用户当前已准备的材料逐项对齐，生成一份提交前可逐项打勾的核对清单，每项包含材料名称、要求说明、当前状态、核对动作和截止时间，方便用户在投递前完成最终确认。",
+  "preserve_existing": true,
+  "always_load": true,
+  "read_only": true,
+  "child_tools": [],
+  "input": {
+    "material_requirements": {
+      "type": "json",
+      "required": true,
+      "description": "已梳理出的岗位材料要求清单，包含材料种类、格式约束、篇幅要求和截止时间"
+    },
+    "prepared_materials": {
+      "type": "json",
+      "required": true,
+      "description": "用户当前已准备的材料清单，每项注明文档类型、格式状态和是否完成"
+    },
+    "submission_context": {
+      "type": "json",
+      "required": true,
+      "description": "用户提供的投递平台、提交方式以及是否包含额外步骤；未提供时按通用投递流程生成核对项"
+    }
+  }
+}
