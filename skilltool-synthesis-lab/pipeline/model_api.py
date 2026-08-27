@@ -20,7 +20,7 @@ class ModelConfig:
     api_key: str = ""
     temperature: float = 0.2
     max_tokens: int = 6000
-    timeout_seconds: int = 120
+    timeout_seconds: int = 300
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "ModelConfig":
@@ -34,7 +34,7 @@ class ModelConfig:
             api_key=api_key,
             temperature=float(value.get("temperature", 0.2)),
             max_tokens=int(value.get("max_tokens", 6000)),
-            timeout_seconds=int(value.get("timeout_seconds", 120)),
+            timeout_seconds=int(value.get("timeout_seconds", 300)),
         )
 
     def validate(self) -> None:

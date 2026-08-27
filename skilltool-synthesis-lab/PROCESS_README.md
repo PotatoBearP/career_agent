@@ -283,12 +283,16 @@ pipeline.advance(result, "candidate_synthesis")
 
 ### 6.3 普通工具与 Harness Tool 的区别
 
-普通工具来自 `data/tools/project_tools.json`：
+普通工具来自面向 Career Agent 的 `data/tools/project_tools.json`：
 
-- 由 Skill 在执行过程中调用；
+- 完整登记 24 项，并记录前置依赖、调用顺序、实现状态和 SkillTool 可选性；
+- 只有已实现且 `selectable_for_skilltool=true` 的工具会暴露给合成模型；
+- 被选工具由 Skill 在执行过程中调用；
 - 写入 `tool_selection` 和 `child_tools`；
 - 默认不选，只有任务确实需要时才选择；
-- 新鲜外部数据通常使用 `WebSearch`，必要时条件调用 `WebFetch`。
+- 新鲜外部数据通常使用 `WebSearch`，必要时按推荐顺序调用 `WebFetch`；
+- 强依赖必须同时进入 `child_tools`，例如 `Read → Edit`、`Bash(background) → TaskOutput` 和 `profile_read → profile_update`；
+- `Skill`、`Agent`、Plan Mode、Worktree 及缺少实现的 `LiveMeeting` 只登记、不参与 SkillTool 合成。
 
 Harness Tool 来自模型根据 `ref/tools` 结构生成的简单 before/after 工序：
 

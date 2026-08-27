@@ -30,6 +30,7 @@
             <label>Model<input id="modelName" /></label>
             <label>API Key<input id="apiKey" type="password" autocomplete="off" placeholder="仅用于本次请求" /></label>
             <div class="row"><label>Temperature<input id="temperature" type="number" min="0" max="2" step="0.1" /></label><label>Max tokens<input id="maxTokens" type="number" min="1000" step="500" /></label></div>
+            <label>请求超时（分钟）<input id="timeoutMinutes" type="number" min="0.5" max="60" step="0.5" value="5" /><small>单次模型请求的最长等待时间，默认 5 分钟。</small></label>
           </div>
           <label class="checkbox"><input id="persistRun" type="checkbox" checked />保存生成产物</label>
         </section>

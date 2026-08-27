@@ -538,6 +538,7 @@ def main() -> None:
     parser.add_argument("--run-api-sample", action="store_true", help="run the sample with data/model_config.local.json and exit")
     parser.add_argument("--resume-api-run", metavar="RUN_ID", help="resume a saved API run from its next stage")
     parser.add_argument("--api-model", help="override the model name from local config for an API run")
+    parser.add_argument("--timeout-seconds", type=int, help="override one model request timeout; default comes from model config")
     parser.add_argument("--recheck-run", metavar="RUN_ID", help="re-run deterministic reconciliation and quality for a saved run")
     args = parser.parse_args()
     RUNS_ROOT.mkdir(parents=True, exist_ok=True)
@@ -554,7 +555,11 @@ def main() -> None:
     if args.run_api_sample:
         data = bootstrap_payload()
         config = ModelConfig.from_dict(local_model_config())
-        model = OpenAICompatibleModel(replace(config, model=args.api_model or config.model, timeout_seconds=600))
+        model = OpenAICompatibleModel(replace(
+            config,
+            model=args.api_model or config.model,
+            timeout_seconds=args.timeout_seconds or config.timeout_seconds,
+        ))
         def report_progress(stage: str, status: str) -> None:
             print(f"[{status}] {stage}", flush=True)
         result = SynthesisPipeline(model, runs_root=RUNS_ROOT).run(
@@ -573,7 +578,11 @@ def main() -> None:
         if not run_file.is_file():
             raise FileNotFoundError(f"run not found: {args.resume_api_run}")
         config = ModelConfig.from_dict(local_model_config())
-        model = OpenAICompatibleModel(replace(config, model=args.api_model or config.model, timeout_seconds=600))
+        model = OpenAICompatibleModel(replace(
+            config,
+            model=args.api_model or config.model,
+            timeout_seconds=args.timeout_seconds or config.timeout_seconds,
+        ))
         def report_resume_progress(stage: str, status: str) -> None:
             print(f"[{status}] {stage}", flush=True)
         result = SynthesisPipeline(model, runs_root=RUNS_ROOT).resume(

@@ -25,6 +25,10 @@ def load(relative: str):
 
 
 class ModelAPITest(unittest.TestCase):
+    def test_default_model_timeout_is_five_minutes(self):
+        config = ModelConfig.from_dict({"base_url": "https://example.com", "model": "test"})
+        self.assertEqual(config.timeout_seconds, 300)
+
     def test_normalizes_chat_completions_url(self):
         self.assertEqual(chat_completions_url("https://example.com/v1"), "https://example.com/v1/chat/completions")
         self.assertEqual(chat_completions_url("https://example.com"), "https://example.com/v1/chat/completions")
@@ -570,20 +574,23 @@ class PipelineTest(unittest.TestCase):
         with self.assertRaises(PipelineError):
             _validate_initialization_coverage(tasks, coverage[:-1])
 
-    def test_catalog_excludes_recursive_skill_tools(self):
+    def test_catalog_matches_confirmed_career_agent_tool_list(self):
         catalog = load("data/tools/project_tools.json")
         names = {tool["name"] for tool in catalog["tools"]}
-        self.assertNotIn("Skill", names)
-        self.assertNotIn("discover_skills", names)
-        self.assertNotIn("ReturnSkillResult", names)
-        self.assertIn("WebSearch", names)
-        self.assertNotIn("ListMcpResourcesTool", names)
-        self.assertNotIn("ReadMcpResourceTool", names)
-        self.assertNotIn("WebBrowser", names)
-        self.assertNotIn("Monitor", names)
-        self.assertFalse(any(tool.get("category") == "mcp" for tool in catalog["tools"]))
-        self.assertTrue(catalog["excluded_mcp_tools"])
-        self.assertTrue(catalog["excluded_unavailable_tools"])
+        self.assertEqual(names, {
+            "Read", "Edit", "Write", "NotebookEdit", "Glob", "Grep",
+            "Bash", "TaskOutput", "TaskStop", "EnterPlanMode", "ExitPlanMode",
+            "TodoWrite", "Agent", "WebSearch", "WebFetch", "AskUserQuestion",
+            "Skill", "ImageGenerate", "VideoGenerate", "EnterWorktree",
+            "ExitWorktree", "profile_read", "profile_update", "LiveMeeting",
+        })
+        self.assertEqual(len(names), 24)
+        by_name = {tool["name"]: tool for tool in catalog["tools"]}
+        self.assertEqual(by_name["Edit"]["prerequisites"][0]["name"], "Read")
+        self.assertEqual(by_name["profile_update"]["prerequisites"][0]["name"], "profile_read")
+        self.assertFalse(by_name["Skill"]["selectable_for_skilltool"])
+        self.assertEqual(by_name["LiveMeeting"]["implementation_status"], "missing")
+        self.assertEqual(catalog["skill_candidates"][0]["name"], "lesson-generation")
 
     def test_catalog_entries_are_complete_and_unique(self):
         catalog = load("data/tools/project_tools.json")
@@ -595,19 +602,66 @@ class PipelineTest(unittest.TestCase):
             self.assertTrue(tool.get("category"))
             self.assertTrue(tool.get("description"))
             self.assertTrue(tool.get("availability"))
-            self.assertNotIn("mcp", tool["name"].lower())
+            self.assertIn(tool.get("prerequisite_status"), catalog["dependency_types"])
+            self.assertIsInstance(tool.get("prerequisites"), list)
+            self.assertTrue(tool.get("typical_call_order"))
+            self.assertIn(tool.get("implementation_status"), {"implemented", "missing"})
+            self.assertIsInstance(tool.get("selectable_for_skilltool"), bool)
 
     def test_model_visible_catalog_does_not_expose_exclusion_records(self):
         catalog = load("data/tools/project_tools.json")
         visible = available_tool_catalog(catalog)
-        serialized = json.dumps(visible, ensure_ascii=False)
-        self.assertNotIn("excluded_mcp_tools", visible)
-        self.assertNotIn("ListMcpResourcesTool", serialized)
-        self.assertNotIn("ReadMcpResourceTool", serialized)
-        self.assertEqual(
-            [tool["name"] for tool in visible["tools"]],
-            [tool["name"] for tool in catalog["tools"]],
+        visible_names = {tool["name"] for tool in visible["tools"]}
+        self.assertEqual(len(visible_names), 17)
+        self.assertIn("profile_read", visible_names)
+        self.assertIn("profile_update", visible_names)
+        self.assertNotIn("Skill", visible_names)
+        self.assertNotIn("Agent", visible_names)
+        self.assertNotIn("LiveMeeting", visible_names)
+        self.assertTrue(all("prerequisites" in tool for tool in visible["tools"]))
+
+    def test_direct_validation_enforces_career_tool_allowlist(self):
+        task = {"task_id": "task", "synthesis_decision": "skilltool"}
+        candidate = {
+            "skill_id": "career_check",
+            "skill_name": "career-check",
+            "tool_name": "CareerCheck",
+            "task_ids": ["task"],
+            "child_tools": ["WebSearch", "WebFetch", "AskUserQuestion"],
+            "tool_selection": [
+                {"tool_name": name, "usage_mode": "required", "reason": "test"}
+                for name in ["WebSearch", "WebFetch", "AskUserQuestion"]
+            ],
+            "operating_model": {"workflow": [{"step": 1}]},
+        }
+        validation = validate_direct_candidates(
+            [task], [candidate], load("data/tools/project_tools.json")
         )
+        self.assertTrue(validation["passed"])
+
+        candidate["child_tools"] = ["SubscribePR"]
+        candidate["tool_selection"] = [{
+            "tool_name": "SubscribePR",
+            "usage_mode": "required",
+            "reason": "test",
+        }]
+        validation = validate_direct_candidates(
+            [task], [candidate], load("data/tools/project_tools.json")
+        )
+        self.assertFalse(validation["passed"])
+        self.assertTrue(any("allowlist" in error for error in validation["errors"]))
+
+        candidate["child_tools"] = ["Edit"]
+        candidate["tool_selection"] = [{
+            "tool_name": "Edit",
+            "usage_mode": "required",
+            "reason": "test",
+        }]
+        validation = validate_direct_candidates(
+            [task], [candidate], load("data/tools/project_tools.json")
+        )
+        self.assertFalse(validation["passed"])
+        self.assertTrue(any("Edit requires Read" in error for error in validation["errors"]))
 
     def test_quality_rejects_unlisted_or_recursive_child_tool(self):
         template = load("data/templates/skilltool_template.json")

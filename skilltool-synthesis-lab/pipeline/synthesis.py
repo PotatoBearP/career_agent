@@ -948,7 +948,10 @@ class SynthesisPipeline:
                 available_tool_names = {
                     str(item.get("name"))
                     for item in self.tool_catalog.get("tools") or []
-                    if isinstance(item, dict) and item.get("name")
+                    if isinstance(item, dict)
+                    and item.get("name")
+                    and item.get("selectable_for_skilltool") is True
+                    and item.get("implementation_status") != "missing"
                 }
                 available_output_refs = {
                     str(value)

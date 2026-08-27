@@ -8,7 +8,9 @@ from .artifacts import build_artifact_preview
 
 
 def validate_direct_candidates(
-    tasks: list[dict[str, Any]], candidates: list[dict[str, Any]]
+    tasks: list[dict[str, Any]],
+    candidates: list[dict[str, Any]],
+    tool_catalog: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     expected = {str(task.get("task_id")) for task in tasks}
     covered = [
@@ -17,6 +19,21 @@ def validate_direct_candidates(
         for task_id in candidate.get("task_ids") or []
     ]
     errors: list[str] = []
+    available_tool_names = (
+        {
+            str(tool.get("name"))
+            for tool in tool_catalog.get("tools") or []
+            if tool.get("selectable_for_skilltool") is True
+            and tool.get("implementation_status") != "missing"
+        }
+        if tool_catalog is not None
+        else None
+    )
+    tool_by_name = {
+        str(tool.get("name")): tool
+        for tool in (tool_catalog or {}).get("tools") or []
+        if isinstance(tool, dict) and tool.get("name")
+    }
     if set(covered) != expected or len(covered) != len(expected):
         errors.append("eligible tasks are not covered exactly once")
     for candidate in candidates:
@@ -33,6 +50,22 @@ def validate_direct_candidates(
         }
         if child_tools != selected_tools:
             errors.append(f"{skill_id}: child_tools do not match tool_selection")
+        if available_tool_names is not None:
+            unknown_tools = sorted(child_tools - available_tool_names)
+            if unknown_tools:
+                errors.append(
+                    f"{skill_id}: tools are not in the Career Agent allowlist: {unknown_tools}"
+                )
+        for tool_name in child_tools:
+            for prerequisite in tool_by_name.get(tool_name, {}).get("prerequisites") or []:
+                if (
+                    isinstance(prerequisite, dict)
+                    and prerequisite.get("type") == "required"
+                    and prerequisite.get("name") not in child_tools
+                ):
+                    errors.append(
+                        f"{skill_id}: tool {tool_name} requires {prerequisite.get('name')}"
+                    )
         harness_names: set[str] = set()
         for tool in candidate.get("harness_tools") or []:
             if not isinstance(tool, dict) or not tool.get("tool_name"):
@@ -69,7 +102,9 @@ def finalize_direct_result(result: dict[str, Any], *, generator: str) -> dict[st
         (result.get("candidate_generation") or {}).get("raw_candidates") or []
     )
     validation_started = time.perf_counter()
-    validation = validate_direct_candidates(tasks, candidates)
+    validation = validate_direct_candidates(
+        tasks, candidates, result.get("tool_catalog")
+    )
     validation_duration_ms = round((time.perf_counter() - validation_started) * 1000)
     if not validation["passed"]:
         raise ValueError("direct synthesis validation failed: " + "; ".join(validation["errors"]))

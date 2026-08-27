@@ -33,7 +33,7 @@ def _payload(value: Any) -> str:
 
 
 def available_tool_catalog(tool_catalog: dict[str, Any]) -> dict[str, Any]:
-    """Return only synthesis-selectable tools and their selection policy.
+    """Return only implemented, synthesis-selectable tools and their dependency policy.
 
     Exclusion/audit records deliberately stay out of model prompts so an MCP or
     recursive tool name cannot be mistaken for an available child tool.
@@ -47,9 +47,14 @@ def available_tool_catalog(tool_catalog: dict[str, Any]) -> dict[str, Any]:
                 "category": item.get("category"),
                 "description": item.get("description"),
                 "availability": item.get("availability"),
+                "prerequisite_status": item.get("prerequisite_status"),
+                "prerequisites": item.get("prerequisites") or [],
+                "typical_call_order": item.get("typical_call_order"),
             }
             for item in tool_catalog.get("tools") or []
             if isinstance(item, dict)
+            and item.get("selectable_for_skilltool") is True
+            and item.get("implementation_status") != "missing"
         ],
     }
 
@@ -217,6 +222,8 @@ SKILLTOOL TEMPLATE (every candidate must follow this structure):
 
 AVAILABLE NON-SKILL PROJECT TOOLS:
 {_payload(available_tool_catalog(tool_catalog))}
+
+TOOL BOUNDARY: Select no tools by default and use only the smallest necessary subset of the catalog. Tools made specifically for Git, GitHub, PR hosting, or another named third-party website/service are forbidden even if mentioned elsewhere in the context; generic web, file, calculation, and interaction capabilities in the catalog remain available.
 
 REFERENCE SKILL EXEMPLARS PROVIDED BY THE USER:
 {_payload(reference_pack)}

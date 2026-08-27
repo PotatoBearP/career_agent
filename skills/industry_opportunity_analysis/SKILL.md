@@ -47,7 +47,6 @@ Ask at most 3 questions if target industry, geography, or decision purpose is un
 
 - `WebSearchTool`: Use for current market trends, role demand, hiring signals, and industry changes.
 - `WebFetchTool`: Use for specific reports, official pages, job descriptions, or cited articles.
-- `WebBrowserTool`: Use when comparing multiple sources or investigating an emerging topic.
 - Do not use tools that are not listed in the metadata.
 - If a required tool is unavailable, state the limitation and proceed with assumptions only when safe.
 

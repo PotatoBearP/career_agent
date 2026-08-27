@@ -27,6 +27,7 @@ button,input,textarea,select { font: inherit; }
 .form-grid { display:grid; gap:9px; }
 .form-grid.disabled { opacity:.45; pointer-events:none; }
 label { display:grid; gap:5px; color:var(--muted); font-size:11px; }
+label small { color:var(--muted); font-size:10px; line-height:1.4; }
 input,textarea,select { width:100%; border:1px solid var(--line); border-radius:5px; padding:8px; background:#fff; color:#202124; outline:none; }
 input:focus,textarea:focus,select:focus { border-color:var(--accent); }
 .scenario-selector { margin-bottom:10px; }.scenario-selector small { color:var(--muted); line-height:1.45; }

@@ -20,7 +20,7 @@ def main() -> int:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--base-url", required=True)
     parser.add_argument("--model", required=True)
-    parser.add_argument("--timeout", type=int, default=600)
+    parser.add_argument("--timeout", type=int, default=300)
     args = parser.parse_args()
 
     run_path = ROOT / "runs" / args.run_id / "run.json"

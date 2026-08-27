@@ -101,13 +101,14 @@ function handleInputEdit() {
 }
 
 function modelConfigFromForm() {
+  const timeoutMinutes = Number($("#timeoutMinutes").value);
   return {
     base_url: $("#baseUrl").value.trim(),
     model: $("#modelName").value.trim(),
     api_key: $("#apiKey").value,
     temperature: Number($("#temperature").value || 0.2),
     max_tokens: Number($("#maxTokens").value || 6000),
-    timeout_seconds: 120,
+    timeout_seconds: Math.round((Number.isFinite(timeoutMinutes) && timeoutMinutes > 0 ? timeoutMinutes : 5) * 60),
   };
 }
 
@@ -1270,6 +1271,7 @@ function applyBootstrap(data) {
   $("#modelName").value = data.model_config.model || "";
   $("#temperature").value = data.model_config.temperature ?? 0.2;
   $("#maxTokens").value = data.model_config.max_tokens ?? 6000;
+  $("#timeoutMinutes").value = Number(data.model_config.timeout_seconds ?? 300) / 60;
   $("#apiKey").placeholder = data.model_config.api_key_configured ? "已由本地安全配置提供" : "仅用于本次请求";
   renderScenarioOptions();
   syncEditor();

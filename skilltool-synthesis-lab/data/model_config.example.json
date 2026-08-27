@@ -4,5 +4,5 @@
   "api_key_env": "SKILLTOOL_MODEL_API_KEY",
   "temperature": 0.2,
   "max_tokens": 6000,
-  "timeout_seconds": 120
+  "timeout_seconds": 300
 }

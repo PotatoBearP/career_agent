@@ -23,7 +23,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run and persist exactly one task-synthesis iteration.")
     parser.add_argument("--base-url", required=True)
     parser.add_argument("--model", required=True)
-    parser.add_argument("--timeout", type=int, default=600)
+    parser.add_argument("--timeout", type=int, default=300)
     args = parser.parse_args()
     api_key = getpass.getpass("API key (not stored): ")
     config = ModelConfig(

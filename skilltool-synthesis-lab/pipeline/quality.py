@@ -302,6 +302,7 @@ def _candidate_report(
     candidate: dict[str, Any],
     *,
     available_tool_names: set[str] | None = None,
+    tool_by_name: dict[str, dict[str, Any]] | None = None,
     scenario: dict[str, Any] | None = None,
     input_inventory: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
@@ -434,6 +435,18 @@ def _candidate_report(
             issues.append({"code": "tool_fallback_missing", "severity": "error", "message": f"按需工具 {name} 未说明不用时的降级路径"})
     if child_tools != set(selected_names):
         issues.append({"code": "tool_selection_mismatch", "severity": "error", "message": "child_tools 必须由 tool_selection 精确派生"})
+    for tool_name in child_tools:
+        for prerequisite in (tool_by_name or {}).get(tool_name, {}).get("prerequisites") or []:
+            if (
+                isinstance(prerequisite, dict)
+                and prerequisite.get("type") == "required"
+                and prerequisite.get("name") not in child_tools
+            ):
+                issues.append({
+                    "code": "tool_prerequisite_missing",
+                    "severity": "error",
+                    "message": f"辅助工具 {tool_name} 强依赖 {prerequisite.get('name')}",
+                })
 
     if isinstance(scenario, dict):
         target_domain = scenario.get("target_domain") or {}
@@ -586,12 +599,22 @@ def evaluate_portfolio(
     scenario: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     available_tool_names = (
-        {str(tool.get("name")) for tool in tool_catalog.get("tools") or []}
+        {
+            str(tool.get("name"))
+            for tool in tool_catalog.get("tools") or []
+            if tool.get("selectable_for_skilltool") is True
+            and tool.get("implementation_status") != "missing"
+        }
         if tool_catalog is not None
         else None
     )
+    tool_by_name = {
+        str(tool.get("name")): tool
+        for tool in (tool_catalog or {}).get("tools") or []
+        if isinstance(tool, dict) and tool.get("name")
+    }
     reports = [
-        _candidate_report(candidate, available_tool_names=available_tool_names, scenario=scenario, input_inventory=task_map.get("input_inventory") or [])
+        _candidate_report(candidate, available_tool_names=available_tool_names, tool_by_name=tool_by_name, scenario=scenario, input_inventory=task_map.get("input_inventory") or [])
         for candidate in candidates
     ]
     redundancy: list[dict[str, Any]] = []

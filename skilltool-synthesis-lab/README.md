@@ -58,6 +58,7 @@ Web UI 中选择“模型 API”，填写：
 - 模型名称；
 - API Key；
 - temperature 和 max tokens。
+- 单次请求超时（按分钟单独设置，默认 5 分钟）。
 
 API Key 只随本次浏览器请求发送到本地服务，不会写入 `run.json`。任务发现、解构和延申各自生成并保存 checkpoint，不在单轮生成中隐式去重；语义去重作为独立任务迭代执行并保存自己的决策与前后任务池。后续轮次失败不会丢失已完成任务；候选阶段按 SkillTool 任务逐个请求并在每个候选完成后 checkpoint；候选降重阶段只评审紧凑摘要。
 
@@ -126,7 +127,7 @@ Web UI 不再绑定固定的四轮顺序。初始化任务池后，可按任意�
 - `data/scenarios/*.txt`：用自然语言描述的业务目标、范围和必需输出；
 - `data/model_config.example.json`：不含密钥的模型配置样例。
 - `data/templates/skilltool_template.json`：合成时强制遵守、WebUI 可查看的 SkillTool 模板；
-- `data/tools/project_tools.json`：从项目 `getAllBaseTools` 建立的独立工具快照；只把已有实现的非 MCP、非递归 Skill 工具暴露给合成模型，并记录平台、环境变量或 feature flag 等可用条件。
+- `data/tools/project_tools.json`：用户确认的 24 项 Career Agent 工具清单；逐项记录分类、功能、前置依赖、依赖类型、典型调用顺序、实现状态和 SkillTool 可选性。当前 17 项可作为普通工具参与合成。
 
 Web UI 可直接编辑画像和场景文本，不要求 JSON 格式。画像和场景用于决定应当合成哪些能力，但不能成为一级任务的运行时产物依赖；一级任务必须只通过调用时向用户收集普通输入即可直接执行。每个任务必须先预测输出及稳定的输出语义键；初始化、任务拆解和自然延伸不会隐式删除语义相近任务，需要时通过独立“语义去重”审计并更新任务池。
 
@@ -201,13 +202,15 @@ runs/<run-id>/
 
 候选合成会读取 `ref/skills/*/SKILL.md` 与对应的 `action-tool.json`，提取各章节的代表性运行时片段作为结构示范；同时从 `ref/tools` 提取适合作为简单 Harness Tool 的确定性工序示例。模型必须据此为每个候选生成专属的角色、硬边界、工作流、判定规则、结果分支、产物校验和返回前检查；reference 的业务内容不会直接复制到新 Skill。
 
-工具目录默认一个都不选。只有完成具体业务目标需要时，模型才可以从目录中选择普通工具；MCP 工具、Skill、Skill 发现工具、生成的 SkillActionTool、ReturnSkillResult、测试工具和空实现占位均被排除。排除审计记录保存在目录文件中，但不会进入模型可见的可选工具 payload，避免模型把排除项误认为可调用工具。
+工具目录同时承担“完整登记”和“合成白名单”两个职责。完整清单保留 24 项，模型只会看到 `selectable_for_skilltool=true` 且已有实现的 17 项。`Skill`、`Agent`、Plan Mode 和 Worktree 等控制面工具不会成为 SkillTool 子工具；尚未找到实现的 `LiveMeeting` 仅作缺口记录。`Edit`、`NotebookEdit`、`TaskOutput`、`TaskStop`、`profile_update` 等强依赖由产物校验确定性检查。
+
+“生成一节课”被记录为待设计 Skill，而不是普通工具：输入知识点与用户画像，负责知识点讲解、测试试题及用户作答后的反馈问答。
 
 ## 扩展新场景
 
 1. 增加 profile/scenario 自然语言文本，或通过 Web UI 粘贴。
 2. 在 `pipeline/prompts.py` 调整合成约束或输出契约。
-3. 如有需要，在 `data/tools/project_tools.json` 补充可选择的普通工具。
+3. 新增工具时在 `data/tools/project_tools.json` 补齐依赖、调用顺序、实现状态和 SkillTool 可选性；待合成能力应进入 `skill_candidates`，不要混入普通工具。
 4. 使用模型 API 运行，复核每轮 checkpoint、最终任务池和直接产物校验结果。
 5. 将通过直接校验的 generated-skills 接入目标 SkillTool runtime。
 

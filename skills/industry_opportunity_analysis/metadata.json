@@ -33,8 +33,7 @@
     ],
     "allowed_tools": [
       "WebSearchTool",
-      "WebFetchTool",
-      "WebBrowserTool"
+      "WebFetchTool"
     ],
     "recommended_verifiers": [
       "evidence_support_check",
@@ -60,8 +59,7 @@
     ],
     "allowed_tools": [
       "WebSearchTool",
-      "WebFetchTool",
-      "WebBrowserTool"
+      "WebFetchTool"
     ],
     "recommended_verifiers": [
       "evidence_support_check",

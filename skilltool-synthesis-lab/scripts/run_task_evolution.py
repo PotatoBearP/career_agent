@@ -21,7 +21,7 @@ def main() -> int:
     parser.add_argument("--source-run-id", required=True)
     parser.add_argument("--base-url", required=True)
     parser.add_argument("--model", required=True)
-    parser.add_argument("--timeout", type=int, default=600)
+    parser.add_argument("--timeout", type=int, default=300)
     args = parser.parse_args()
     source_path = ROOT / "runs" / args.source_run_id / "run.json"
     source = json.loads(source_path.read_text(encoding="utf-8"))

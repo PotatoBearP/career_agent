@@ -27,6 +27,26 @@ class RunStorageApiTests(unittest.TestCase):
     def temporary_directory(self) -> tempfile.TemporaryDirectory:
         return tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parent)
 
+    def test_career_skills_avoid_site_specific_third_party_tools(self) -> None:
+        skills_root = Path(__file__).resolve().parents[2] / "skills"
+        allowed = {
+            "WebSearchTool",
+            "WebFetchTool",
+            "AskUserQuestionTool",
+            "FileWriteTool",
+            "REPLTool",
+            "ReadMcpResourceTool",
+            "ReturnSkillResult",
+        }
+        metadata_files = list(skills_root.glob("*/metadata.json"))
+        self.assertTrue(metadata_files)
+        for metadata_file in metadata_files:
+            metadata = json.loads(metadata_file.read_text(encoding="utf-8"))
+            for section_name in ("original_metadata", "compiled_metadata"):
+                selected = metadata[section_name].get("allowed_tools") or []
+                self.assertLessEqual(len(selected), 3, metadata_file)
+                self.assertTrue(set(selected).issubset(allowed), metadata_file)
+
     def test_list_and_read_runs(self) -> None:
         with self.temporary_directory() as directory:
             root = Path(directory)
@@ -113,6 +133,10 @@ class RunStorageApiTests(unittest.TestCase):
     def test_local_key_is_not_reused_for_another_endpoint(self) -> None:
         config = request_model_config({"base_url": "https://other.example", "model": "other"})
         self.assertEqual(config.api_key, "")
+
+    def test_request_timeout_can_be_overridden_independently(self) -> None:
+        config = request_model_config({"timeout_seconds": 90})
+        self.assertEqual(config.timeout_seconds, 90)
 
     def test_rejects_question_mark_encoding_corruption(self) -> None:
         reject_corrupted_text({"text": "正常的单个问号？ and ?"})
