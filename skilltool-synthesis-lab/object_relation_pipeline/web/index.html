@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Object Relation Skill Pipeline</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header><div><h1>Object Relation Skill Pipeline</h1><p>P0 → m→n → Object Set → k→1 → P1 → Skill</p></div><span id="status">连接中</span></header>
+    <main>
+      <aside>
+        <section><h2>历史运行</h2><div id="runs" class="empty">暂无运行</div></section>
+        <section>
+          <h2>模型</h2>
+          <div class="segmented"><button data-mode="mock" class="active">离线 Mock</button><button data-mode="api">模型 API</button></div>
+          <div id="apiFields" class="disabled">
+            <label>Base URL<input id="baseUrl" /></label><label>Model<input id="modelName" /></label>
+            <label>API Key<input id="apiKey" type="password" autocomplete="off" /></label>
+            <div class="grid model-options">
+              <label>Temperature<input id="temperature" type="number" min="0" max="2" step="0.1" /></label>
+              <label>Max tokens<input id="maxTokens" type="number" min="1" step="1" /></label>
+              <label>Timeout（秒）<input id="timeoutSeconds" type="number" min="1" step="1" /></label>
+            </div>
+            <p class="hint">Stage 1.2 和 Skill 生成单次最多使用 48000 tokens，实际值还受模型服务限制。</p>
+          </div>
+        </section>
+        <section>
+          <h2>输入</h2>
+          <label>画像<textarea id="profile"></textarea></label>
+          <label>场景<select id="scenarioSelect"></select><textarea id="scenario"></textarea></label>
+        </section>
+        <section>
+          <h2>运行区间</h2>
+          <label>起始阶段<select id="fromStage"></select></label><label>结束阶段<select id="toStage"></select></label>
+          <div class="grid"><label>Seed<input id="seed" type="number" /></label><label>P1 数量<input id="targetCount" type="number" min="1" /></label><label>k min<input id="kMin" type="number" min="1" /></label><label>k max<input id="kMax" type="number" min="1" /></label></div>
+          <label>采样模式<select id="samplingMode"><option value="constrained">受约束</option><option value="random">随机</option></select></label>
+          <button id="runButton" class="primary">运行所选区间</button>
+        </section>
+      </aside>
+      <div class="content">
+        <section><div class="title"><div><h2>流水线</h2><p id="runMeta">尚未运行</p></div></div><div id="stages" class="stages"></div></section>
+        <section><div class="title"><h2>初始任务池 P0</h2><span id="p0Count"></span></div><div id="p0" class="cards empty">等待 Stage 1.2</div></section>
+        <section><div class="title"><h2>隐藏 m→n 关系</h2><span id="relationCount"></span></div><div id="relations" class="cards empty">等待 Stage 2.1</div></section>
+        <section><div class="title"><h2>Object Set</h2><span id="objectCount"></span></div><div id="objects" class="object-grid empty">等待 Stage 2.2</div></section>
+        <section><div class="title"><h2>采样 k→1 关系</h2><span id="sampleCount"></span></div><div id="sampled" class="cards empty">等待 Stage 3.1</div></section>
+        <section><div class="title"><h2>任务池 P1</h2><span id="p1Count"></span></div><div id="p1" class="cards empty">等待 Stage 3.3</div></section>
+        <section><div class="title"><h2>Skill 产物</h2><span id="skillCount"></span></div><div id="skills" class="cards empty">等待 Stage 4.2</div><pre id="artifact"></pre></section>
+      </div>
+    </main>
+    <div id="toast"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
