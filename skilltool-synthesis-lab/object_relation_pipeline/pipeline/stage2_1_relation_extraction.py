@@ -6,6 +6,7 @@ from copy import deepcopy
 from typing import Any
 
 from .contracts import StageContext, StageExecution
+from .contexts import scenario_text, task_context_pack
 from .prompts import RELATION_SYSTEM_PROMPT, relation_extraction_prompt
 from .storage import write_value
 
@@ -49,13 +50,14 @@ def run(context: StageContext) -> StageExecution:
     tasks = context.state.get("p0_tasks") or []
     if not tasks:
         raise ValueError("P0 task pool is required")
-    scenario = context.state["inputs"]["scenario"]
     relations: list[dict[str, Any]] = []
     mentions: list[dict[str, Any]] = []
     item_traces: list[dict[str, Any]] = []
     files: dict[str, Any] = {}
     for task_index, task in enumerate(tasks, start=1):
         task_id = str(task.get("task_id") or f"p0_task_{task_index:03d}")
+        task_context = task_context_pack(context.state, task)
+        scenario = scenario_text(task_context)
         prompt = relation_extraction_prompt(task, scenario)
         item_dir = context.run_dir / "stages" / STAGE_NAME / "tasks" / task_id
         write_value(item_dir / "prompt.txt", prompt)
@@ -82,6 +84,9 @@ def run(context: StageContext) -> StageExecution:
                     "role": role,
                     "source_task_id": task_id,
                     "source_task_name": task.get("name"),
+                    "profile_scope": list((task.get("context_contract") or {}).get("profile_ids") or []),
+                    "scenario_scope": list((task.get("context_contract") or {}).get("scenario_ids") or []),
+                    "binding_ids": list((task.get("context_contract") or {}).get("binding_ids") or []),
                     **normalized,
                 }
                 mentions.append(mention)
@@ -96,6 +101,7 @@ def run(context: StageContext) -> StageExecution:
             "n": len(relation_outputs),
             "label": f"t([{','.join(relation_inputs)}],[{','.join(relation_outputs)}])",
             "relation_summary": str(raw.get("relation_summary") or ""),
+            "context_contract": deepcopy(task.get("context_contract") or {}),
         }
         relations.append(relation)
         write_value(item_dir / "relation.json", relation)
@@ -109,7 +115,7 @@ def run(context: StageContext) -> StageExecution:
     files["latent-relations.json"] = relations
     files["raw-object-mentions.json"] = mentions
     return StageExecution(
-        input_payload={"p0_tasks": tasks, "scenario": scenario},
+        input_payload={"p0_tasks": tasks, "contexts": context.state["inputs"]},
         output=output,
         state_updates={
             **output,

@@ -7,6 +7,7 @@ from copy import deepcopy
 from typing import Any
 
 from .contracts import StageContext, StageExecution
+from .contexts import context_pack, scenario_text
 from .prompts import RELATION_SYSTEM_PROMPT, object_clustering_prompt
 from .storage import write_value
 
@@ -59,7 +60,7 @@ def run(context: StageContext) -> StageExecution:
     relations = deepcopy(context.state.get("latent_relations") or [])
     if not mentions or not relations:
         raise ValueError("relation extraction output is required before clustering")
-    scenario = context.state["inputs"]["scenario"]
+    scenario = scenario_text(context_pack(context.state["inputs"]))
     prompt = object_clustering_prompt(mentions, scenario)
     stage_dir = context.run_dir / "stages" / STAGE_NAME
     write_value(stage_dir / "clustering-prompt.txt", prompt)
@@ -117,6 +118,9 @@ def run(context: StageContext) -> StageExecution:
                     }
                     for item in typed_members
                 ],
+                "profile_scope": list(dict.fromkeys(value for item in typed_members for value in item.get("profile_scope") or [])),
+                "scenario_scope": list(dict.fromkeys(value for item in typed_members for value in item.get("scenario_scope") or [])),
+                "binding_ids": list(dict.fromkeys(value for item in typed_members for value in item.get("binding_ids") or [])),
             }
             normalized_clusters.append(canonical)
             assigned.update(typed_ids)
@@ -142,6 +146,9 @@ def run(context: StageContext) -> StageExecution:
             "role_statistics": {str(mention.get("role")): 1},
             "acquisition_options": list(mention.get("acquisition_options") or []),
             "provenance": [{"mention_id": mention_id, "task_id": mention.get("source_task_id"), "role": mention.get("role")}],
+            "profile_scope": list(mention.get("profile_scope") or []),
+            "scenario_scope": list(mention.get("scenario_scope") or []),
+            "binding_ids": list(mention.get("binding_ids") or []),
         }
         normalized_clusters.append(canonical)
         decisions.append({

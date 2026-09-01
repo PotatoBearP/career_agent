@@ -26,7 +26,7 @@ from object_relation_pipeline.pipeline.stage3_3_p1_task_validation import determ
 from object_relation_pipeline.pipeline.stage2_2_object_clustering import _project_semantic_role  # noqa: E402
 from object_relation_pipeline.pipeline.stage4_1_skill_generation import RUNTIME_INPUT_BOUNDARY, _p1_task_map, _replace_task_references_with_skill_names  # noqa: E402
 from object_relation_pipeline.pipeline.stage4_2_artifact_finalization import validate_runtime_metadata_boundaries  # noqa: E402
-from object_relation_pipeline.pipeline.storage import create_state  # noqa: E402
+from object_relation_pipeline.pipeline.storage import create_state, load_state  # noqa: E402
 from object_relation_pipeline import server as web_server  # noqa: E402
 
 
@@ -107,6 +107,86 @@ class ObjectRelationPipelineTests(unittest.TestCase):
             state = runner.run_interval(state, from_stage="stage4_1", to_stage="stage4_2")
             self.assertEqual(state["run_status"], "completed")
             self.assertEqual(resolve_stage("stage2_1"), "stage2_1_relation_extraction")
+
+    def test_one_profile_multiple_scenarios_produces_cross_scenario_p0(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            second_scenario = (LAB_ROOT / "data/scenarios/job_application_material_preparation.txt").read_text(encoding="utf-8")
+            state = create_state(
+                run_id="orun-test-multi-context",
+                profiles=[{"profile_id": "profile_person", "name": "person", "content": self.profile}],
+                scenarios=[
+                    {"scenario_id": "scenario_opportunities", "name": "opportunities", "content": self.scenario},
+                    {"scenario_id": "scenario_validation", "name": "validation", "content": second_scenario},
+                ],
+                model_mode="mock",
+                model_name="mock",
+                options={"p0": {"target_count": 12, "bridge_tasks_per_group": 2}, "sampling": {}},
+            )
+            result = self.runner(root).run_interval(state, from_stage="stage1_1", to_stage="stage1_6")
+            self.assertEqual(len(result["inputs"]["bindings"]), 2)
+            self.assertEqual(len(result["context_plan"]["bridge_groups"]), 1)
+            bridge_tasks = [task for task in result["p0_tasks"] if task["context_contract"]["mode"] == "cross_scenario"]
+            self.assertEqual(len(bridge_tasks), 4)
+            self.assertTrue(all(len(task["inputs"]) >= 2 and len(task["outputs"]) >= 1 for task in bridge_tasks))
+            self.assertEqual(set(result["p0_coverage"]["scenarios"]["covered"]), {"scenario_opportunities", "scenario_validation"})
+            for stage in STAGE_ORDER[:6]:
+                self.assertTrue((root / result["run_id"] / "stages" / stage / "output.json").is_file())
+
+    def test_multiple_profiles_one_scenario_and_explicit_sparse_bindings(self) -> None:
+        profiles = [
+            {"profile_id": "profile_a", "content": self.profile},
+            {"profile_id": "profile_b", "content": self.profile.replace("求职者", "转型者")},
+        ]
+        scenarios = [
+            {"scenario_id": "scenario_a", "content": self.scenario},
+            {"scenario_id": "scenario_b", "content": self.scenario.replace("机会", "方向")},
+        ]
+        auto = create_state(
+            run_id="orun-test-n-one",
+            profiles=profiles,
+            scenarios=[scenarios[0]],
+            model_mode="mock",
+            model_name="mock",
+            options={},
+        )
+        self.assertEqual(len(auto["inputs"]["bindings"]), 2)
+        sparse = create_state(
+            run_id="orun-test-sparse",
+            profiles=profiles,
+            scenarios=scenarios,
+            bindings=[
+                {"profile_id": "profile_a", "scenario_id": "scenario_a"},
+                {"profile_id": "profile_b", "scenario_id": "scenario_b"},
+            ],
+            model_mode="mock",
+            model_name="mock",
+            options={},
+        )
+        self.assertEqual(sparse["inputs"]["binding_mode"], "explicit")
+        self.assertEqual(len(sparse["inputs"]["bindings"]), 2)
+        self.assertEqual(sparse["inputs"]["bindings"][0]["profile_id"], "profile_a")
+
+    def test_legacy_single_context_run_is_migrated_for_resume(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            run_id = "orun-test-legacy"
+            run_dir = root / run_id
+            run_dir.mkdir()
+            legacy = {
+                "schema_version": "object-relation-pipeline.v1",
+                "run_id": run_id,
+                "inputs": {"profile": self.profile, "scenario": self.scenario},
+                "options": {},
+                "completed_stages": ["stage1_1_input_validation", "stage1_2_p0_task_synthesis"],
+                "p0_tasks": [{"task_id": "p0_task_001", "name": "legacy task"}],
+            }
+            (run_dir / "run.json").write_text(json.dumps(legacy, ensure_ascii=False), encoding="utf-8")
+            migrated = load_state(root, run_id)
+            self.assertEqual(migrated["schema_version"], "object-relation-pipeline.v2")
+            self.assertEqual(migrated["completed_stages"], list(STAGE_ORDER[:6]))
+            self.assertEqual(migrated["next_stage"], "stage2_1_relation_extraction")
+            self.assertEqual(migrated["p0_tasks"][0]["context_contract"]["mode"], "local")
 
     def test_sampling_is_seed_reproducible(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -299,8 +379,8 @@ class ObjectRelationPipelineTests(unittest.TestCase):
                     base_url + "/api/run",
                     data=json.dumps({
                         "mode": "mock",
-                        "profile": self.profile,
-                        "scenario": self.scenario,
+                        "profiles": [{"profile_id": "profile_http", "content": self.profile}],
+                        "scenarios": [{"scenario_id": "scenario_http", "content": self.scenario}],
                         "from_stage": "stage1_1",
                         "to_stage": "stage2_2",
                         "sampling": {
@@ -317,6 +397,7 @@ class ObjectRelationPipelineTests(unittest.TestCase):
                 )
                 result = json.loads(opener.open(request, timeout=20).read())
                 self.assertEqual(result["next_stage"], "stage3_1_relation_sampling")
+                self.assertEqual(result["inputs"]["profiles"][0]["profile_id"], "profile_http")
                 self.assertGreater(result["summary"]["canonical_objects"], 1)
             finally:
                 httpd.shutdown()

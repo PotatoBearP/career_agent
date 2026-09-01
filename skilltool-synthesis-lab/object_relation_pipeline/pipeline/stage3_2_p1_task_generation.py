@@ -5,6 +5,7 @@ from copy import deepcopy
 from typing import Any
 
 from .contracts import StageContext, StageExecution
+from .contexts import relation_context_pack, scenario_text
 from .prompts import RELATION_SYSTEM_PROMPT, p1_generation_prompt
 from .storage import write_value
 
@@ -132,6 +133,7 @@ def normalize_generated_task(
             "output_object_id": relation["output_object_id"],
             "k": relation["k"],
             "label": f"t([{','.join(relation['input_object_ids'])}],{relation['output_object_id']})",
+            "context_contract": deepcopy(relation.get("context_contract") or {}),
         },
     }
 
@@ -141,7 +143,6 @@ def run(context: StageContext) -> StageExecution:
     objects = list((context.state.get("object_set") or {}).get("canonical_objects") or [])
     if not relations or not objects:
         raise ValueError("sampled relations and Object Set are required")
-    scenario = context.state["inputs"]["scenario"]
     tool_catalog = (context.state.get("p0_base_result") or {}).get("tool_catalog") or {}
     tool_names = {str(item.get("name")) for item in tool_catalog.get("tools") or [] if isinstance(item, dict) and item.get("name")}
     candidates = []
@@ -149,6 +150,7 @@ def run(context: StageContext) -> StageExecution:
     traces = []
     files: dict[str, Any] = {}
     for relation_index, relation in enumerate(relations, start=1):
+        scenario = scenario_text(relation_context_pack(context.state, relation))
         prompt = p1_generation_prompt(relation, objects, scenario, tool_catalog)
         relation_id = relation["relation_id"]
         item_dir = context.run_dir / "stages" / STAGE_NAME / "relations" / relation_id
@@ -179,7 +181,7 @@ def run(context: StageContext) -> StageExecution:
     if not candidates:
         raise ValueError("LLM did not realize any sampled relation as a P1 task")
     return StageExecution(
-        input_payload={"sampled_relations": relations, "canonical_objects": objects, "scenario": scenario},
+        input_payload={"sampled_relations": relations, "canonical_objects": objects, "contexts": context.state["inputs"]},
         output={"p1_task_candidates": candidates, "unrealizable_relations": unrealizable},
         state_updates={
             "p1_task_candidates": candidates,

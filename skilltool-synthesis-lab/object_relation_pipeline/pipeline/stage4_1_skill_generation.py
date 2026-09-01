@@ -5,6 +5,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from .contracts import StageContext, StageExecution
+from .contexts import context_pack, context_text
 
 
 LAB_ROOT = Path(__file__).resolve().parents[2]
@@ -175,6 +176,11 @@ def run(context: StageContext) -> StageExecution:
     if not base_result:
         raise ValueError("reused P0 base result is missing")
     base_result["run_id"] = context.state["run_id"]
+    combined_context = context_text(context_pack(context.state["inputs"]))
+    base_result["inputs"] = {
+        "profile": "Multiple generation profiles are available as evidence scopes. Do not embed their personal values into runtime inputs.\n\n" + combined_context,
+        "scenario": combined_context,
+    }
     base_result["run_status"] = "in_progress"
     base_result["next_stage"] = "candidate_synthesis"
     base_result["task_map"] = _p1_task_map(context.state)

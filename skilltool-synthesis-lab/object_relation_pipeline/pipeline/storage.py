@@ -9,9 +9,25 @@ from pathlib import Path
 from typing import Any
 
 from .contracts import STAGE_ORDER, StageExecution
+from .contexts import normalize_context_inputs
 
 
 RUN_ID_PATTERN = re.compile(r"^orun-[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+P0_DEFAULTS = {
+    "target_count": 24,
+    "candidate_multiplier": 2,
+    "min_tasks_per_binding": 1,
+    "cross_scenario_ratio": 0.3,
+    "max_bindings": 16,
+    "bridge_tasks_per_group": 2,
+    "max_bridge_candidates": 32,
+    "max_bridge_groups": 8,
+    "hard_min_m": 1,
+    "hard_min_n": 1,
+    "preferred_min_m": 2,
+    "min_complexity_score": 0.65,
+    "allow_cross_profile_tasks": False,
+}
 
 
 def json_text(value: Any) -> str:
@@ -46,22 +62,36 @@ def validate_run_id(run_id: str) -> None:
 def create_state(
     *,
     run_id: str,
-    profile: str,
-    scenario: str,
+    profile: str | None = None,
+    scenario: str | None = None,
+    profiles: list[dict[str, Any] | str] | None = None,
+    scenarios: list[dict[str, Any] | str] | None = None,
+    bindings: list[dict[str, Any]] | None = None,
     model_mode: str,
     model_name: str,
     options: dict[str, Any],
 ) -> dict[str, Any]:
     validate_run_id(run_id)
+    options = dict(options or {})
+    p0_options = {**P0_DEFAULTS, **dict(options.get("p0") or {})}
+    options["p0"] = p0_options
+    normalized_inputs = normalize_context_inputs(
+        profile=profile,
+        scenario=scenario,
+        profiles=profiles,
+        scenarios=scenarios,
+        bindings=bindings,
+        max_bindings=int(p0_options["max_bindings"]),
+    )
     return {
-        "schema_version": "object-relation-pipeline.v1",
+        "schema_version": "object-relation-pipeline.v2",
         "run_id": run_id,
         "run_status": "in_progress",
         "model_mode": model_mode,
         "model_name": model_name,
         "created_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "updated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
-        "inputs": {"profile": profile, "scenario": scenario},
+        "inputs": normalized_inputs,
         "options": options,
         "stage_order": list(STAGE_ORDER),
         "completed_stages": [],
@@ -69,6 +99,8 @@ def create_state(
         "stage_results": {},
         "summary": {
             "p0_tasks": 0,
+            "p0_candidates": 0,
+            "p0_complexity_passed": 0,
             "latent_relations": 0,
             "canonical_objects": 0,
             "sampled_relations": 0,
@@ -87,7 +119,59 @@ def load_state(runs_root: Path, run_id: str) -> dict[str, Any]:
     state = json.loads(path.read_text(encoding="utf-8"))
     if state.get("run_id") != run_id:
         raise ValueError("stored run id does not match directory")
+    _migrate_legacy_state(state)
     return state
+
+
+def _migrate_legacy_state(state: dict[str, Any]) -> None:
+    """Keep pre-v2 runs inspectable and resumable without re-running paid model stages."""
+    inputs = state.get("inputs") or {}
+    if not inputs.get("profiles") or not inputs.get("scenarios") or not inputs.get("bindings"):
+        state["inputs"] = normalize_context_inputs(
+            profile=str(inputs.get("profile") or ""),
+            scenario=str(inputs.get("scenario") or ""),
+            max_bindings=int(P0_DEFAULTS["max_bindings"]),
+        )
+    state.setdefault("options", {})["p0"] = {
+        **P0_DEFAULTS,
+        **dict((state.get("options") or {}).get("p0") or {}),
+    }
+    completed = list(state.get("completed_stages") or [])
+    old_stage = "stage1_2_p0_task_synthesis"
+    if old_stage in completed:
+        binding = state["inputs"]["bindings"][0]
+        contract = {
+            "mode": "local",
+            "profile_ids": [binding["profile_id"]],
+            "scenario_ids": [binding["scenario_id"]],
+            "binding_ids": [binding["binding_id"]],
+            "scenario_contributions": [],
+            "integration_reason": "migrated single-context v1 run",
+        }
+        tasks = state.get("p0_tasks") or []
+        for task in tasks:
+            task.setdefault("context_contract", dict(contract))
+            task.setdefault("candidate_origin", "legacy_local")
+        state.setdefault("context_plan", {
+            "local_bindings": state["inputs"]["bindings"],
+            "bridge_candidates": [],
+            "bridge_groups": [],
+            "policy": {"migration": "v1_single_context"},
+        })
+        state.setdefault("p0_local_candidates", tasks)
+        state.setdefault("p0_task_candidates", tasks)
+        state.setdefault("p0_complexity_passed", tasks)
+        replacement = list(STAGE_ORDER[:6])
+        completed = replacement + [item for item in completed if item not in {"stage1_1_input_validation", old_stage}]
+        state["completed_stages"] = [item for item in STAGE_ORDER if item in completed]
+        state["migration"] = {
+            "source_schema": state.get("schema_version") or "object-relation-pipeline.v1",
+            "mode": "preserve_completed_v1_p0",
+        }
+    state["schema_version"] = "object-relation-pipeline.v2"
+    state["stage_order"] = list(STAGE_ORDER)
+    completed = list(state.get("completed_stages") or [])
+    state["next_stage"] = STAGE_ORDER[len(completed)] if len(completed) < len(STAGE_ORDER) else None
 
 
 def save_state(run_dir: Path, state: dict[str, Any]) -> None:

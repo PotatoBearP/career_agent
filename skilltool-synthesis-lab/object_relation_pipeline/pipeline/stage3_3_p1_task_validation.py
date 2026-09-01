@@ -4,6 +4,7 @@ from copy import deepcopy
 from typing import Any
 
 from .contracts import StageContext, StageExecution
+from .contexts import relation_context_pack, scenario_text
 from .prompts import RELATION_SYSTEM_PROMPT, p1_generation_prompt, p1_validation_prompt
 from .stage3_2_p1_task_generation import normalize_generated_task
 from .storage import write_value
@@ -61,7 +62,6 @@ def run(context: StageContext) -> StageExecution:
     if not candidates or not relations:
         raise ValueError("P1 candidates and sampled relations are required")
     target_count = int((context.state.get("sampling_config") or {}).get("target_count") or len(candidates))
-    scenario = context.state["inputs"]["scenario"]
     tool_catalog = (context.state.get("p0_base_result") or {}).get("tool_catalog") or {}
     tool_names = {str(item.get("name")) for item in tool_catalog.get("tools") or [] if isinstance(item, dict) and item.get("name")}
     relation_by_id = _relation_map(relations)
@@ -77,6 +77,7 @@ def run(context: StageContext) -> StageExecution:
             rejected.append({"task_id": original_candidate.get("task_id"), "reason": "unknown sampled relation"})
             continue
         candidate = deepcopy(original_candidate)
+        scenario = scenario_text(relation_context_pack(context.state, relation))
         item_dir = context.run_dir / "stages" / STAGE_NAME / "tasks" / str(candidate.get("task_id") or f"candidate_{candidate_index:03d}")
         hard_issues = deterministic_issues(candidate, relation)
         if hard_issues:
@@ -150,7 +151,7 @@ def run(context: StageContext) -> StageExecution:
         input_payload={
             "p1_task_candidates": candidates,
             "sampled_relations": relations,
-            "scenario": scenario,
+            "contexts": context.state["inputs"],
             "validation_scope_note": "P0 duplicate comparison is intentionally excluded.",
         },
         output={"p1_tasks": accepted, "validation_reports": reports, "rejected_relations": rejected},

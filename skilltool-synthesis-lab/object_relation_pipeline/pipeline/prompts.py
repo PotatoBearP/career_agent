@@ -18,8 +18,166 @@ def _json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, indent=2)
 
 
+def context_binding_prompt(contexts: dict[str, Any], bridge_candidates: list[dict[str, Any]]) -> str:
+    return f"""STAGE: MULTI_CONTEXT_BINDING_PLANNING
+
+Review possible cross-scenario bridge groups for a multi-context task pool.
+Local profile-scenario bindings are already fixed and must not be changed.
+
+Approve a bridge only when one natural user task can genuinely require business information from every listed scenario.
+Do not approve combinations that merely concatenate reports, share a broad topic, or mix facts from different people.
+Profile documents are evidence scopes, not runtime inputs. Cross-profile bridges are forbidden unless explicitly marked allowed in the input policy.
+
+BEGIN_CONTEXT_REGISTRY_JSON
+{_json(contexts)}
+END_CONTEXT_REGISTRY_JSON
+
+BEGIN_BRIDGE_CANDIDATES_JSON
+{_json(bridge_candidates)}
+END_BRIDGE_CANDIDATES_JSON
+
+Return:
+{{
+  "bridge_groups": [
+    {{
+      "bridge_group_id": "exact candidate ID",
+      "approved": true,
+      "reason": "why all scenarios can contribute to one natural task",
+      "integration_theme": "concise semantic theme"
+    }}
+  ]
+}}"""
+
+
+def cross_context_p0_prompt(
+    context: dict[str, Any],
+    bridge_group: dict[str, Any],
+    *,
+    task_count: int,
+) -> str:
+    return f"""STAGE: CROSS_CONTEXT_SYNTHESIS
+
+Generate exactly {task_count} complete, natural user tasks that genuinely bridge every scenario in the supplied group.
+
+Hard requirements:
+- Each task must require at least one distinct real information contribution from every scenario.
+- The output must integrate those contributions and must not be derivable from only one scenario.
+- Prefer non-trivial comparison, synthesis, diagnosis, decision, or planning work. Do not return retrieval, copying, formatting, report concatenation, or internal pipeline steps.
+- Design a meaningful hidden m-to-n information relation. Prefer at least two minimal semantic inputs and at least one newly derived output; never inflate m by splitting one concept into cosmetic fields.
+- Profile facts are generation evidence only. Parameterize personal facts and never make profile/scenario IDs, task IDs, relation contracts, or other pipeline metadata into business inputs.
+- Every task must be bounded enough for one reusable Skill.
+
+BEGIN_CONTEXT_PACK_JSON
+{_json(context)}
+END_CONTEXT_PACK_JSON
+
+BEGIN_BRIDGE_GROUP_JSON
+{_json(bridge_group)}
+END_BRIDGE_GROUP_JSON
+
+Return:
+{{
+  "tasks": [
+    {{
+      "name": "natural user-facing task name",
+      "business_goal": "new user-valued result",
+      "user_request_examples": ["request one", "request two"],
+      "inputs": [
+        {{"name": "snake_case", "display_name": "label", "description": "semantic information", "type": "object|array|string|number|boolean", "source": "user_input|upstream_artifact|ordinary_tool_output|prior_output", "scenario_ids": ["contributing scenario ID"]}}
+      ],
+      "outputs": [
+        {{"name": "snake_case", "display_name": "label", "description": "new information", "type": "object|array|string|number|boolean"}}
+      ],
+      "scenario_contributions": [
+        {{"scenario_id": "exact scenario ID", "required_information": ["semantic input contribution"]}}
+      ],
+      "integration_reason": "why no single scenario is sufficient"
+    }}
+  ]
+}}"""
+
+
+def p0_complexity_prompt(task: dict[str, Any], context: dict[str, Any]) -> str:
+    return f"""STAGE: COMPLEXITY_VALIDATION
+
+Audit one proposed task for a minimal, non-trivial hidden information relation t([I...],[O...]).
+
+Rules:
+- Identify minimal semantic information objects, not UI fields, metadata, workflow steps, or cosmetic fragments.
+- Input and output lists must be non-empty.
+- The output must be newly derived information, not an alias, copy, lookup, extraction-only result, or reformat of an input.
+- A task with one input may still be valid only when the transformation has substantial reasoning depth.
+- For cross-scenario tasks, verify that every declared scenario contributes indispensable information.
+- Pipeline identifiers and context IDs are control metadata and never count toward m or n.
+
+BEGIN_CANDIDATE_JSON
+{_json(task)}
+END_CANDIDATE_JSON
+
+BEGIN_TASK_CONTEXT_JSON
+{_json(context)}
+END_TASK_CONTEXT_JSON
+
+Return:
+{{
+  "task_id": "exact task ID",
+  "minimal_inputs": [{{"name": "snake_case", "description": "semantic information"}}],
+  "minimal_outputs": [{{"name": "snake_case", "description": "new information"}}],
+  "m": 2,
+  "n": 1,
+  "derivation_type": "comparison|synthesis|diagnosis|decision|planning|transformation|retrieval|formatting",
+  "complexity_scores": {{
+    "information_diversity": 0.0,
+    "transformation_depth": 0.0,
+    "output_novelty": 0.0,
+    "business_value": 0.0,
+    "boundedness": 0.0
+  }},
+  "cross_scenario_fidelity": true,
+  "passed": true,
+  "issues": [{{"code": "snake_case", "message": "specific issue"}}],
+  "repairable": false,
+  "repair_instructions": []
+}}"""
+
+
+def p0_portfolio_dedupe_prompt(candidates: list[dict[str, Any]]) -> str:
+    compact = [
+        {
+            "task_id": item.get("task_id"),
+            "name": item.get("name"),
+            "business_goal": item.get("business_goal"),
+            "inputs": [field.get("description") or field.get("name") for field in item.get("inputs") or []],
+            "outputs": [field.get("description") or field.get("name") for field in item.get("outputs") or []],
+            "context_contract": item.get("context_contract"),
+        }
+        for item in candidates
+    ]
+    return f"""STAGE: PORTFOLIO_SEMANTIC_DEDUPE
+
+Identify semantically duplicate tasks across profiles, scenarios, and bindings.
+Judge equivalence by user intent, minimal required information, derived output semantics, and decision use—not wording or IDs.
+Do not merge tasks merely because they share a scenario, object type, report form, or similar name.
+When the same reusable task appears for several profiles, retain one representative and union its context coverage.
+
+BEGIN_PORTFOLIO_JSON
+{_json(compact)}
+END_PORTFOLIO_JSON
+
+Return:
+{{
+  "groups": [
+    {{
+      "representative_task_id": "exact retained ID",
+      "member_task_ids": ["all equivalent IDs including representative"],
+      "reason": "semantic equivalence evidence"
+    }}
+  ]
+}}"""
+
+
 def relation_extraction_prompt(task: dict[str, Any], scenario: str) -> str:
-    return f"""STAGE: P0_RELATION_EXTRACTION
+    return f"""STAGE: RELATION_EXTRACTION
 
 Decompose exactly one natural user task into its latent information relation:
 t([I_0, ..., I_(m-1)], [O_0, ..., O_(n-1)]).
@@ -74,7 +232,7 @@ Input and output mentions may belong to the same canonical object when their reu
 
 Rules:
 - Cluster by meaning, not merely similar wording.
-- Mentions from the same P0 task, including two mentions on the same side of a relation, are not automatically distinct. Merge them when and only when they are genuinely interchangeable information semantics.
+- Mentions from the same task, including two mentions on the same side of a relation, are not automatically distinct. Merge them when and only when they are genuinely interchangeable information semantics.
 - Exact name or type equality is never sufficient evidence for merging; use descriptions, task provenance, and scenario meaning.
 - Do not merge objects with different business meanings just because both are lists, reports, rankings, profiles, or plans.
 - Do not merge incompatible JSON types.

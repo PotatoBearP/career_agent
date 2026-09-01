@@ -3,7 +3,7 @@
 这是一条位于 `skilltool-synthesis-lab` 内的独立实验管线：
 
 ```text
-自然语言画像 / 场景
+一组自然语言画像 × 一组场景（自动或显式绑定）
   → 初始任务池 P0
   → 每个任务的隐藏 m→n 信息关系
   → 全局 Object Set 聚类去重
@@ -20,8 +20,12 @@ P1 验证只检查关系忠实度、输入充分性、输出可推导性、场�
 
 | 阶段 | 文件 | 作用 |
 |---|---|---|
-| `stage1_1` | `pipeline/stage1_1_input_validation.py` | 复用确定性输入检查，失败即阻断 |
-| `stage1_2` | `pipeline/stage1_2_p0_task_synthesis.py` | 复用现有初始化 Prompt 和 P0 任务生成 |
+| `stage1_1` | `pipeline/stage1_1_input_validation.py` | 对每个 profile–scenario binding 复用确定性输入检查 |
+| `stage1_2` | `pipeline/stage1_2_context_binding_planning.py` | 固化局部 bindings，并由 LLM 审批同一 profile 内的跨场景桥接组 |
+| `stage1_3` | `pipeline/stage1_3_p0_local_synthesis.py` | 对每个 binding 直接复用现有初始化 P0 生成 |
+| `stage1_4` | `pipeline/stage1_4_p0_cross_context_synthesis.py` | 为获批桥接组生成必须融合各场景信息的候选任务 |
+| `stage1_5` | `pipeline/stage1_5_p0_complexity_validation.py` | 逐任务审计最小 m→n、输出新颖性和跨场景忠实度 |
+| `stage1_6` | `pipeline/stage1_6_p0_portfolio_finalization.py` | LLM 语义去重并按画像、场景和 binding 覆盖率确定 P0 |
 | `stage2_1` | `pipeline/stage2_1_relation_extraction.py` | 逐 P0 任务调用 LLM 抽取 m→n 信息关系 |
 | `stage2_2` | `pipeline/stage2_2_object_clustering.py` | LLM 语义聚类；确定性层只校验分区、补齐漏项、拆分类型并按聚类证据投影关系，不使用名称等硬编码规则判重 |
 | `stage3_1` | `pipeline/stage3_1_relation_sampling.py` | 固定 seed 的 random/constrained k→1 采样 |
@@ -63,6 +67,22 @@ py -3 run_pipeline.py `
   --sampling-mode constrained
 ```
 
+多个画像或场景可以重复传参；未提供显式绑定时会生成笛卡尔积（受 `--max-bindings` 限制）：
+
+```powershell
+py -3 run_pipeline.py `
+  --profile ../data/profiles/computer_ai_graduate.txt `
+  --profile ../data/profiles/another_profile.txt `
+  --scenario ../data/scenarios/industry_opportunity_discovery.txt `
+  --scenario ../data/scenarios/job_application_material_preparation.txt `
+  --p0-target-count 24 `
+  --cross-scenario-ratio 0.3 `
+  --max-bindings 16 `
+  --bridge-tasks-per-group 2
+```
+
+N×M 中只需要部分组合时，通过 `--context-config context.json` 提供 `profiles`、`scenarios`、`bindings` 和可选 `p0` 配置。默认禁止一个任务跨越多个 profile；跨场景桥接只会在同一 profile 的场景之间产生。
+
 ## 区间运行
 
 先运行到 Object Set：
@@ -103,6 +123,7 @@ py -3 run_stage.py --stage stage1_1 --mode mock
 
 ```powershell
 py -3 run_stage.py --run-id <run-id> --stage stage1_2
+py -3 run_stage.py --run-id <run-id> --stage stage1_3
 py -3 run_stage.py --run-id <run-id> --stage stage2_1
 ```
 
@@ -116,7 +137,9 @@ py -3 server.py
 
 打开 <http://127.0.0.1:8791>。页面支持：
 
-- 编辑画像和场景；
+- 添加、删除和编辑多个画像与多个场景，可选择预置内容；
+- 自动生成 bindings，或通过 JSON 输入显式稀疏 bindings；
+- 配置 P0 数量、跨场景比例、binding 上限和每个桥接组任务数；
 - 选择模型、起止阶段和采样参数；
 - 在 API 模式配置 `temperature`、`max_tokens` 和请求超时时间；其中任务池与 Skill 生成阶段的代码上限为 48000 tokens，实际值还受模型服务限制；
 - 查看历史运行；

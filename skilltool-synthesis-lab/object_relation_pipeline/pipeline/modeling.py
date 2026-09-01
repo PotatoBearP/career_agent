@@ -36,7 +36,15 @@ class MockRelationModel:
         self.last_trace: dict[str, Any] = {}
 
     def complete_json(self, *, system: str, user: str) -> dict[str, Any]:
-        if "STAGE: P0_RELATION_EXTRACTION" in user:
+        if "STAGE: MULTI_CONTEXT_BINDING_PLANNING" in user:
+            output = self._context_plan(user)
+        elif "STAGE: CROSS_CONTEXT_P0_SYNTHESIS" in user:
+            output = self._cross_p0(user)
+        elif "STAGE: P0_COMPLEXITY_VALIDATION" in user:
+            output = self._complexity(user)
+        elif "STAGE: P0_PORTFOLIO_SEMANTIC_DEDUPE" in user:
+            output = self._portfolio_dedupe(user)
+        elif "STAGE: P0_RELATION_EXTRACTION" in user:
             output = self._relation(user)
         elif "STAGE: OBJECT_CLUSTERING" in user:
             output = self._clusters(user)
@@ -52,6 +60,76 @@ class MockRelationModel:
             "response_content": json.dumps(output, ensure_ascii=False),
         }
         return output
+
+    def _context_plan(self, user: str) -> dict[str, Any]:
+        candidates = _block(user, "BEGIN_BRIDGE_CANDIDATES_JSON", "END_BRIDGE_CANDIDATES_JSON")
+        return {"bridge_groups": [{
+            "bridge_group_id": item["bridge_group_id"],
+            "approved": True,
+            "reason": "The scenarios contribute complementary evidence to one bounded decision.",
+            "integration_theme": "cross-scenario evidence synthesis",
+        } for item in candidates]}
+
+    def _cross_p0(self, user: str) -> dict[str, Any]:
+        group = _block(user, "BEGIN_BRIDGE_GROUP_JSON", "END_BRIDGE_GROUP_JSON")
+        match = re.search(r"Generate exactly (\d+)", user)
+        count = int(match.group(1)) if match else 2
+        scenario_ids = list(group.get("scenario_ids") or [])
+        tasks = []
+        for index in range(1, count + 1):
+            inputs = [{
+                "name": f"scenario_evidence_{scenario_index}",
+                "display_name": f"Scenario evidence {scenario_index}",
+                "description": f"Decision-relevant information contributed by scenario {scenario_index}",
+                "type": "object",
+                "source": "user_input",
+                "scenario_ids": [scenario_id],
+            } for scenario_index, scenario_id in enumerate(scenario_ids, start=1)]
+            tasks.append({
+                "name": f"Synthesize cross-scenario decision {index}",
+                "business_goal": "Integrate complementary scenario evidence into one actionable decision",
+                "user_request_examples": ["Please combine these scenario facts into a decision.", "Help me decide using both sets of evidence."],
+                "inputs": inputs,
+                "outputs": [{
+                    "name": f"integrated_decision_{index}",
+                    "display_name": "Integrated decision",
+                    "description": "A newly derived decision supported by every scenario contribution",
+                    "type": "object",
+                }],
+                "scenario_contributions": [{
+                    "scenario_id": scenario_id,
+                    "required_information": [f"scenario evidence {scenario_index}"],
+                } for scenario_index, scenario_id in enumerate(scenario_ids, start=1)],
+                "integration_reason": "No single scenario contains all evidence required for the decision.",
+            })
+        return {"tasks": tasks}
+
+    def _complexity(self, user: str) -> dict[str, Any]:
+        task = _block(user, "BEGIN_P0_CANDIDATE_JSON", "END_P0_CANDIDATE_JSON")
+        inputs = task.get("inputs") or [{"name": "required_information", "description": "required information"}]
+        outputs = task.get("outputs") or [{"name": "derived_result", "description": "derived result"}]
+        return {
+            "task_id": task.get("task_id"),
+            "minimal_inputs": [{"name": item.get("name") or f"input_{index}", "description": item.get("description") or "required information"} for index, item in enumerate(inputs, 1)],
+            "minimal_outputs": [{"name": item.get("name") or f"output_{index}", "description": item.get("description") or "derived information"} for index, item in enumerate(outputs, 1)],
+            "m": len(inputs),
+            "n": len(outputs),
+            "derivation_type": "synthesis",
+            "complexity_scores": {key: 0.82 for key in ("information_diversity", "transformation_depth", "output_novelty", "business_value", "boundedness")},
+            "cross_scenario_fidelity": True,
+            "passed": True,
+            "issues": [],
+            "repairable": False,
+            "repair_instructions": [],
+        }
+
+    def _portfolio_dedupe(self, user: str) -> dict[str, Any]:
+        candidates = _block(user, "BEGIN_P0_PORTFOLIO_JSON", "END_P0_PORTFOLIO_JSON")
+        return {"groups": [{
+            "representative_task_id": item["task_id"],
+            "member_task_ids": [item["task_id"]],
+            "reason": "No semantic duplicate in deterministic mock portfolio.",
+        } for item in candidates]}
 
     def _relation(self, user: str) -> dict[str, Any]:
         task = _block(user, "BEGIN_TASK_JSON", "END_TASK_JSON")

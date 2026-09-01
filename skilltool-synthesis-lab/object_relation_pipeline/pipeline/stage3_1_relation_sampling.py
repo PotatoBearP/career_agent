@@ -20,6 +20,50 @@ def _weighted_choice(rng: random.Random, values: list[dict[str, Any]], weights: 
     return rng.choices(values, weights=weights, k=1)[0]
 
 
+def _scope(item: dict[str, Any], key: str, fallback: set[str]) -> set[str]:
+    values = {str(value) for value in item.get(key) or []}
+    return values or set(fallback)
+
+
+def _context_contract(
+    items: list[dict[str, Any]],
+    *,
+    all_profiles: set[str],
+    all_scenarios: set[str],
+    bridge_groups: list[dict[str, Any]],
+) -> dict[str, Any] | None:
+    profile_sets = [_scope(item, "profile_scope", all_profiles) for item in items]
+    scenario_sets = [_scope(item, "scenario_scope", all_scenarios) for item in items]
+    common_profiles = set.intersection(*profile_sets)
+    if not common_profiles:
+        return None
+    common_scenarios = set.intersection(*scenario_sets)
+    binding_ids = sorted({str(value) for item in items for value in item.get("binding_ids") or []})
+    if common_scenarios:
+        selected_profile = sorted(common_profiles)[0]
+        selected_scenario = sorted(common_scenarios)[0]
+        return {
+            "mode": "local",
+            "profile_ids": [selected_profile],
+            "scenario_ids": [selected_scenario],
+            "binding_ids": binding_ids,
+            "integration_reason": "all sampled objects share a compatible context scope",
+        }
+    scenario_union = set().union(*scenario_sets)
+    for group in bridge_groups:
+        group_profiles = set(map(str, group.get("profile_ids") or []))
+        group_scenarios = set(map(str, group.get("scenario_ids") or []))
+        if common_profiles & group_profiles and scenario_union <= group_scenarios:
+            return {
+                "mode": "cross_scenario",
+                "profile_ids": sorted(common_profiles & group_profiles),
+                "scenario_ids": sorted(scenario_union),
+                "binding_ids": list(group.get("binding_ids") or binding_ids),
+                "integration_reason": str(group.get("reason") or "approved cross-scenario bridge"),
+            }
+    return None
+
+
 def run(context: StageContext) -> StageExecution:
     object_set = context.state.get("object_set") or {}
     objects = list(object_set.get("canonical_objects") or [])
@@ -47,6 +91,10 @@ def run(context: StageContext) -> StageExecution:
     input_eligible = [item for item in objects if _input_options(item)]
     if len(input_eligible) < k_min:
         raise ValueError("Object Set does not contain enough acquirable input objects")
+
+    all_profiles = {str(item["profile_id"]) for item in context.state["inputs"].get("profiles") or []}
+    all_scenarios = {str(item["scenario_id"]) for item in context.state["inputs"].get("scenarios") or []}
+    bridge_groups = list((context.state.get("context_plan") or {}).get("bridge_groups") or [])
 
     while len(sampled) < candidate_goal and attempts < max_attempts:
         attempts += 1
@@ -86,6 +134,23 @@ def run(context: StageContext) -> StageExecution:
         if signature in signatures:
             rejected.append({"attempt": attempts, "reason": "duplicate_relation_signature", "signature": signature})
             continue
+        relation_context = _context_contract(
+            [*selected_inputs, output],
+            all_profiles=all_profiles,
+            all_scenarios=all_scenarios,
+            bridge_groups=bridge_groups,
+        )
+        if mode == "constrained" and relation_context is None:
+            rejected.append({"attempt": attempts, "reason": "incompatible_context_scope", "signature": signature})
+            continue
+        if relation_context is None:
+            relation_context = {
+                "mode": "unconstrained",
+                "profile_ids": sorted(set().union(*[_scope(item, "profile_scope", all_profiles) for item in [*selected_inputs, output]])),
+                "scenario_ids": sorted(set().union(*[_scope(item, "scenario_scope", all_scenarios) for item in [*selected_inputs, output]])),
+                "binding_ids": sorted({str(value) for item in [*selected_inputs, output] for value in item.get("binding_ids") or []}),
+                "integration_reason": "random sampling mode permits cross-context hypotheses",
+            }
         signatures.add(signature)
         sampled.append({
             "relation_id": f"sample_relation_{len(sampled) + 1:03d}",
@@ -95,6 +160,7 @@ def run(context: StageContext) -> StageExecution:
             "sampling_mode": mode,
             "seed": seed,
             "relation_signature": signature,
+            "context_contract": relation_context,
             "input_acquisition_options": {
                 item["object_id"]: _input_options(item)
                 for item in selected_inputs

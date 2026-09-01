@@ -67,16 +67,33 @@ def scenario_catalog() -> list[dict[str, str]]:
     return results
 
 
+def profile_catalog() -> list[dict[str, str]]:
+    results = []
+    for path in sorted((LAB_ROOT / "data/profiles").glob("*.txt")):
+        results.append({
+            "profile_id": path.stem,
+            "name": path.stem.replace("_", " "),
+            "content": path.read_text(encoding="utf-8").strip(),
+        })
+    return results
+
+
 def bootstrap_payload() -> dict[str, Any]:
     scenarios = scenario_catalog()
+    profiles = profile_catalog()
     return {
-        "profile": (LAB_ROOT / "data/profiles/computer_ai_graduate.txt").read_text(encoding="utf-8").strip(),
+        "profile": profiles[0]["content"],
         "scenario": scenarios[0]["content"],
+        "profiles": profiles,
         "scenarios": scenarios,
         "stage_order": list(STAGE_ORDER),
         "stage_labels": {
             "stage1_1_input_validation": "1.1 输入检查",
-            "stage1_2_p0_task_synthesis": "1.2 初始任务池 P0",
+            "stage1_2_context_binding_planning": "1.2 上下文绑定规划",
+            "stage1_3_p0_local_synthesis": "1.3 局部 P0 候选生成",
+            "stage1_4_p0_cross_context_synthesis": "1.4 跨场景 P0 候选生成",
+            "stage1_5_p0_complexity_validation": "1.5 P0 m→n 复杂度审计",
+            "stage1_6_p0_portfolio_finalization": "1.6 P0 去重与组合定稿",
             "stage2_1_relation_extraction": "2.1 m→n 关系抽取",
             "stage2_2_object_clustering": "2.2 Object Set 聚类",
             "stage3_1_relation_sampling": "3.1 k→1 关系采样",
@@ -93,6 +110,13 @@ def bootstrap_payload() -> dict[str, Any]:
             "k_min": 1,
             "k_max": 3,
             "mode": "constrained",
+        },
+        "p0_defaults": {
+            "target_count": 24,
+            "cross_scenario_ratio": 0.3,
+            "max_bindings": 16,
+            "bridge_tasks_per_group": 2,
+            "min_complexity_score": 0.65,
         },
     }
 
@@ -156,17 +180,22 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError("model mode cannot change during a run")
                 if "stage3_1_relation_sampling" not in (state.get("completed_stages") or []) and isinstance(body.get("sampling"), dict):
                     state.setdefault("options", {}).setdefault("sampling", {}).update(body["sampling"])
-                    save_state(RUNS_ROOT / state["run_id"], state)
+                if "stage1_2_context_binding_planning" not in (state.get("completed_stages") or []) and isinstance(body.get("p0"), dict):
+                    state.setdefault("options", {}).setdefault("p0", {}).update(body["p0"])
+                save_state(RUNS_ROOT / state["run_id"], state)
             else:
                 base_model, relation_model, model_name = build_models(mode, config)
                 sampling = body.get("sampling") or {}
                 state = create_state(
                     run_id=new_run_id(model_name),
-                    profile=str(body.get("profile") or "").strip(),
-                    scenario=str(body.get("scenario") or "").strip(),
+                    profile=str(body.get("profile") or "").strip() or None,
+                    scenario=str(body.get("scenario") or "").strip() or None,
+                    profiles=body.get("profiles") if isinstance(body.get("profiles"), list) else None,
+                    scenarios=body.get("scenarios") if isinstance(body.get("scenarios"), list) else None,
+                    bindings=body.get("bindings") if isinstance(body.get("bindings"), list) else None,
                     model_mode=mode,
                     model_name=model_name,
-                    options={"sampling": sampling},
+                    options={"sampling": sampling, "p0": body.get("p0") or {}},
                 )
                 run_dir = RUNS_ROOT / state["run_id"]
                 run_dir.mkdir(parents=True, exist_ok=False)

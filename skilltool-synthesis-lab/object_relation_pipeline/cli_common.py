@@ -40,8 +40,14 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--run-id", help="Continue an existing run; omit to create one.")
     parser.add_argument("--mode", choices=("mock", "api"), default="mock")
     parser.add_argument("--config", type=Path, help="OpenAI-compatible model config JSON.")
-    parser.add_argument("--profile", type=Path, default=LAB_ROOT / "data/profiles/computer_ai_graduate.txt")
-    parser.add_argument("--scenario", type=Path, default=LAB_ROOT / "data/scenarios/industry_opportunity_discovery.txt")
+    parser.add_argument("--profile", type=Path, action="append", help="Profile text file; repeat for multiple profiles.")
+    parser.add_argument("--scenario", type=Path, action="append", help="Scenario text file; repeat for multiple scenarios.")
+    parser.add_argument("--context-config", type=Path, help="JSON containing profiles, scenarios, optional bindings and p0 options.")
+    parser.add_argument("--p0-target-count", type=int)
+    parser.add_argument("--cross-scenario-ratio", type=float)
+    parser.add_argument("--max-bindings", type=int)
+    parser.add_argument("--bridge-tasks-per-group", type=int)
+    parser.add_argument("--p0-min-complexity-score", type=float)
     parser.add_argument("--seed", type=int)
     parser.add_argument("--target-count", type=int)
     parser.add_argument("--candidate-multiplier", type=int)
@@ -68,11 +74,33 @@ def execute(args: argparse.Namespace, *, from_stage: str, to_stage: str) -> dict
             "k_max": args.k_max if args.k_max is not None else 3,
             "mode": args.sampling_mode or "constrained",
         }
-        options = {"sampling": sampling_options}
+        context_config = load_json(args.context_config) if args.context_config else {}
+        profile_paths = args.profile or [LAB_ROOT / "data/profiles/computer_ai_graduate.txt"]
+        scenario_paths = args.scenario or [LAB_ROOT / "data/scenarios/industry_opportunity_discovery.txt"]
+        profiles = context_config.get("profiles") or [
+            {"profile_id": f"profile_{index:03d}", "name": path.stem, "content": path.read_text(encoding="utf-8").strip()}
+            for index, path in enumerate(profile_paths, 1)
+        ]
+        scenarios = context_config.get("scenarios") or [
+            {"scenario_id": f"scenario_{index:03d}", "name": path.stem, "content": path.read_text(encoding="utf-8").strip()}
+            for index, path in enumerate(scenario_paths, 1)
+        ]
+        p0_options = {
+            **dict(context_config.get("p0") or {}),
+            **{key: value for key, value in {
+                "target_count": args.p0_target_count,
+                "cross_scenario_ratio": args.cross_scenario_ratio,
+                "max_bindings": args.max_bindings,
+                "bridge_tasks_per_group": args.bridge_tasks_per_group,
+                "min_complexity_score": args.p0_min_complexity_score,
+            }.items() if value is not None},
+        }
+        options = {"sampling": sampling_options, "p0": p0_options}
         state = create_state(
             run_id=run_id,
-            profile=args.profile.read_text(encoding="utf-8").strip(),
-            scenario=args.scenario.read_text(encoding="utf-8").strip(),
+            profiles=profiles,
+            scenarios=scenarios,
+            bindings=context_config.get("bindings"),
             model_mode=mode,
             model_name=model_name,
             options=options,
@@ -91,6 +119,17 @@ def execute(args: argparse.Namespace, *, from_stage: str, to_stage: str) -> dict
         }
         current = state.setdefault("options", {}).setdefault("sampling", {})
         current.update({key: value for key, value in overrides.items() if value is not None})
+        if "stage1_2_context_binding_planning" not in (state.get("completed_stages") or []):
+            p0_overrides = {
+                "target_count": args.p0_target_count,
+                "cross_scenario_ratio": args.cross_scenario_ratio,
+                "max_bindings": args.max_bindings,
+                "bridge_tasks_per_group": args.bridge_tasks_per_group,
+                "min_complexity_score": args.p0_min_complexity_score,
+            }
+            state.setdefault("options", {}).setdefault("p0", {}).update(
+                {key: value for key, value in p0_overrides.items() if value is not None}
+            )
         save_state(RUNS_ROOT / state["run_id"], state)
     runner = PipelineRunner(runs_root=RUNS_ROOT, base_model=base_model, relation_model=relation_model)
 

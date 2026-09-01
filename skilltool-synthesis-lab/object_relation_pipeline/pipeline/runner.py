@@ -8,7 +8,11 @@ from .contracts import STAGE_ORDER, StageContext, StageExecution
 from .storage import persist_failure, persist_stage, save_state, write_value
 from . import (
     stage1_1_input_validation,
-    stage1_2_p0_task_synthesis,
+    stage1_2_context_binding_planning,
+    stage1_3_p0_local_synthesis,
+    stage1_4_p0_cross_context_synthesis,
+    stage1_5_p0_complexity_validation,
+    stage1_6_p0_portfolio_finalization,
     stage2_1_relation_extraction,
     stage2_2_object_clustering,
     stage3_1_relation_sampling,
@@ -21,7 +25,11 @@ from . import (
 
 STAGE_RUNNERS: dict[str, Callable[[StageContext], StageExecution]] = {
     "stage1_1_input_validation": stage1_1_input_validation.run,
-    "stage1_2_p0_task_synthesis": stage1_2_p0_task_synthesis.run,
+    "stage1_2_context_binding_planning": stage1_2_context_binding_planning.run,
+    "stage1_3_p0_local_synthesis": stage1_3_p0_local_synthesis.run,
+    "stage1_4_p0_cross_context_synthesis": stage1_4_p0_cross_context_synthesis.run,
+    "stage1_5_p0_complexity_validation": stage1_5_p0_complexity_validation.run,
+    "stage1_6_p0_portfolio_finalization": stage1_6_p0_portfolio_finalization.run,
     "stage2_1_relation_extraction": stage2_1_relation_extraction.run,
     "stage2_2_object_clustering": stage2_2_object_clustering.run,
     "stage3_1_relation_sampling": stage3_1_relation_sampling.run,

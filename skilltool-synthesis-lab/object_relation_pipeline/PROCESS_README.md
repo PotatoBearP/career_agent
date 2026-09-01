@@ -18,6 +18,8 @@ Object 是一个可复用的信息语义契约，不是具体值，也不是动�
 }
 ```
 
+对象还保存 `profile_scope`、`scenario_scope` 和 `binding_ids`。受约束采样要求所有 k 个输入与输出共享兼容作用域；若场景没有直接交集，则只能使用 Stage 1.2 已审批的同 profile 跨场景桥接组。随机模式允许把不兼容组合保留为待 LLM 判断的假设。
+
 `stage2_1` 中每个 P0 任务产生：
 
 ```text
@@ -37,6 +39,10 @@ t([I_0, ..., I_(k-1)], O)
 `pipeline/prompts.py` 是中间关系阶段 Prompt 的唯一来源：
 
 - `relation_extraction_prompt`：区分任务前必需信息、任务后新增信息和内部步骤。
+- `context_binding_prompt`：只审批能形成单一自然任务的跨场景桥接组，禁止跨 profile 混合个人事实。
+- `cross_context_p0_prompt`：要求每个场景贡献不可缺少的真实业务信息，避免简单拼接。
+- `p0_complexity_prompt`：重新识别最小 m、n，并评估变换深度、输出新颖性、业务价值和边界性。
+- `p0_portfolio_dedupe_prompt`：按意图、最小输入和输出语义做跨上下文去重，不使用名称硬编码。
 - `object_clustering_prompt`：按信息语义聚类，不按 I/O 角色或同一关系内的位置隔离；名称和类型相同不能单独作为合并依据。确定性层只投影 LLM 已确认的语义簇，并在 `relation-semantic-projections.json` 保存同一关系内的合并证据。
 - `p1_generation_prompt`：只能使用采样的 k 个输入并产生唯一输出；关系不成立时允许返回不可实现。
 - `p1_validation_prompt`：明确禁止比较 P0，只评审关系本身和场景合理性。
